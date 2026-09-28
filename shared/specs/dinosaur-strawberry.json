@@ -1,25 +1,17 @@
 {
-  "schemaVersion": "0.1",
+  "schemaVersion": "0.2",
   "gameType": "collect",
   "orientation": "landscape",
   "title": "火山恐龙大冒险",
-  "player": {
-    "character": "yellow-dinosaur",
-    "movement": "follow-finger",
-    "speed": 300
-  },
-  "background": {
-    "asset": "volcano"
-  },
-  "collectibles": [
-    {
-      "asset": "strawberry",
-      "score": 10,
-      "count": 20
-    }
+  "player": { "character": "yellow-dinosaur", "movement": "follow-finger", "speed": 300 },
+  "background": { "asset": "volcano" },
+  "objects": [
+    { "type": "collectible", "asset": "strawberry", "score": 10, "count": 15, "effect": "grow" },
+    { "type": "obstacle", "asset": "rock", "count": 4 },
+    { "type": "hazard", "asset": "lava", "area": { "x": 0, "y": 600, "width": 1280, "height": 120 } },
+    { "type": "enemy", "asset": "t-rex", "speed": 150, "count": 1 }
   ],
-  "win": {
-    "type": "score",
-    "value": 100
-  }
+  "hitPolicy": "lose-score",
+  "hitScore": 5,
+  "win": { "type": "score", "value": 100 }
 }

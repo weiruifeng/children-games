@@ -1,25 +1,14 @@
 {
-  "schemaVersion": "0.1",
+  "schemaVersion": "0.2",
   "gameType": "collect",
   "orientation": "landscape",
   "title": "小猫捡星星",
-  "player": {
-    "character": "cat",
-    "movement": "follow-finger",
-    "speed": 350
-  },
-  "background": {
-    "asset": "space"
-  },
-  "collectibles": [
-    {
-      "asset": "star",
-      "score": 5,
-      "count": 30
-    }
+  "player": { "character": "cat", "movement": "follow-finger", "speed": 350 },
+  "background": { "asset": "space" },
+  "objects": [
+    { "type": "collectible", "asset": "star", "score": 5, "count": 30 },
+    { "type": "obstacle", "asset": "rock", "count": 6 }
   ],
-  "win": {
-    "type": "score",
-    "value": 100
-  }
+  "hitPolicy": "bounce",
+  "win": { "type": "score", "value": 100 }
 }

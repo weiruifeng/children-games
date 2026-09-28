@@ -1,25 +1,14 @@
 {
-  "schemaVersion": "0.1",
+  "schemaVersion": "0.2",
   "gameType": "collect",
   "orientation": "landscape",
   "title": "小兔子拔胡萝卜",
-  "player": {
-    "character": "rabbit",
-    "movement": "follow-finger",
-    "speed": 280
-  },
-  "background": {
-    "asset": "meadow"
-  },
-  "collectibles": [
-    {
-      "asset": "carrot",
-      "score": 10,
-      "count": 15
-    }
+  "player": { "character": "rabbit", "movement": "follow-finger", "speed": 280 },
+  "background": { "asset": "meadow" },
+  "objects": [
+    { "type": "collectible", "asset": "carrot", "score": 10, "count": 15, "effect": "grow" },
+    { "type": "enemy", "asset": "wolf", "speed": 160, "count": 1 }
   ],
-  "win": {
-    "type": "score",
-    "value": 100
-  }
+  "hitPolicy": "lose-life",
+  "win": { "type": "score", "value": 100 }
 }
