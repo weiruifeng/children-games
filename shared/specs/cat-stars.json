@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "0.1",
+  "gameType": "collect",
+  "orientation": "landscape",
+  "title": "小猫捡星星",
+  "player": {
+    "character": "cat",
+    "movement": "follow-finger",
+    "speed": 350
+  },
+  "background": {
+    "asset": "space"
+  },
+  "collectibles": [
+    {
+      "asset": "star",
+      "score": 5,
+      "count": 30
+    }
+  ],
+  "win": {
+    "type": "score",
+    "value": 100
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "0.1",
+  "gameType": "collect",
+  "orientation": "landscape",
+  "title": "小兔子拔胡萝卜",
+  "player": {
+    "character": "rabbit",
+    "movement": "follow-finger",
+    "speed": 280
+  },
+  "background": {
+    "asset": "meadow"
+  },
+  "collectibles": [
+    {
+      "asset": "carrot",
+      "score": 10,
+      "count": 15
+    }
+  ],
+  "win": {
+    "type": "score",
+    "value": 100
+  }
+}

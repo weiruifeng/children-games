@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "0.1",
+  "gameType": "collect",
+  "orientation": "landscape",
+  "title": "火山恐龙大冒险",
+  "player": {
+    "character": "yellow-dinosaur",
+    "movement": "follow-finger",
+    "speed": 300
+  },
+  "background": {
+    "asset": "volcano"
+  },
+  "collectibles": [
+    {
+      "asset": "strawberry",
+      "score": 10,
+      "count": 20
+    }
+  ],
+  "win": {
+    "type": "score",
+    "value": 100
+  }
+}
