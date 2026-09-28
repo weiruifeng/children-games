@@ -14,6 +14,7 @@ describe('validateGameSpec', () => {
       win: { type: 'score', value: 100 },
     });
     expect(spec.gameType).toBe('collect');
+    if (spec.gameType !== 'collect') throw new Error('unreachable');
     expect(spec.player.speed).toBe(300); // 默认值生效
   });
 
