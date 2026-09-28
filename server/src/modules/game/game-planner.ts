@@ -1,4 +1,4 @@
-import { validateGameSpec, type CollectSpec } from '@children-games/shared';
+import { validateGameSpec, type CollectSpec } from '../../../../shared/src/index';
 import type { LlmService, ChatMessage } from '../llm/llm.service';
 import { SYSTEM_PROMPT, buildUserPrompt, buildRetryPrompt } from './game-planner.prompt';
 
@@ -33,7 +33,14 @@ export class GamePlanner {
     ];
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-      const content = await this.llm.chat(messages);
+      let content: string;
+      try {
+        content = await this.llm.chat(messages);
+      } catch {
+        // LLM 调用本身失败（网络/鉴权），直接回退默认游戏
+        this.logger.warn(`GamePlanner 生成失败（LLM 调用异常），回退默认游戏。idea=${idea}`);
+        return DEFAULT_SPEC;
+      }
       const parsed = this.parseJson(content);
       if (parsed) {
         const spec = this.toCollect(parsed);

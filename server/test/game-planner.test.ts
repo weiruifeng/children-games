@@ -60,4 +60,14 @@ describe('GamePlanner', () => {
     expect(logger.warn).toHaveBeenCalled();
     expect(llm.chat).toHaveBeenCalledTimes(3);
   });
+
+  it('LLM 调用本身抛异常时回退默认游戏（不 500）', async () => {
+    const llm = { chat: vi.fn().mockRejectedValue(new Error('401 unauthorized')) };
+    const logger = { warn: vi.fn() };
+    const planner = new GamePlanner(llm as any, logger as any);
+    const spec = await planner.generate('我要恐龙');
+    expect(spec.gameType).toBe('collect');
+    expect(spec.title).toBe('恐龙吃草莓');
+    expect(logger.warn).toHaveBeenCalled();
+  });
 });
