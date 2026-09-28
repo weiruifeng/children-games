@@ -1,7 +1,13 @@
 import { GAMES } from '../game/specs';
 import { getAsset } from '../game/runtime/assets/proceduralAssets';
 
-export default function Home({ onPlay }: { onPlay: (id: string) => void }) {
+export default function Home({
+  onPlay,
+  onCreate,
+}: {
+  onPlay: (id: string) => void;
+  onCreate: () => void;
+}) {
   return (
     <div className="home">
       <h1>🎮 我的游戏</h1>
@@ -12,6 +18,10 @@ export default function Home({ onPlay }: { onPlay: (id: string) => void }) {
             <span className="game-title">{g.spec.title}</span>
           </button>
         ))}
+        <button className="game-card create-card" onClick={onCreate}>
+          <span className="game-emoji">✨</span>
+          <span className="game-title">创造新游戏</span>
+        </button>
       </div>
     </div>
   );
