@@ -1,0 +1,12 @@
+- generic [ref=e3]:
+  - heading "🎮 我的游戏" [level=1] [ref=e4]
+  - generic [ref=e5]:
+    - button "🦖 火山恐龙大冒险" [ref=e6] [cursor=pointer]:
+      - generic [ref=e7]: 🦖
+      - generic [ref=e8]: 火山恐龙大冒险
+    - button "🐱 小猫捡星星" [ref=e9] [cursor=pointer]:
+      - generic [ref=e10]: 🐱
+      - generic [ref=e11]: 小猫捡星星
+    - button "🐰 小兔子拔胡萝卜" [ref=e12] [cursor=pointer]:
+      - generic [ref=e13]: 🐰
+      - generic [ref=e14]: 小兔子拔胡萝卜
