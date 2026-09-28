@@ -21,6 +21,7 @@
 | L6 | 模型 | 参考 ai-tools `llm.config.ts`，用 `deepseek-v4-pro`（或 flash）单模型 |
 | L7 | 前端交互 | 首页＋创造入口 → 输入页 → 生成中 loading → 进游戏页 → 失败无感给默认 |
 | L8 | 配置安全 | API key 走 `.env`，不硬编码进仓库 |
+| L9 | gameType 约束 | 第一刀 Prompt 约束 LLM 只生成 `collect` 类型（躲陨石/跳障碍也映射成 collect + enemy/obstacle 机制），保证永远能跑起来；Dodge/Jump 真做成模板是第二刀 |
 
 ## 2. 参考 ai-tools 的取舍
 
@@ -122,6 +123,6 @@ server/src/
 ## 7. 成功标准
 
 - 输入「我要一只黄恐龙在火山吃草莓」，能生成合法 CollectSpec 并跑起来。
-- 输入「我要躲陨石」「我要跳障碍」，Planner 能生成含 enemy/obstacle 的 spec（当前 Runtime 只支持 collect 类型，Dodge/Jump 第二刀）。
+- 输入「我要躲陨石」「我要跳障碍」，Planner 生成 collect + enemy/obstacle 机制的 spec（第一刀约束只出 collect，Dodge/Jump 模板第二刀）。
 - 输入乱码/无关内容，后端不崩溃，回退默认游戏。
 - 手动验证：从输入到可玩，全程无报错、有 loading 过渡。
