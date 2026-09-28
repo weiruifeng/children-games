@@ -10,7 +10,7 @@ export type HitState = {
   gameOver: boolean;
 };
 
-export type HitResult = { position: Vec2; state: HitState };
+export type HitResult = { position: Vec2; state: HitState; dropped: CollectedItem | null };
 
 export type Bounds = { minX: number; minY: number; maxX: number; maxY: number };
 
@@ -37,6 +37,7 @@ export function resolveHit(
 ): HitResult {
   const position = knockback(player, source, knockbackDist, bounds);
   const next: HitState = { ...state, collected: [...state.collected] };
+  let dropped: CollectedItem | null = null;
 
   switch (policy) {
     case 'bounce':
@@ -49,11 +50,14 @@ export function resolveHit(
       if (next.lives === 0) next.gameOver = true;
       break;
     case 'drop-item': {
-      const dropped = next.collected.pop();
-      if (dropped) next.score = Math.max(0, next.score - dropped.score);
+      const d = next.collected.pop();
+      if (d) {
+        next.score = Math.max(0, next.score - d.score);
+        dropped = d;
+      }
       break;
     }
   }
 
-  return { position, state: next };
+  return { position, state: next, dropped };
 }

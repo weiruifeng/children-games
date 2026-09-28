@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { CollectSpec, GameObject } from '@children-games/shared';
+import type { CollectSpec, GameObject, HitPolicy } from '@children-games/shared';
 import { getAsset } from '../assets/proceduralAssets';
 import { movePlayerClamped } from '../movement';
 import { resolveHit, type HitState, type CollectedItem } from '../hit';
@@ -149,8 +149,10 @@ export class CollectScene extends Phaser.Scene {
     this.moveEnemies(delta);
     this.handleInvulnerableFlicker();
     this.checkCollectibles();
+    if (this.won || this.gameOver) return; // 刚胜利/失败则本帧不再判定碰撞
     this.checkHazards();
     this.checkEnemies();
+    this.checkObstacles();
   }
 
   private movePlayer(delta: number): void {
@@ -190,8 +192,12 @@ export class CollectScene extends Phaser.Scene {
         const def = item.getData('def') as CollectibleDef;
         this.score += def.score;
         this.collected.push({ asset: def.asset, score: def.score });
-        if (def.effect === 'grow') this.playerScale = nextGrowScale(this.playerScale, WORLD.growCap);
-        this.player.setScale(this.playerScale);
+        if (def.effect === 'grow') {
+          this.playerScale = nextGrowScale(this.playerScale, WORLD.growCap);
+          this.player.setScale(this.playerScale);
+        } else if (def.effect === 'fly') {
+          this.applyFly();
+        }
         this.scoreText.setText(this.scoreLabel());
         item.destroy();
         if (this.score >= this.spec.win.value) { this.victory(); return; }
@@ -224,14 +230,29 @@ export class CollectScene extends Phaser.Scene {
     }
   }
 
+  // 障碍物：碰到沿「玩家←障碍」方向弹开（不触发 hitPolicy，也不进无敌）
+  private checkObstacles(): void {
+    const obstacles = [...this.children.list].filter(
+      (c) => (c as Phaser.GameObjects.Text).getData?.('kind') === 'obstacle',
+    ) as Phaser.GameObjects.Text[];
+    for (const o of obstacles) {
+      if (!o.active) continue;
+      if (Math.hypot(o.x - this.player.x, o.y - this.player.y) < WORLD.playerSize) {
+        this.applyHit({ x: o.x, y: o.y }, 'bounce');
+        return;
+      }
+    }
+  }
+
   private isInvulnerable(): boolean {
     return this.now() < this.invulnerableUntil;
   }
 
-  private applyHit(source: { x: number; y: number }): void {
+  private applyHit(source: { x: number; y: number }, policyOverride?: HitPolicy): void {
+    const policy = policyOverride ?? this.spec.hitPolicy ?? 'lose-score';
     const state: HitState = { score: this.score, lives: this.lives, collected: this.collected, gameOver: false };
     const r = resolveHit(
-      { x: this.player.x, y: this.player.y }, source, this.spec.hitPolicy ?? 'lose-score', state,
+      { x: this.player.x, y: this.player.y }, source, policy, state,
       WORLD.knockback,
       { minX: WORLD.playerSize / 2, minY: WORLD.playerSize / 2, maxX: WIDTH - WORLD.playerSize / 2, maxY: HEIGHT - WORLD.playerSize / 2 },
       this.spec.hitScore ?? 5,
@@ -240,19 +261,44 @@ export class CollectScene extends Phaser.Scene {
     this.lives = r.state.lives;
     this.collected = r.state.collected;
     this.player.setPosition(r.position.x, r.position.y);
-    this.invulnerableUntil = this.now() + WORLD.invulnerableMs;
+    // 掉落的物品回到随机位置（spec 2.2）
+    if (r.dropped) {
+      this.spawnCollectibleAt(
+        { asset: r.dropped.asset, score: r.dropped.score },
+        { x: this.player.x, y: this.player.y },
+      );
+    }
+    // 障碍弹开不进无敌（只有 hazard/enemy 触发 hitPolicy 时才有无敌）
+    if (!policyOverride) this.invulnerableUntil = this.now() + WORLD.invulnerableMs;
     this.scoreText.setText(this.scoreLabel());
-    if (this.spec.hitPolicy === 'lose-life' && this.livesText) this.livesText.setText(this.livesLabel());
+    if (policy === 'lose-life' && this.livesText) this.livesText.setText(this.livesLabel());
     if (r.state.gameOver) this.gameOverScreen();
   }
 
   private respawnOne(def: CollectibleDef): void {
+    this.spawnCollectibleAt(def, { x: this.player.x, y: this.player.y });
+  }
+
+  // 在 player 附近随机生成一个 collectible，保留 effect
+  private spawnCollectibleAt(def: CollectibleDef, avoid: { x: number; y: number }): void {
     const placed = layoutObjects(
-      [{ type: 'collectible', asset: def.asset, score: def.score, count: 1 }],
-      { width: WIDTH, height: HEIGHT }, WORLD.margin,
-      { x: this.player.x, y: this.player.y }, WORLD.minDist,
+      [{ type: 'collectible', asset: def.asset, score: def.score, count: 1, effect: def.effect }],
+      { width: WIDTH, height: HEIGHT }, WORLD.margin, avoid, WORLD.minDist,
     );
     this.addObject(placed[0].object, placed[0].point);
+  }
+
+  // fly 特效：玩家 tween 一个向上抛物线再落下
+  private applyFly(): void {
+    const y0 = this.player.y;
+    this.tweens.add({
+      targets: this.player,
+      y: { from: y0, to: y0 - 160 },
+      duration: 240,
+      ease: 'Quad.easeOut',
+      yoyo: true,
+      repeat: 0,
+    });
   }
 
   private scoreLabel(): string {

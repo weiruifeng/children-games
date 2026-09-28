@@ -40,11 +40,18 @@ describe('resolveHit', () => {
     );
     expect(r.state.collected).toHaveLength(2); // 掉一个
     expect(r.state.score).toBe(10);            // 15 - 5 = 10
+    expect(r.dropped).toEqual({ asset: 'star', score: 5 }); // 返回被掉的物品，供场景重生
   });
 
   it('drop-item：collected 为空时不掉、不 crash、分数不变', () => {
     const r = resolveHit({ x: 100, y: 100 }, { x: 50, y: 100 }, 'drop-item', state({ collected: [], score: 15 }), 60, bounds, 5);
     expect(r.state.collected).toHaveLength(0);
     expect(r.state.score).toBe(15);
+    expect(r.dropped).toBeNull();
+  });
+
+  it('bounce：不掉物品', () => {
+    const r = resolveHit({ x: 100, y: 100 }, { x: 50, y: 100 }, 'bounce', state(), 60, bounds, 5);
+    expect(r.dropped).toBeNull();
   });
 });
