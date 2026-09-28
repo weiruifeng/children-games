@@ -4,6 +4,7 @@
 //   LLM_BASE_URL - OpenAI 兼容端点 baseUrl
 //   LLM_API_KEY  - API key
 //   LLM_MODEL    - 模型名，默认 deepseek-v4-pro
+import 'dotenv/config';
 
 export const LLM_ENDPOINT = {
   baseUrl: process.env.LLM_BASE_URL ?? '',

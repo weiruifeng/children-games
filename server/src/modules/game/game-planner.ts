@@ -41,17 +41,14 @@ export class GamePlanner {
         this.logger.warn(`GamePlanner 生成失败（LLM 调用异常），回退默认游戏。idea=${idea}`);
         return DEFAULT_SPEC;
       }
-      const parsed = this.parseJson(content);
-      if (parsed) {
-        const spec = this.toCollect(parsed);
-        if (spec) return spec;
-      }
-      // 回喂错误，重试
+      const outcome = this.tryParse(content);
+      if (outcome.spec) return outcome.spec;
+      // 回喂具体错误，重试
       messages = [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: buildUserPrompt(idea) },
         { role: 'assistant', content },
-        { role: 'user', content: buildRetryPrompt('生成的 JSON 非法或不是 collect 类型') },
+        { role: 'user', content: buildRetryPrompt(outcome.error ?? '生成的 JSON 非法或不是 collect 类型') },
       ];
     }
 
@@ -59,26 +56,27 @@ export class GamePlanner {
     return DEFAULT_SPEC;
   }
 
-  // 剥离 markdown 代码块包裹，再 JSON.parse；失败返回 null
-  private parseJson(content: string): unknown | null {
+  // 解析并校验，返回 { spec } 或 { error }
+  private tryParse(content: string): { spec: CollectSpec | null; error?: string } {
     let text = content.trim();
-    const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    // 大小写不敏感的 markdown 代码块包裹
+    const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
     if (fence) text = fence[1].trim();
+    let parsed: unknown;
     try {
-      return JSON.parse(text);
+      parsed = JSON.parse(text);
     } catch {
-      return null;
+      return { spec: null, error: '输出不是合法 JSON' };
     }
-  }
-
-  // 校验并收紧到 collect；非法返回 null
-  private toCollect(parsed: unknown): CollectSpec | null {
     try {
       const spec = validateGameSpec(parsed);
-      if (spec.gameType !== 'collect') return null;
-      return spec;
-    } catch {
-      return null;
+      if (spec.gameType !== 'collect') {
+        return { spec: null, error: `gameType 必须是 collect，实际是 ${spec.gameType}` };
+      }
+      return { spec };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return { spec: null, error: msg };
     }
   }
 }
