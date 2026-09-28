@@ -1,26 +1,26 @@
 import { randomPositions, type Vec2 } from '../math';
+import type { GameObject } from '@children-games/shared';
 
-export type CollectibleDef = { asset: string; score: number; count: number };
+export type PlacedObject = { object: GameObject; point: Vec2 };
 
-export type PlacedCollectible = { def: CollectibleDef; point: Vec2 };
-
-// 为多类型收集物生成互不重叠的摆放点。
-// 关键：所有类型共享同一个已放置列表作为 avoid，跨类型也不重叠（修复单类型各自生成导致的重叠）。
-export function layoutCollectibles(
-  defs: CollectibleDef[],
+// 为所有「有 count 的随机对象」（collectible/obstacle/enemy）生成互不重叠的摆放点。
+// hazard 有绝对坐标 area，不在此处理。
+export function layoutObjects(
+  objects: GameObject[],
   bounds: { width: number; height: number },
   margin: number,
   start: Vec2,
   minDist: number,
   rng: () => number = Math.random,
-): PlacedCollectible[] {
+): PlacedObject[] {
   const placed: Vec2[] = [start];
-  const result: PlacedCollectible[] = [];
-  for (const def of defs) {
-    const points = randomPositions(def.count, bounds, margin, placed, minDist, rng);
+  const result: PlacedObject[] = [];
+  for (const object of objects) {
+    if (object.type === 'hazard') continue; // hazard 由场景用 area 渲染
+    const points = randomPositions(object.count, bounds, margin, placed, minDist, rng);
     for (const point of points) {
       placed.push(point);
-      result.push({ def, point });
+      result.push({ object, point });
     }
   }
   return result;

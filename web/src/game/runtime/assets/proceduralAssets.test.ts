@@ -16,4 +16,11 @@ describe('getAsset', () => {
     expect(a.kind).toBe('emoji');
     expect(a.emoji).toBe('❓');
   });
+
+  it('注册新素材', () => {
+    expect(getAsset('rock').emoji).toBe('🪨');
+    expect(getAsset('t-rex').emoji).toBe('🦖');
+    expect(getAsset('wolf').emoji).toBe('🐺');
+    expect(getAsset('lava').kind).toBe('color');
+  });
 });
