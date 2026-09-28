@@ -88,8 +88,9 @@ export class CollectScene extends Phaser.Scene {
   private addObject(object: GameObject, point: { x: number; y: number }): void {
     const a = getAsset(object.asset);
     if (object.type === 'enemy') {
+      // 敌人比玩家大一圈，呼应「超级大的霸王龙」，一眼区分敌我
       const sprite = this.add
-        .text(point.x, point.y, a.emoji ?? '?', { fontSize: `${WORLD.playerSize}px` })
+        .text(point.x, point.y, a.emoji ?? '?', { fontSize: `${WORLD.playerSize * 1.5}px` })
         .setOrigin(0.5)
         .setDepth(3);
       this.enemies.push({ sprite, speed: object.speed });

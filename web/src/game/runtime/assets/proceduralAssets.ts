@@ -17,7 +17,7 @@ const REGISTRY: Record<string, AssetSpec> = {
   rabbit: { kind: 'emoji', emoji: '🐰' },
   rock: { kind: 'emoji', emoji: '🪨' },
   lava: { kind: 'color', color: 0xff4500, tint: 0xcc3700 },
-  't-rex': { kind: 'emoji', emoji: '🦖' },
+  't-rex': { kind: 'emoji', emoji: '🦕' },
   wolf: { kind: 'emoji', emoji: '🐺' },
   volcano: { kind: 'color', color: 0xb3541e, tint: 0x7a2e0e },
   meadow: { kind: 'color', color: 0x7ec850, tint: 0x4a9e2f },
