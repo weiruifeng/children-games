@@ -1,23 +1,20 @@
 import Phaser from 'phaser';
 import type { CollectSpec } from '@children-games/shared';
 import { getAsset } from '../assets/proceduralAssets';
-import { clamp, moveToward, randomPositions, type Vec2 } from '../../math';
+import { movePlayerClamped } from '../movement';
+import { layoutCollectibles, type CollectibleDef } from '../layout';
+import { WORLD } from '../world';
 
 export const COLLECT_SCENE_KEY = 'CollectScene';
 
-const WIDTH = 1280;
-const HEIGHT = 720;
-const MARGIN = 60;      // 收集物/玩家安全边距
-const PLAYER_SIZE = 48; // 角色与收集物的世界尺寸
-const MIN_DIST = 60;    // 生成点最小间距
-
-type CollectibleDef = { asset: string; score: number; count: number };
+const WIDTH = WORLD.width;
+const HEIGHT = WORLD.height;
 
 export class CollectScene extends Phaser.Scene {
   private spec!: CollectSpec;
   private player!: Phaser.GameObjects.Text;
   private scoreText!: Phaser.GameObjects.Text;
-  private target: Vec2 | null = null;
+  private target: { x: number; y: number } | null = null;
   private score = 0;
   private won = false;
 
@@ -38,11 +35,11 @@ export class CollectScene extends Phaser.Scene {
     // 玩家
     const p = getAsset(this.spec.player.character);
     this.player = this.add
-      .text(WIDTH / 2, HEIGHT / 2, p.emoji ?? '?', { fontSize: `${PLAYER_SIZE}px` })
+      .text(WIDTH / 2, HEIGHT / 2, p.emoji ?? '?', { fontSize: `${WORLD.playerSize}px` })
       .setOrigin(0.5)
       .setDepth(2);
 
-    // 收集物（纯随机摆放，避开玩家起点）
+    // 收集物（多类型共享摆放、互不重叠，避开玩家起点）
     this.spawnCollectibles();
 
     // HUD 分数
@@ -70,22 +67,27 @@ export class CollectScene extends Phaser.Scene {
   }
 
   private spawnCollectibles(): void {
-    const start: Vec2 = { x: WIDTH / 2, y: HEIGHT / 2 };
-    for (const def of this.spec.collectibles) {
-      const points = randomPositions(def.count, { width: WIDTH, height: HEIGHT }, MARGIN, [start], MIN_DIST);
-      for (const pt of points) {
-        this.addCollectible(def, pt);
-      }
+    const start = { x: WIDTH / 2, y: HEIGHT / 2 };
+    const placed = layoutCollectibles(
+      this.spec.collectibles,
+      { width: WIDTH, height: HEIGHT },
+      WORLD.margin,
+      start,
+      WORLD.minDist,
+    );
+    for (const { def, point } of placed) {
+      this.addCollectible(def, point);
     }
   }
 
-  private addCollectible(def: CollectibleDef, pt: Vec2): void {
+  private addCollectible(def: CollectibleDef, point: { x: number; y: number }): void {
     const a = getAsset(def.asset);
     this.add
-      .text(pt.x, pt.y, a.emoji ?? '?', { fontSize: `${PLAYER_SIZE}px` })
+      .text(point.x, point.y, a.emoji ?? '?', { fontSize: `${WORLD.playerSize}px` })
       .setOrigin(0.5)
       .setDepth(1)
       .setData('score', def.score)
+      .setData('asset', def.asset)
       .setData('kind', 'collectible');
   }
 
@@ -98,32 +100,36 @@ export class CollectScene extends Phaser.Scene {
     if (this.won) return;
     const speed = this.spec.player.speed ?? 300;
     if (this.target) {
-      const next = moveToward(
+      const r = movePlayerClamped(
         { x: this.player.x, y: this.player.y },
         this.target,
         speed,
         delta / 1000,
+        {
+          minX: WORLD.playerSize / 2,
+          minY: WORLD.playerSize / 2,
+          maxX: WIDTH - WORLD.playerSize / 2,
+          maxY: HEIGHT - WORLD.playerSize / 2,
+        },
       );
-      this.player.setPosition(
-        clamp(next.x, PLAYER_SIZE / 2, WIDTH - PLAYER_SIZE / 2),
-        clamp(next.y, PLAYER_SIZE / 2, HEIGHT - PLAYER_SIZE / 2),
-      );
-      // 到达目标附近即停下
-      if (Math.hypot(this.target.x - this.player.x, this.target.y - this.player.y) < 4) {
-        this.target = null;
-      }
+      this.player.setPosition(r.x, r.y);
+      if (r.arrived) this.target = null;
     }
     this.checkCollect();
   }
 
   private checkCollect(): void {
-    const children = this.children.list;
-    for (const child of children) {
-      const item = child as Phaser.GameObjects.Text;
-      if (item.getData('kind') !== 'collectible' || !item.active) continue;
+    // 快照后再销毁：避免遍历中改 children.list 导致相邻项被跳过
+    const items = [...this.children.list].filter(
+      (c) => (c as Phaser.GameObjects.Text).getData?.('kind') === 'collectible',
+    ) as Phaser.GameObjects.Text[];
+
+    for (const item of items) {
+      if (!item.active) continue;
       const dist = Math.hypot(item.x - this.player.x, item.y - this.player.y);
-      if (dist < PLAYER_SIZE) {
+      if (dist < WORLD.playerSize) {
         const score = item.getData('score') as number;
+        const asset = item.getData('asset') as string;
         this.score += score;
         this.scoreText.setText(this.scoreLabel());
         item.destroy();
@@ -131,16 +137,22 @@ export class CollectScene extends Phaser.Scene {
           this.victory();
           return;
         }
-        this.respawnOne();
+        this.respawnOne(asset);
       }
     }
   }
 
-  // 捡到后随机重生一个，保证场上永远有东西可捡（只赢不输）
-  private respawnOne(): void {
-    const def = this.spec.collectibles[0];
-    const points = randomPositions(1, { width: WIDTH, height: HEIGHT }, MARGIN, [{ x: this.player.x, y: this.player.y }], MIN_DIST);
-    this.addCollectible(def, points[0]);
+  // 捡到后随机重生一个同类，保证场上永远有东西可捡（只赢不输）
+  private respawnOne(asset: string): void {
+    const def = this.spec.collectibles.find((d) => d.asset === asset) ?? this.spec.collectibles[0];
+    const placed = layoutCollectibles(
+      [def],
+      { width: WIDTH, height: HEIGHT },
+      WORLD.margin,
+      { x: this.player.x, y: this.player.y },
+      WORLD.minDist,
+    );
+    this.addCollectible(def, placed[0].point);
   }
 
   private scoreLabel(): string {
