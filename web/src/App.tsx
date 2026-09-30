@@ -2,27 +2,44 @@ import { useState } from 'react';
 import type { CollectSpec } from '@children-games/shared';
 import Home from './pages/Home';
 import Game from './pages/Game';
-import Create from './pages/Create';
+import Converse from './pages/Converse';
 import { GAMES } from './game/specs';
 
 type Route =
   | { name: 'home' }
   | { name: 'create' }
-  | { name: 'game'; spec: CollectSpec };
+  | { name: 'modify'; sessionId: string }
+  | { name: 'game'; spec: CollectSpec; sessionId?: string };
 
 export default function App() {
   const [route, setRoute] = useState<Route>({ name: 'home' });
 
   if (route.name === 'create') {
     return (
-      <Create
+      <Converse
         onBack={() => setRoute({ name: 'home' })}
-        onCreated={(spec) => setRoute({ name: 'game', spec })}
+        onSpec={(spec, sessionId) => setRoute({ name: 'game', spec, sessionId })}
+      />
+    );
+  }
+  if (route.name === 'modify') {
+    return (
+      <Converse
+        sessionId={route.sessionId}
+        onBack={() => setRoute({ name: 'home' })}
+        onSpec={(spec, sessionId) => setRoute({ name: 'game', spec, sessionId })}
       />
     );
   }
   if (route.name === 'game') {
-    return <Game spec={route.spec} onBack={() => setRoute({ name: 'home' })} />;
+    return (
+      <Game
+        spec={route.spec}
+        sessionId={route.sessionId}
+        onBack={() => setRoute({ name: 'home' })}
+        onModify={(sessionId) => setRoute({ name: 'modify', sessionId })}
+      />
+    );
   }
   return (
     <Home
