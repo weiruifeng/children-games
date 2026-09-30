@@ -45,6 +45,23 @@ describe('ConversationPlanner', () => {
     await p.converse(state({ spec: DEFAULT_SPEC }), '让恐龙会飞');
     const call = (llm.chat as any).mock.calls[0][0];
     expect(JSON.stringify(call)).toContain('当前游戏');
+    expect(JSON.stringify(call)).toContain('恐龙');
+    expect(JSON.stringify(call)).toContain('火山');
+  });
+
+  it('空 question 被拒绝 → 回退默认游戏', async () => {
+    const llm = makeLlm([JSON.stringify({ type: 'question', question: '', options: ['a'] })]);
+    const p = new ConversationPlanner(llm as any);
+    const r = await p.converse(state(), '我要恐龙');
+    expect(r.type).toBe('spec'); // 空 question 非法 → 走 fallback，无旧 spec 回默认
+    if (r.type === 'spec') expect(r.spec.title).toBe('恐龙吃草莓');
+  });
+
+  it('全空字符串 options 被拒绝 → 回退默认游戏', async () => {
+    const llm = makeLlm([JSON.stringify({ type: 'question', question: '去哪', options: [''] })]);
+    const p = new ConversationPlanner(llm as any);
+    const r = await p.converse(state(), '我要恐龙');
+    expect(r.type).toBe('spec');
   });
 
   it('questionCount>=2：prompt 强制 spec', async () => {

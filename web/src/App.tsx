@@ -8,7 +8,7 @@ import { GAMES } from './game/specs';
 type Route =
   | { name: 'home' }
   | { name: 'create' }
-  | { name: 'modify'; sessionId: string }
+  | { name: 'modify'; sessionId: string; spec: CollectSpec }
   | { name: 'game'; spec: CollectSpec; sessionId?: string };
 
 export default function App() {
@@ -26,7 +26,8 @@ export default function App() {
     return (
       <Converse
         sessionId={route.sessionId}
-        onBack={() => setRoute({ name: 'home' })}
+        mode="modify"
+        onBack={() => setRoute({ name: 'game', spec: route.spec, sessionId: route.sessionId })}
         onSpec={(spec, sessionId) => setRoute({ name: 'game', spec, sessionId })}
       />
     );
@@ -37,7 +38,7 @@ export default function App() {
         spec={route.spec}
         sessionId={route.sessionId}
         onBack={() => setRoute({ name: 'home' })}
-        onModify={(sessionId) => setRoute({ name: 'modify', sessionId })}
+        onModify={(sessionId) => setRoute({ name: 'modify', sessionId, spec: route.spec })}
       />
     );
   }

@@ -102,8 +102,9 @@ export class ConversationPlanner {
     if (p.type === 'question') {
       const question = p.question;
       const options = p.options;
-      if (typeof question !== 'string' || !Array.isArray(options) || options.length === 0) return null;
-      const strs = options.filter((o): o is string => typeof o === 'string');
+      if (typeof question !== 'string' || question.trim() === '') return null;
+      if (!Array.isArray(options) || options.length === 0) return null;
+      const strs = options.filter((o): o is string => typeof o === 'string' && o.trim() !== '');
       if (strs.length === 0) return null;
       return { type: 'question', question, options: strs };
     }

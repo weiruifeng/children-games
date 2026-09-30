@@ -4,10 +4,12 @@ import { converse } from '../service/game-api';
 
 export default function Converse({
   sessionId: initialSessionId,
+  mode = 'create',
   onSpec,
   onBack,
 }: {
   sessionId?: string;
+  mode?: 'create' | 'modify';
   onSpec: (spec: CollectSpec, sessionId: string) => void;
   onBack: () => void;
 }) {
@@ -54,7 +56,13 @@ export default function Converse({
 
   return (
     <div className="create-page">
-      <h1>{question ? question : '想玩什么游戏？说给魔法师听'}</h1>
+      <h1>
+        {question
+          ? question
+          : mode === 'modify'
+            ? '想把游戏改成什么样？说给魔法师听'
+            : '想玩什么游戏？说给魔法师听'}
+      </h1>
       {question && (
         <div className="option-grid">
           {options.map((o) => (
@@ -68,7 +76,7 @@ export default function Converse({
         className="idea-input"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder={question ? '或者自己说' : '比如：一只黄恐龙在火山吃草莓'}
+        placeholder={question ? '或者自己说' : mode === 'modify' ? '比如：让恐龙会飞' : '比如：一只黄恐龙在火山吃草莓'}
         onKeyDown={(e) => {
           if (e.key === 'Enter') submit();
         }}
