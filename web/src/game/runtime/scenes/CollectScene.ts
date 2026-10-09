@@ -1,12 +1,13 @@
 import Phaser from 'phaser';
 import type { CollectSpec, GameObject, HitPolicy } from '@children-games/shared';
 import { getAsset } from '../assets/proceduralAssets';
-import { movePlayerClamped } from '../movement';
+import { followSpeed, movePlayerClamped } from '../movement';
 import { resolveHit, type HitState, type CollectedItem } from '../hit';
 import { enemyStep } from '../enemy';
-import { nextGrowScale } from '../effects';
+import { nextGrowScale, scaledDimensions } from '../effects';
 import { layoutObjects } from '../layout';
 import { WORLD } from '../world';
+import { UI_ASSETS } from '../../../ui/UiIcon';
 
 export const COLLECT_SCENE_KEY = 'CollectScene';
 
@@ -14,14 +15,40 @@ const WIDTH = WORLD.width;
 const HEIGHT = WORLD.height;
 
 type CollectibleDef = { asset: string; score: number; effect?: 'grow' | 'fly' };
+type VisualObject = Phaser.GameObjects.Text | Phaser.GameObjects.Image;
+type Illustration = { key: string; width: number; height: number };
+
+// Asset ids are shared by specs, so illustrations are scoped to the theme's
+// background id instead of one global asset-id map.
+const THEME_ILLUSTRATIONS: Record<string, Record<string, Illustration>> = {
+  volcano: {
+    volcano: { key: 'dino-background-valley', width: WIDTH, height: HEIGHT },
+    'yellow-dinosaur': { key: 'dino-hero', width: 96, height: 96 },
+    strawberry: { key: 'dino-strawberry', width: 72, height: 72 },
+    't-rex': { key: 'dino-trex', width: 144, height: 144 },
+    rock: { key: 'dino-safety-boulder', width: 110, height: 100 },
+  },
+  space: {
+    space: { key: 'cat-background-nebula', width: WIDTH, height: HEIGHT },
+    cat: { key: 'cat-player-kitten', width: 104, height: 108 },
+    star: { key: 'cat-collectible-star', width: 78, height: 78 },
+    rock: { key: 'cat-obstacle-boulder', width: 110, height: 100 },
+  },
+  meadow: {
+    meadow: { key: 'rabbit-background-meadow', width: WIDTH, height: HEIGHT },
+    rabbit: { key: 'rabbit-player-bunny', width: 108, height: 112 },
+    carrot: { key: 'rabbit-collectible-carrot', width: 78, height: 78 },
+    wolf: { key: 'rabbit-enemy-wolf', width: 150, height: 110 },
+  },
+};
 
 export class CollectScene extends Phaser.Scene {
   private spec!: CollectSpec;
-  private player!: Phaser.GameObjects.Text;
+  private player!: VisualObject;
   private scoreText!: Phaser.GameObjects.Text;
   private livesText!: Phaser.GameObjects.Text;
   private target: { x: number; y: number } | null = null;
-  private enemies: { sprite: Phaser.GameObjects.Text; speed: number }[] = [];
+  private enemies: { sprite: VisualObject; speed: number }[] = [];
   private score = 0;
   private lives: number = WORLD.initialLives;
   private collected: CollectedItem[] = [];
@@ -29,6 +56,8 @@ export class CollectScene extends Phaser.Scene {
   private gameOver = false;
   private invulnerableUntil = 0;
   private playerScale = 1;
+  private activePointerId: number | null = null;
+  private playerBaseSize: { width: number; height: number } = { width: WORLD.playerSize, height: WORLD.playerSize };
 
   constructor() {
     super({ key: COLLECT_SCENE_KEY });
@@ -43,8 +72,34 @@ export class CollectScene extends Phaser.Scene {
     this.gameOver = false;
     this.invulnerableUntil = 0;
     this.playerScale = 1;
+    this.playerBaseSize = { width: WORLD.playerSize, height: WORLD.playerSize };
     this.target = null;
+    this.activePointerId = null;
     this.enemies = [];
+  }
+
+  preload(): void {
+    this.load.image('dino-background-valley', '/assets/dinosaur-strawberry/background-valley.png');
+    this.load.image('dino-hero', '/assets/dinosaur-strawberry/hero-yellow-dinosaur.png');
+    this.load.image('dino-strawberry', '/assets/dinosaur-strawberry/collectible-strawberry.png');
+    this.load.image('dino-trex', '/assets/dinosaur-strawberry/enemy-purple-trex.png');
+    this.load.image('dino-safety-boulder', '/assets/dinosaur-strawberry/obstacle-safety-boulder.png');
+    this.load.image('cat-background-nebula', '/assets/cat-stars/background-nebula.png');
+    this.load.image('cat-player-kitten', '/assets/cat-stars/player-kitten.png');
+    this.load.image('cat-collectible-star', '/assets/cat-stars/collectible-star.png');
+    this.load.image('cat-obstacle-boulder', '/assets/cat-stars/obstacle-space-boulder.png');
+    this.load.image('rabbit-background-meadow', '/assets/rabbit-carrot/background-meadow.png');
+    this.load.image('rabbit-player-bunny', '/assets/rabbit-carrot/player-bunny.png');
+    this.load.image('rabbit-collectible-carrot', '/assets/rabbit-carrot/collectible-carrot.png');
+    this.load.image('rabbit-enemy-wolf', '/assets/rabbit-carrot/enemy-wolf.png');
+    this.load.image('ui-score-panel', UI_ASSETS.scorePanel);
+    this.load.image('ui-life-badge', UI_ASSETS.lifeBadge);
+    this.load.image('ui-life-heart', UI_ASSETS.lifeHeart);
+    this.load.image('ui-victory-panel', UI_ASSETS.victoryPanel);
+    this.load.image('ui-victory-sparkles', UI_ASSETS.victorySparkles);
+    this.load.image('ui-victory-medal', UI_ASSETS.victoryMedal);
+    this.load.image('ui-restart-button', UI_ASSETS.restartButton);
+    this.load.image('ui-restart-icon', UI_ASSETS.restart);
   }
 
   create(): void {
@@ -56,6 +111,13 @@ export class CollectScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
+    const illustrated = this.illustratedAsset(this.spec.background.asset);
+    if (illustrated) {
+      this.add.image(WIDTH / 2, HEIGHT / 2, illustrated.key)
+        .setDisplaySize(illustrated.width, illustrated.height)
+        .setDepth(-2);
+      return;
+    }
     const bg = getAsset(this.spec.background.asset);
     this.cameras.main.setBackgroundColor(bg.color ?? 0x000000);
     if (bg.tint != null) {
@@ -64,11 +126,8 @@ export class CollectScene extends Phaser.Scene {
   }
 
   private spawnPlayer(): void {
-    const p = getAsset(this.spec.player.character);
-    this.player = this.add
-      .text(WIDTH / 2, HEIGHT / 2, p.emoji ?? '?', { fontSize: `${WORLD.playerSize}px` })
-      .setOrigin(0.5)
-      .setDepth(2);
+    this.player = this.createVisual(this.spec.player.character, WIDTH / 2, HEIGHT / 2, 2);
+    this.playerBaseSize = { width: this.player.displayWidth, height: this.player.displayHeight };
   }
 
   private spawnObjects(): void {
@@ -86,13 +145,8 @@ export class CollectScene extends Phaser.Scene {
   }
 
   private addObject(object: GameObject, point: { x: number; y: number }): void {
-    const a = getAsset(object.asset);
     if (object.type === 'enemy') {
-      // 敌人比玩家大一圈，呼应「超级大的霸王龙」，一眼区分敌我
-      const sprite = this.add
-        .text(point.x, point.y, a.emoji ?? '?', { fontSize: `${WORLD.playerSize * 1.5}px` })
-        .setOrigin(0.5)
-        .setDepth(3);
+      const sprite = this.createVisual(object.asset, point.x, point.y, 3);
       this.enemies.push({ sprite, speed: object.speed });
       return;
     }
@@ -100,13 +154,27 @@ export class CollectScene extends Phaser.Scene {
     const def = object.type === 'collectible'
       ? { asset: object.asset, score: object.score, effect: object.effect }
       : null;
-    this.add
-      .text(point.x, point.y, a.emoji ?? '?', { fontSize: `${WORLD.playerSize}px` })
-      .setOrigin(0.5)
-      .setDepth(1)
+    this.createVisual(object.asset, point.x, point.y, 1)
       .setData('kind', kind)
       .setData('asset', object.asset)
       .setData('def', def);
+  }
+
+  private createVisual(assetId: string, x: number, y: number, depth: number): VisualObject {
+    const illustrated = this.illustratedAsset(assetId);
+    if (illustrated) {
+      return this.add.image(x, y, illustrated.key)
+        .setDisplaySize(illustrated.width, illustrated.height)
+        .setDepth(depth);
+    }
+    const asset = getAsset(assetId);
+    return this.add.text(x, y, asset.emoji ?? '?', { fontSize: `${WORLD.playerSize}px` })
+      .setOrigin(0.5)
+      .setDepth(depth);
+  }
+
+  private illustratedAsset(assetId: string): Illustration | undefined {
+    return THEME_ILLUSTRATIONS[this.spec.background.asset]?.[assetId];
   }
 
   private addHazard(object: { area: { x: number; y: number; width: number; height: number }; asset: string }): void {
@@ -120,23 +188,36 @@ export class CollectScene extends Phaser.Scene {
   }
 
   private createHud(): void {
+    this.add.image(32, 24, 'ui-score-panel').setOrigin(0, 0).setDisplaySize(300, 100).setDepth(9);
     this.scoreText = this.add
-      .text(32, 32, this.scoreLabel(), { fontSize: '48px', fontStyle: 'bold', color: '#ffffff' })
-      .setOrigin(0, 0).setDepth(10).setStroke('#000000', 6);
+      .text(82, 48, this.scoreLabel(), { fontSize: '42px', fontStyle: 'bold', color: '#ffffff' })
+      .setOrigin(0, 0).setDepth(10).setStroke('#1a4f91', 5);
     if (this.spec.hitPolicy === 'lose-life') {
+      this.add.image(32, 132, 'ui-life-badge').setOrigin(0, 0).setDisplaySize(240, 92).setDepth(9);
+      this.add.image(56, 150, 'ui-life-heart').setOrigin(0, 0).setDisplaySize(52, 52).setDepth(10);
       this.livesText = this.add
-        .text(32, 100, this.livesLabel(), { fontSize: '40px', color: '#ff6b6b' })
-        .setOrigin(0, 0).setDepth(10).setStroke('#000000', 4);
+        .text(116, 157, this.livesLabel(), { fontSize: '36px', fontStyle: 'bold', color: '#ffffff' })
+        .setOrigin(0, 0).setDepth(10).setStroke('#a7283f', 4);
     }
   }
 
   private bindInput(): void {
-    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.setTarget(p));
-    this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
-      if (p.isDown) this.setTarget(p);
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      this.activePointerId = p.id;
+      this.setTarget(p);
     });
-    this.input.on('pointerup', () => { this.target = null; });
-    this.input.on('pointerupoutside', () => { this.target = null; });
+    this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
+      if (p.id === this.activePointerId) this.setTarget(p);
+    });
+    this.input.on('pointerup', (p: Phaser.Input.Pointer) => this.releasePointer(p));
+    this.input.on('pointerupoutside', (p: Phaser.Input.Pointer) => this.releasePointer(p));
+    this.input.on('pointercancel', (p: Phaser.Input.Pointer) => this.releasePointer(p, true));
+  }
+
+  private releasePointer(p: Phaser.Input.Pointer, cancelled = false): void {
+    if (p.id !== this.activePointerId) return;
+    this.activePointerId = null;
+    if (cancelled) this.target = null;
   }
 
   private setTarget(p: Phaser.Input.Pointer): void {
@@ -157,11 +238,13 @@ export class CollectScene extends Phaser.Scene {
   }
 
   private movePlayer(delta: number): void {
-    const speed = this.spec.player.speed ?? 300;
     if (this.target) {
+      const baseSpeed = this.spec.player.speed ?? 300;
+      const distanceToTarget = Math.hypot(this.target.x - this.player.x, this.target.y - this.player.y);
+      const playerRadius = Math.max(this.player.displayWidth, this.player.displayHeight) / 2;
       const r = movePlayerClamped(
-        { x: this.player.x, y: this.player.y }, this.target, speed, delta / 1000,
-        { minX: WORLD.playerSize / 2, minY: WORLD.playerSize / 2, maxX: WIDTH - WORLD.playerSize / 2, maxY: HEIGHT - WORLD.playerSize / 2 },
+        { x: this.player.x, y: this.player.y }, this.target, followSpeed(baseSpeed, distanceToTarget), delta / 1000,
+        { minX: playerRadius, minY: playerRadius, maxX: WIDTH - playerRadius, maxY: HEIGHT - playerRadius },
       );
       this.player.setPosition(r.x, r.y);
       if (r.arrived) this.target = null;
@@ -186,7 +269,7 @@ export class CollectScene extends Phaser.Scene {
   private checkCollectibles(): void {
     const items = [...this.children.list].filter(
       (c) => (c as Phaser.GameObjects.Text).getData?.('kind') === 'collectible',
-    ) as Phaser.GameObjects.Text[];
+    ) as VisualObject[];
     for (const item of items) {
       if (!item.active) continue;
       if (Math.hypot(item.x - this.player.x, item.y - this.player.y) < WORLD.playerSize) {
@@ -195,7 +278,8 @@ export class CollectScene extends Phaser.Scene {
         this.collected.push({ asset: def.asset, score: def.score });
         if (def.effect === 'grow') {
           this.playerScale = nextGrowScale(this.playerScale, WORLD.growCap);
-          this.player.setScale(this.playerScale);
+          const size = scaledDimensions(this.playerBaseSize.width, this.playerBaseSize.height, this.playerScale);
+          this.player.setDisplaySize(size.width, size.height);
         } else if (def.effect === 'fly') {
           this.applyFly();
         }
@@ -235,7 +319,7 @@ export class CollectScene extends Phaser.Scene {
   private checkObstacles(): void {
     const obstacles = [...this.children.list].filter(
       (c) => (c as Phaser.GameObjects.Text).getData?.('kind') === 'obstacle',
-    ) as Phaser.GameObjects.Text[];
+    ) as VisualObject[];
     for (const o of obstacles) {
       if (!o.active) continue;
       if (Math.hypot(o.x - this.player.x, o.y - this.player.y) < WORLD.playerSize) {
@@ -307,7 +391,7 @@ export class CollectScene extends Phaser.Scene {
   }
 
   private livesLabel(): string {
-    return `❤️ × ${this.lives}`;
+    return `× ${this.lives}`;
   }
 
   private now(): number {
@@ -317,22 +401,40 @@ export class CollectScene extends Phaser.Scene {
   private victory(): void {
     this.won = true;
     this.target = null;
-    this.tweens.add({ targets: this.player, scale: { from: this.playerScale, to: this.playerScale + 0.4 }, duration: 300, yoyo: true, repeat: 2 });
-    this.add.text(WIDTH / 2, HEIGHT / 2 - 80, '🎉 你赢啦！', { fontSize: '96px', fontStyle: 'bold', color: '#ffd54a' }).setOrigin(0.5).setDepth(20).setStroke('#000000', 8);
-    this.addRestartButton();
+    this.tweens.add({
+      targets: this.player,
+      scaleX: { from: this.player.scaleX, to: this.player.scaleX * 1.25 },
+      scaleY: { from: this.player.scaleY, to: this.player.scaleY * 1.25 },
+      duration: 300,
+      yoyo: true,
+      repeat: 2,
+    });
+    this.showEndScreen('你赢啦！', 'ui-victory-medal');
   }
 
   private gameOverScreen(): void {
     this.gameOver = true;
     this.target = null;
-    this.add.text(WIDTH / 2, HEIGHT / 2 - 80, '😢 再试一次！', { fontSize: '96px', fontStyle: 'bold', color: '#ffd54a' }).setOrigin(0.5).setDepth(20).setStroke('#000000', 8);
+    this.showEndScreen('再试一次！', 'ui-restart-icon');
+  }
+
+  private showEndScreen(title: string, iconKey: string): void {
+    this.add.rectangle(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, 0x10213e, 0.45).setDepth(19);
+    this.add.image(WIDTH / 2, HEIGHT / 2, 'ui-victory-panel').setDisplaySize(560, 590).setDepth(20);
+    this.add.image(WIDTH / 2 - 255, HEIGHT / 2 - 255, 'ui-victory-sparkles').setDisplaySize(175, 118).setDepth(21);
+    this.add.image(WIDTH / 2 + 255, HEIGHT / 2 + 250, 'ui-victory-sparkles').setDisplaySize(175, 118).setFlipX(true).setDepth(21);
+    this.add.image(WIDTH / 2, HEIGHT / 2 - 125, iconKey).setDisplaySize(120, 120).setDepth(22);
+    this.add.text(WIDTH / 2, HEIGHT / 2 + 5, title, { fontSize: '68px', fontStyle: 'bold', color: '#e78222' })
+      .setOrigin(0.5).setDepth(22).setStroke('#ffffff', 5);
     this.addRestartButton();
   }
 
   private addRestartButton(): void {
-    const btn = this.add
-      .text(WIDTH / 2, HEIGHT / 2 + 80, '🔄 再玩一次', { fontSize: '56px', color: '#ffffff' })
-      .setOrigin(0.5).setDepth(20).setStroke('#000000', 6).setPadding(20).setInteractive({ useHandCursor: true });
+    const btn = this.add.image(WIDTH / 2, HEIGHT / 2 + 145, 'ui-restart-button')
+      .setDisplaySize(350, 116).setDepth(22).setInteractive({ useHandCursor: true });
+    this.add.image(WIDTH / 2 - 108, HEIGHT / 2 + 145, 'ui-restart-icon').setDisplaySize(48, 48).setDepth(23);
+    this.add.text(WIDTH / 2 + 24, HEIGHT / 2 + 145, '再玩一次', { fontSize: '42px', fontStyle: 'bold', color: '#7a4a00' })
+      .setOrigin(0.5).setDepth(23);
     btn.on('pointerdown', () => this.scene.restart());
   }
 }

@@ -37,6 +37,11 @@ export class ConversationPlanner {
   ) {}
 
   async converse(state: SessionState, input: string): Promise<ConverseResult> {
+    const content = await this.request(state, input);
+    return this.resolve(state, content);
+  }
+
+  async request(state: SessionState, input: string): Promise<string | null> {
     const forceSpec = state.questionCount >= MAX_QUESTIONS;
     const summary = state.spec ? summarizeSpec(state.spec) : undefined;
 
@@ -46,12 +51,16 @@ export class ConversationPlanner {
       { role: 'user', content: buildConverseUserPrompt(input, summary, forceSpec) },
     ];
 
-    let content: string;
     try {
-      content = await this.llm.chat(messages);
+      return await this.llm.chat(messages);
     } catch {
-      return this.fallback(state);
+      return null;
     }
+  }
+
+  resolve(state: SessionState, content: string | null): ConverseResult {
+    const forceSpec = state.questionCount >= MAX_QUESTIONS;
+    if (content === null) return this.fallback(state);
 
     const parsed = this.parseJson(content);
     const result = parsed ? this.validate(parsed) : null;

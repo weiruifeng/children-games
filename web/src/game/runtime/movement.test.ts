@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { movePlayerClamped } from './movement';
+import { followSpeed, movePlayerClamped } from './movement';
 
 const bounds = { minX: 24, minY: 24, maxX: 1256, maxY: 696 };
 
@@ -26,5 +26,13 @@ describe('movePlayerClamped', () => {
     const r = movePlayerClamped({ x: 0, y: 0 }, { x: -100, y: 0 }, 100, 1, bounds);
     expect(r.x).toBe(24); // clamp 到 minX
     expect(r.arrived).toBe(true);
+  });
+});
+
+describe('followSpeed', () => {
+  it('远离目标时加速，贴近目标时减速，并保持合理上下限', () => {
+    expect(followSpeed(300, 20)).toBe(120);
+    expect(followSpeed(300, 300)).toBe(600);
+    expect(followSpeed(300, 2000)).toBe(1200);
   });
 });

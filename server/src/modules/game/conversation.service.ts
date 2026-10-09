@@ -3,6 +3,10 @@ import { randomUUID } from 'node:crypto';
 import { LlmService } from '../llm/llm.service';
 import { ConversationPlanner, type SessionState } from './conversation-planner';
 
+export type ConversationStreamEvent =
+  | { type: 'stage'; stage: 'received' | 'generating' | 'validating' }
+  | { type: 'result'; sessionId: string; result: Awaited<ReturnType<ConversationPlanner['converse']>> };
+
 @Injectable()
 export class ConversationService {
   private readonly planner: ConversationPlanner;
@@ -14,10 +18,21 @@ export class ConversationService {
   }
 
   async converse(sessionId: string | undefined, input: string) {
+    for await (const event of this.converseStream(sessionId, input)) {
+      if (event.type === 'result') return { sessionId: event.sessionId, result: event.result };
+    }
+    throw new Error('对话流未返回结果');
+  }
+
+  async *converseStream(sessionId: string | undefined, input: string): AsyncGenerator<ConversationStreamEvent> {
     const id = sessionId && this.sessions.has(sessionId) ? sessionId : randomUUID();
     const state = this.sessions.get(id) ?? { spec: null, history: [], questionCount: 0 };
 
-    const result = await this.planner.converse(state, input);
+    yield { type: 'stage', stage: 'received' };
+    yield { type: 'stage', stage: 'generating' };
+    const content = await this.planner.request(state, input);
+    yield { type: 'stage', stage: 'validating' };
+    const result = this.planner.resolve(state, content);
 
     // 更新 session
     state.history.push({ role: 'user', content: input });
@@ -31,6 +46,6 @@ export class ConversationService {
     }
     this.sessions.set(id, state);
 
-    return { sessionId: id, result };
+    yield { type: 'result', sessionId: id, result };
   }
 }

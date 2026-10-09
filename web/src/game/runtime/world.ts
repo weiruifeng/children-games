@@ -8,5 +8,5 @@ export const WORLD = {
   knockback: 80,      // 被碰到后的弹开距离
   initialLives: 3,    // lose-life 的初始命数
   invulnerableMs: 2000, // 无敌时长
-  growCap: 1.6,       // grow 特效的 scale 上限
+  growCap: 1.3,       // grow 特效最多比初始尺寸大 30%
 } as const;
