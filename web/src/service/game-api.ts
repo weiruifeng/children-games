@@ -9,6 +9,17 @@ export type ConverseStreamEvent =
   | { type: 'result'; sessionId: string; result: ConverseResult }
   | { type: 'error'; message: string };
 
+export type SavedGame = {
+  gameId: string;
+  title: string;
+  currentVersionId: string;
+  versionNumber: number;
+  spec: CollectSpec;
+  createdAt: string;
+  updatedAt: string;
+};
+export type GameVersionSummary = { versionId: string; versionNumber: number; origin: string; createdAt: string };
+
 export async function converse(
   sessionId: string | undefined,
   input: string,
@@ -49,4 +60,34 @@ export async function converseStream(
     }
     if (done) break;
   }
+}
+
+async function studioRequest<T>(path: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`/api/studio/games${path}`, options);
+  if (!response.ok) throw new Error(`作品库暂时不可用: ${response.status}`);
+  return response.json() as Promise<T>;
+}
+
+export async function listSavedGames(): Promise<SavedGame[]> {
+  return studioRequest<SavedGame[]>('');
+}
+
+export async function createSavedGame(spec: CollectSpec): Promise<SavedGame> {
+  return studioRequest<SavedGame>('', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ spec }),
+  });
+}
+
+export async function saveGameVersion(gameId: string, spec: CollectSpec): Promise<SavedGame> {
+  return studioRequest<SavedGame>(`/${gameId}`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ spec }),
+  });
+}
+
+export async function listGameVersions(gameId: string): Promise<GameVersionSummary[]> {
+  return studioRequest<GameVersionSummary[]>(`/${gameId}/versions`);
+}
+
+export async function restoreGameVersion(gameId: string, versionId: string): Promise<SavedGame> {
+  return studioRequest<SavedGame>(`/${gameId}/versions/${versionId}/restore`, { method: 'POST' });
 }

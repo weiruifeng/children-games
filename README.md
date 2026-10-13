@@ -16,6 +16,7 @@
 
 1. 安装依赖：`npm install`
 2. 复制 `server/.env.example` 为 `server/.env`，填入 OpenAI 兼容 LLM 的地址和密钥。
+   本地 MySQL 配置和固定的开发帐号也在该模板中；初始化说明见[本地 MySQL](docs/local-mysql.md)。
 3. 启动前后端：`npm run dev`
 4. 打开 `http://localhost:5173`
 

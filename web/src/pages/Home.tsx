@@ -1,5 +1,6 @@
 import { GAMES } from '../game/specs';
 import { UiIcon } from '../ui/UiIcon';
+import type { SavedGame } from '../service/game-api';
 
 const GAME_ART: Record<string, { image: string; kicker: string; color: string }> = {
   dinosaur: {
@@ -22,9 +23,13 @@ const GAME_ART: Record<string, { image: string; kicker: string; color: string }>
 export default function Home({
   onPlay,
   onCreate,
+  savedGames,
+  onPlaySaved,
 }: {
   onPlay: (id: string) => void;
   onCreate: () => void;
+  savedGames: SavedGame[];
+  onPlaySaved: (game: SavedGame) => void;
 }) {
   return (
     <div className="home">
@@ -40,6 +45,18 @@ export default function Home({
           <h1 className="home-heading">挑一个世界，<em>出发！</em></h1>
           <p>每一场冒险都藏着好多惊喜和宝贝。</p>
         </section>
+        {savedGames.length > 0 && (
+          <section className="saved-games" aria-label="我的作品">
+            <div className="saved-games-heading"><span>我的作品</span><small>保存过的冒险</small></div>
+            <div className="saved-games-list">
+              {savedGames.map((game) => (
+                <button key={game.gameId} className="saved-game" onClick={() => onPlaySaved(game)}>
+                  <span>✦</span><strong>{game.title}</strong><small>第 {game.versionNumber} 版 · 再玩一次</small>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
         <section className="game-grid" aria-label="游戏列表">
           {GAMES.map((g, index) => {
             const art = GAME_ART[g.id];
