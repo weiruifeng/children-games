@@ -1,0 +1,311 @@
+{
+  "version": 1,
+  "status": "preview",
+  "source": "original deterministic procedural synthesis",
+  "music": {
+    "bgm_home": {
+      "url": "/assets/pinyin-garden/music/bgm_home.wav",
+      "duration": 75,
+      "loop": true,
+      "status": "preview"
+    },
+    "bgm_battle": {
+      "url": "/assets/pinyin-garden/music/bgm_battle.wav",
+      "duration": 90,
+      "loop": true,
+      "status": "preview"
+    },
+    "bgm_final_wave": {
+      "url": "/assets/pinyin-garden/music/bgm_final_wave.wav",
+      "duration": 75,
+      "loop": true,
+      "status": "preview"
+    },
+    "bgm_result": {
+      "url": "/assets/pinyin-garden/music/bgm_result.wav",
+      "duration": 20,
+      "loop": false,
+      "status": "preview"
+    }
+  },
+  "sfx": {
+    "slinger_load": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/slinger_load_01.wav"
+      ],
+      "duration": 0.15,
+      "status": "preview"
+    },
+    "syllable_ready": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/syllable_ready_01.wav"
+      ],
+      "duration": 0.4,
+      "status": "preview"
+    },
+    "slinger_fire": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/slinger_fire_01.wav",
+        "/assets/pinyin-garden/sfx/slinger_fire_02.wav",
+        "/assets/pinyin-garden/sfx/slinger_fire_03.wav"
+      ],
+      "duration": 0.2,
+      "status": "preview"
+    },
+    "cone_load": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/cone_load_01.wav"
+      ],
+      "duration": 0.3,
+      "status": "preview"
+    },
+    "cone_charge": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/cone_charge_01.wav"
+      ],
+      "duration": 0.7,
+      "status": "preview"
+    },
+    "cone_launch": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/cone_launch_01.wav",
+        "/assets/pinyin-garden/sfx/cone_launch_02.wav",
+        "/assets/pinyin-garden/sfx/cone_launch_03.wav"
+      ],
+      "duration": 0.35,
+      "status": "preview"
+    },
+    "cone_impact": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/cone_impact_01.wav",
+        "/assets/pinyin-garden/sfx/cone_impact_02.wav",
+        "/assets/pinyin-garden/sfx/cone_impact_03.wav"
+      ],
+      "duration": 0.5,
+      "status": "preview"
+    },
+    "dew_spawn": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/dew_spawn_01.wav"
+      ],
+      "duration": 0.5,
+      "status": "preview"
+    },
+    "dew_collect": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/dew_collect_01.wav"
+      ],
+      "duration": 0.25,
+      "status": "preview"
+    },
+    "vine_hit": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/vine_hit_01.wav",
+        "/assets/pinyin-garden/sfx/vine_hit_02.wav",
+        "/assets/pinyin-garden/sfx/vine_hit_03.wav"
+      ],
+      "duration": 0.2,
+      "status": "preview"
+    },
+    "vine_fray": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/vine_fray_01.wav"
+      ],
+      "duration": 0.35,
+      "status": "preview"
+    },
+    "vine_exit": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/vine_exit_01.wav"
+      ],
+      "duration": 0.5,
+      "status": "preview"
+    },
+    "enemy_step": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/enemy_step_01.wav",
+        "/assets/pinyin-garden/sfx/enemy_step_02.wav",
+        "/assets/pinyin-garden/sfx/enemy_step_03.wav"
+      ],
+      "duration": 0.15,
+      "status": "preview"
+    },
+    "enemy_attack": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/enemy_attack_01.wav"
+      ],
+      "duration": 0.25,
+      "status": "preview"
+    },
+    "enemy_hit": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/enemy_hit_01.wav"
+      ],
+      "duration": 0.2,
+      "status": "preview"
+    },
+    "enemy_exit": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/enemy_exit_01.wav"
+      ],
+      "duration": 0.5,
+      "status": "preview"
+    },
+    "armor_hit": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/armor_hit_01.wav"
+      ],
+      "duration": 0.25,
+      "status": "preview"
+    },
+    "armor_break": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/armor_break_01.wav"
+      ],
+      "duration": 0.6,
+      "status": "preview"
+    },
+    "scroll_enter": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/scroll_enter_01.wav"
+      ],
+      "duration": 0.9,
+      "status": "preview"
+    },
+    "shield_break": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/shield_break_01.wav"
+      ],
+      "duration": 0.45,
+      "status": "preview"
+    },
+    "plant_place": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/plant_place_01.wav"
+      ],
+      "duration": 0.35,
+      "status": "preview"
+    },
+    "plant_remove": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/plant_remove_01.wav"
+      ],
+      "duration": 0.3,
+      "status": "preview"
+    },
+    "projectile_hit": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/projectile_hit_01.wav",
+        "/assets/pinyin-garden/sfx/projectile_hit_02.wav",
+        "/assets/pinyin-garden/sfx/projectile_hit_03.wav"
+      ],
+      "duration": 0.2,
+      "status": "preview"
+    },
+    "base_hit": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/base_hit_01.wav"
+      ],
+      "duration": 0.45,
+      "status": "preview"
+    },
+    "ui_select": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/ui_select_01.wav"
+      ],
+      "duration": 0.1,
+      "status": "preview"
+    },
+    "ui_cancel": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/ui_cancel_01.wav"
+      ],
+      "duration": 0.12,
+      "status": "preview"
+    },
+    "slot_initial": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/slot_initial_01.wav"
+      ],
+      "duration": 0.15,
+      "status": "preview"
+    },
+    "slot_final": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/slot_final_01.wav"
+      ],
+      "duration": 0.15,
+      "status": "preview"
+    },
+    "slot_tone": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/slot_tone_01.wav"
+      ],
+      "duration": 0.2,
+      "status": "preview"
+    },
+    "needs_edit": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/needs_edit_01.wav"
+      ],
+      "duration": 0.3,
+      "status": "preview"
+    },
+    "resource_low": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/resource_low_01.wav"
+      ],
+      "duration": 0.25,
+      "status": "preview"
+    },
+    "cooldown_ready": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/cooldown_ready_01.wav"
+      ],
+      "duration": 0.25,
+      "status": "preview"
+    },
+    "wave_start": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/wave_start_01.wav"
+      ],
+      "duration": 0.7,
+      "status": "preview"
+    },
+    "danger": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/danger_01.wav"
+      ],
+      "duration": 0.6,
+      "status": "preview"
+    },
+    "victory": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/victory_01.wav"
+      ],
+      "duration": 1.2,
+      "status": "preview"
+    },
+    "retry": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/retry_01.wav"
+      ],
+      "duration": 0.8,
+      "status": "preview"
+    },
+    "unlock": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/unlock_01.wav"
+      ],
+      "duration": 1.0,
+      "status": "preview"
+    },
+    "rescue_windbell": {
+      "urls": [
+        "/assets/pinyin-garden/sfx/rescue_windbell_01.wav"
+      ],
+      "duration": 0.8,
+      "status": "preview"
+    }
+  }
+}

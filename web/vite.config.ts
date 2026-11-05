@@ -9,6 +9,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        pinyinGarden: fileURLToPath(new URL('./experiments/pinyin-garden/index.html', import.meta.url)),
         rescue: fileURLToPath(new URL('./experiments/dino-rescue/index.html', import.meta.url)),
       },
     },

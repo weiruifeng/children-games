@@ -3,3 +3,4 @@ export type { GameSpec, CollectSpec, GameObject, HitPolicy, CollectibleObject, O
 export { validateGameSpec } from './validate';
 export { RESCUE_PHYSICS, RescueSpecSchema, validateRescueSpec, DEFAULT_RESCUE_SPEC, RESCUE_EXAMPLE_REQUESTS } from './rescue';
 export type { RescueSpec, RescueLevel } from './rescue';
+export * from './pinyin-garden';

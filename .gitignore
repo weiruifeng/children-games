@@ -8,3 +8,5 @@ coverage/
 .vite/
 *.tsbuildinfo
 .playwright-mcp/
+
+/.workbench/
