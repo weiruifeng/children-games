@@ -44,6 +44,7 @@ export default function Home({
           <span className="home-eyebrow">今天想去哪儿玩？</span>
           <h1 className="home-heading">挑一个世界，<em>出发！</em></h1>
           <p>每一场冒险都藏着好多惊喜和宝贝。</p>
+          <a href="/experiments/dino-rescue/" style={{ display: 'inline-block', marginTop: 12, color: '#41794b', fontWeight: 700 }}>新冒险：小恐龙救朋友 →</a>
         </section>
         {savedGames.length > 0 && (
           <section className="saved-games" aria-label="我的作品">

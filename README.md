@@ -22,6 +22,13 @@
 
 开发环境下 Web 会把 `/api` 请求代理到 `http://localhost:3009`。语音识别依赖浏览器的 Web Speech API；不支持或未授权时，仍可直接输入文字。
 
+## 横版冒险实验
+
+“小恐龙救朋友”提供三个触屏关卡、就近重试和受约束的 AI 玩法修改。
+运行 `npm run dev` 后打开 [横版试玩](http://localhost:5173/experiments/dino-rescue/)。
+只试玩可用 `npm run dev:rescue`；AI 修改需要运行后端并配置模型。
+玩法契约、OpenGame 复用范围和试玩方法见 [实验说明](docs/opengame-rescue-pilot.md)。
+
 ## 验证
 
 ```bash
@@ -33,4 +40,6 @@ npm run test -w server
 
 ## 当前边界
 
-目前只实现 `collect` 游戏模板；游戏和对话 session 不持久化。Dodge/Jump 模板、游戏版本库、音效/BGM、TTS 和更复杂的敌人行为仍在后续范围内。
+原有创造主流程目前只支持 `collect`；横版冒险作为独立实验入口运行。
+作品和版本库使用 MySQL，对话 session 仍在内存中。
+通用 Dodge/Jump 模板、BGM、TTS 和更复杂的敌人行为仍在后续范围内。

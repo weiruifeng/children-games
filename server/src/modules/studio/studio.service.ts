@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { validateGameSpec, type CollectSpec } from '@children-games/shared';
+import { validateGameSpec, type CollectSpec } from '../../../../shared/src/index';
 import { DatabaseService, type RowDataPacket, type SqlConnection } from './database.service';
 
 export type SavedGame = {
