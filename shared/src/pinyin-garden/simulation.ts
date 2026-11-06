@@ -1,8 +1,9 @@
+import {knowledgePool} from './review';
 import {allowedPlants,composeParts,ENTRY_MAP,LEVELS,PLANTS,signature,type PlantKind,type Parts,type EnemyKind} from './content';
 import {BOARD,cellX,rowY,emptyParts,type GardenState,type Enemy,type Plant} from './model';
 export function createGarden(level=1,seed=173):GardenState {
  if(!LEVELS[level-1])throw new Error('未知关卡');
- return {version:1,level,seed,stage:'ready',wave:0,time:0,waveTime:0,betweenTime:12,spawned:0,nextSpawn:0,dew:250,hearts:3,rescues:[true,true,true],plants:[],enemies:[],projectiles:[],drops:[],cooldowns:{plant_pod_slinger:0,plant_dew_collector:0,plant_vine_guard:0,plant_cone_launcher:0},sharedAmmo:[],drafts:{},selectedPlant:null,task:null,paused:false,helpOpen:false,slow:false,dropTimer:0,score:0,earned:[],results:{},attempts:[],attackedRows:[],strategy:false,nextId:1,eventId:0,events:[],message:'先种下伙伴，再开始这一波。'};
+ return {version:1,level,seed,stage:'ready',wave:0,time:0,waveTime:0,betweenTime:12,spawned:0,nextSpawn:0,dew:250,hearts:3,rescues:[false,false,false],plants:[],enemies:[],projectiles:[],drops:[],cooldowns:{plant_pod_slinger:0,plant_dew_collector:0,plant_vine_guard:0,plant_cone_launcher:0},sharedAmmo:[],drafts:{},selectedPlant:null,task:null,paused:false,helpOpen:false,slow:false,dropTimer:0,score:0,earned:[],results:{},attempts:[],attackedRows:[],strategy:false,nextId:1,eventId:0,events:[],message:'先种下伙伴，再开始这一波。'};
 }
 function event(s:GardenState,type:string,x=640,y=400,value?:string){s.events.push({id:++s.eventId,type,x,y,value});if(s.events.length>40)s.events.shift();}
 function reward(s:GardenState,key:string,points:number){if(!s.earned.includes(key)){s.earned.push(key);s.score+=points;}}
@@ -10,12 +11,12 @@ function random(s:GardenState){s.seed=(Math.imul(1664525,s.seed)+1013904223)>>>0
 export function startWave(s:GardenState):boolean {
  if(!['ready','between'].includes(s.stage))return false;
  if(s.stage==='between')s.wave++;
- s.stage='playing';s.spawned=0;s.nextSpawn=4;s.waveTime=0;s.task=null;s.helpOpen=false;s.paused=false;
+ s.stage='playing';s.spawned=0;s.nextSpawn=12;s.waveTime=0;s.task=null;s.helpOpen=false;s.paused=false;
  s.sharedAmmo=[];s.drafts={};s.projectiles=[];for(const p of s.plants){p.ammo=0;p.signature='';p.target=null;p.firing=false;p.timer=0;}
  s.message=`第 ${s.wave+1} 波，重新补充全队弹药！`;event(s,'wave_start');return true;
 }
 export function placePlant(s:GardenState,kind:PlantKind,row:number,col:number):boolean {
- if(s.paused||s.helpOpen||['won','lost'].includes(s.stage))return false;
+ if(s.paused||s.helpOpen||s.stage!=='playing')return false;
  if(!allowedPlants(s.level).includes(kind)||!LEVELS[s.level-1].rows.includes(row)||col<0||col>=6||!Number.isInteger(col))return false;
  if(s.plants.some(p=>p.row===row&&p.col===col)){s.message='这块地已经有伙伴啦。';return false;}
  if(s.dew<PLANTS[kind].cost){s.message='露珠还不够，等一小会儿。';event(s,'resource_low');return false;}
@@ -40,7 +41,7 @@ export function hasSharedAmmo(s:GardenState,entryId:string):boolean {
  const entry=ENTRY_MAP[entryId];return !!entry&&s.sharedAmmo.some(id=>signature(ENTRY_MAP[id])===signature(entry));
 }
 export function selectKnowledge(s:GardenState,entryId:string):boolean {
- if(s.paused||s.helpOpen||s.stage!=='playing'||!LEVELS[s.level-1].entries.includes(entryId))return false;
+ if(s.paused||s.helpOpen||s.stage!=='playing'||!knowledgePool(s).includes(entryId))return false;
  if(s.task)s.drafts[s.task.entryId]=s.task;
  const entry=ENTRY_MAP[entryId];
  s.task=s.drafts[entryId]??{key:`wave-${s.wave}:ammo-${signature(entry)}`,plantId:0,enemyId:0,entryId,index:0,parts:emptyParts(),help:0,errors:0,finished:false,mode:s.level===4&&Number(entryId.split('-')[1])%2===0?'choose':'compose',choice:''};
@@ -69,8 +70,8 @@ export function submitTask(s:GardenState,now=Date.now()):boolean {
  const t=s.task;if(!t||t.finished||s.paused||s.helpOpen)return false;
  if(s.stage!=='playing')return false;
  const entry=ENTRY_MAP[t.entryId];const correct=t.mode==='choose'?t.choice===entry.text:composeParts(t.parts)===entry.pinyin[t.index];
- const id=`${t.key}:${t.index}`;s.attempts.push({taskId:id,entryId:entry.id,syllable:t.index,correct,assisted:t.help>0,repeated:s.attempts.some(a=>a.taskId===id&&a.correct),at:now});
- if(!correct){t.errors++;s.message=t.mode==='choose'?'再看看拼音，换一个字试试。':composeParts(t.parts)?'声母、韵母或声调还需要调整。':'这组还不能组成支持的音节。';event(s,'needs_edit');return false;}
+ const id=`${t.key}:${t.index}`;if(correct||t.errors===0)s.attempts.push({level:s.level,mode:s.reviewPool?'review':'battle',retry:!!s.retryCount,taskId:id,entryId:entry.id,syllable:t.index,correct,assisted:t.help>0,repeated:s.attempts.some(a=>a.taskId===id&&a.correct),at:now});
+ if(!correct){t.errors=Math.max(1,t.errors);s.message=t.mode==='choose'?'再看看拼音，换一个字试试。':composeParts(t.parts)?'声母、韵母或声调还需要调整。':'这组还不能组成支持的音节。';event(s,'needs_edit');return false;}
  if(!s.results[id]){s.results[id]={independent:t.errors===0&&t.help===0};reward(s,`task:${id}`,100+(s.results[id].independent?50:0));}
  if(s.level===2&&s.enemies.some(en=>s.plants.some(pl=>pl.kind==='plant_vine_guard'&&pl.row===en.row&&Math.abs(en.x-cellX(pl.col))<65)))s.strategy=true;
  if(t.index<entry.parts.length-1){t.index++;t.parts=emptyParts();t.errors=0;t.help=0;s.message='第一个拼好了，接着拼下一个。';event(s,'syllable_ready');return true;}
@@ -78,7 +79,7 @@ export function submitTask(s:GardenState,now=Date.now()):boolean {
  for(const p of s.plants)if(p.kind==='plant_pod_slinger'||p.kind==='plant_cone_launcher')p.timer=Math.max(p.timer,p.kind==='plant_cone_launcher'?3:.8);
  s.message=`${signature(entry)} · 全队可用！`;event(s,'ammo_shared',640,170,signature(entry));return true;
 }
-export function collectDrop(s:GardenState,id:number):void {if(s.paused||s.helpOpen)return;const d=s.drops.find(d=>d.id===id);if(!d)return;s.dew+=d.value;s.drops=s.drops.filter(d=>d.id!==id);event(s,'dew_collect',d.x,d.y);}
+export function collectDrop(s:GardenState,id:number):void {if(s.paused||s.helpOpen)return;const d=s.drops.find(d=>d.id===id);if(!d)return;s.dew+=d.value;s.drops=s.drops.filter(d=>d.id!==id);event(s,'dew_collect',d.x,d.y,String(d.value));}
 function kill(s:GardenState,e:Enemy,matched:boolean):void {
  if(!s.enemies.some(en=>en.id===e.id))return;
  reward(s,`kill:${e.id}`,e.kind==='enemy_scroll'?200:e.kind==='enemy_paper_blob'?100:50);s.dew+=e.kind==='enemy_scroll'?30:e.kind==='enemy_paper_blob'?15:10;
@@ -101,7 +102,8 @@ function spawn(s:GardenState):void {
  const kind:EnemyKind=captain?'enemy_scroll':s.spawned<l.armored[s.wave]?'enemy_paper_blob':'enemy_ink_blob';
  const row=l.rows[Math.floor(random(s)*l.rows.length)];
  if(s.enemies.some(e=>e.row===row&&e.x>BOARD.spawnX-100))return;
- const entryId=l.entries[Math.floor(random(s)*l.entries.length)];
+ const sampled=knowledgePool(s)[Math.floor(random(s)*knowledgePool(s).length)];
+ const entryId=s.level===1&&s.wave===0&&s.spawned===0?'char-1':sampled;
  s.enemies.push({id:s.nextId++,kind,row,x:BOARD.spawnX,hp:kind==='enemy_scroll'?240:80,armor:kind==='enemy_paper_blob'?80:0,entryId,attackTimer:0});s.spawned++;s.nextSpawn=s.waveTime+l.interval;
  if(captain)event(s,'scroll_enter');
 }
@@ -123,7 +125,7 @@ export function tickGarden(s:GardenState,realDelta:number):void {
    p.firing=!!target;p.ammo=0;
    if(target&&p.timer>=(p.kind==='plant_cone_launcher'?3:.8)){
     p.target=target.id;p.signature=signature(ENTRY_MAP[target.entryId]);p.timer=0;
-    s.projectiles.push({id:s.nextId++,row:p.row,x:cellX(p.col)+36,y:rowY(p.row)-30,target:target.id,signature:p.signature,heavy:p.kind==='plant_cone_launcher'});
+    s.projectiles.push({id:s.nextId++,row:p.row,x:cellX(p.col)+15,y:rowY(p.row)-(p.kind==='plant_cone_launcher'?65:45),target:target.id,signature:p.signature,heavy:p.kind==='plant_cone_launcher'});
     event(s,p.kind==='plant_cone_launcher'?'cone_launch':'slinger_fire',cellX(p.col),rowY(p.row));
    }
   }
@@ -143,16 +145,24 @@ export function tickGarden(s:GardenState,realDelta:number):void {
   const barrier=s.plants.filter(p=>p.row===e.row&&cellX(p.col)<e.x+40).sort((a,b)=>b.col-a.col)[0];
   if(barrier&&e.x-cellX(barrier.col)<=65){e.attackTimer+=dt;if(e.attackTimer>=1.2){e.attackTimer-=1.2;barrier.hp-=e.kind==='enemy_scroll'?30:20;event(s,barrier.kind==='plant_vine_guard'?'vine_hit':'enemy_attack',cellX(barrier.col),rowY(barrier.row));if(barrier.hp<=0){s.plants=s.plants.filter(p=>p.id!==barrier.id);if(s.selectedPlant===barrier.id)s.selectedPlant=null;}}}
   else {e.attackTimer=0;e.x-=dt*(e.kind==='enemy_scroll'?9:e.kind==='enemy_paper_blob'?11:14);}
-  if(e.x<=BOARD.homeX){
-   if(s.rescues[e.row]){s.rescues[e.row]=false;for(const victim of [...s.enemies].filter(x=>x.row===e.row))kill(s,victim,false);event(s,'rescue_windbell',BOARD.homeX,rowY(e.row));}
-   else if(s.enemies.some(x=>x.id===e.id)){s.hearts--;s.enemies=s.enemies.filter(x=>x.id!==e.id);event(s,'base_hit');}
+  if(e.x<BOARD.left+BOARD.cellW&&!s.earned.includes(`danger:${e.id}`)){s.earned.push(`danger:${e.id}`);event(s,'danger',e.x,rowY(e.row));}
+  if(e.x<=BOARD.homeX&&s.enemies.some(x=>x.id===e.id)){
+   s.hearts=Math.max(0,s.hearts-1);s.enemies=s.enemies.filter(x=>x.id!==e.id);
+   s.earned.push(`leak:${s.wave}:${e.id}`);event(s,'base_hit',BOARD.homeX,rowY(e.row));
+   if(s.hearts===0)break;
   }
  }
- if(s.hearts<=0){s.hearts=0;s.stage='lost';s.task=null;event(s,'retry');return;}
+ if(s.hearts<=0){s.hearts=0;s.stage='lost';s.task=null;s.message='爱心用完了，从这一波再试一次吧。';event(s,'retry');return;}
  if(s.spawned===LEVELS[s.level-1].counts[s.wave]&&!s.enemies.length){reward(s,`wave:${s.wave}`,100);s.task=null;
   if(s.wave===2){s.stage='won';reward(s,'hearts',s.hearts*100);if(s.level===1&&s.hearts===3)s.strategy=true;event(s,'victory');}
-  else {s.stage='between';s.betweenTime=12;s.message='这一波守住了！准备好后继续。';}
+  else {s.stage='between';s.betweenTime=12;s.message=waveLeaks(s)?`这一波漏过 ${waveLeaks(s)} 只墨团，还剩 ${s.hearts} 颗爱心。`:'这一波守住了！准备好后继续。';}
  }
 }
 export function starsFor(s:GardenState):boolean[]{const results=Object.values(s.results);return [s.stage==='won',s.stage==='won'&&results.length>=5&&results.filter(r=>r.independent).length/results.length>=0.8,s.stage==='won'&&s.strategy];}
 export function snapshot(s:GardenState):GardenState {const copy=JSON.parse(JSON.stringify(s)) as GardenState;copy.events=[];copy.task=null;copy.drafts={};copy.helpOpen=false;copy.paused=false;return copy;}
+
+/** A resumable save keeps the unfinished assembly; wave retries use snapshot instead. */
+export function resumeSnapshot(s:GardenState):GardenState {const copy=JSON.parse(JSON.stringify(s)) as GardenState;copy.events=[];copy.helpOpen=false;if(copy.task)copy.drafts[copy.task.entryId]=copy.task;return copy;}
+
+/** Persisted wave-specific leak markers survive refresh and roll back with waveStart. */
+export function waveLeaks(s:GardenState):number{return s.earned.filter(key=>key.startsWith(`leak:${s.wave}:`)).length;}

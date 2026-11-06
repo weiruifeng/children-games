@@ -5,5 +5,7 @@ export function boardPoint(x:number,y:number,rect:{left:number;top:number;width:
  return {x:px,y:py,row:Math.floor((py-BOARD.top)/BOARD.cellH),col:Math.floor((px-BOARD.left)/BOARD.cellW)};
 }
 export function canDropPlant(s:GardenState,kind:PlantKind,row:number,col:number){
- return !s.paused&&!s.helpOpen&&!['won','lost'].includes(s.stage)&&allowedPlants(s.level).includes(kind)&&LEVELS[s.level-1].rows.includes(row)&&col>=0&&col<6&&s.dew>=PLANTS[kind].cost&&s.cooldowns[kind]===0&&!s.plants.some(p=>p.row===row&&p.col===col);
+ return !s.paused&&!s.helpOpen&&s.stage==='playing'&&allowedPlants(s.level).includes(kind)&&LEVELS[s.level-1].rows.includes(row)&&col>=0&&col<6&&s.dew>=PLANTS[kind].cost&&s.cooldowns[kind]===0&&!s.plants.some(p=>p.row===row&&p.col===col);
 }
+
+export function boardDragSize(rect:{width:number;height:number}){return {width:142*rect.width/1280,height:120*rect.height/640};}

@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "created": "2026-11-05",
+  "tool": "built-in image_gen",
+  "style": "Original matte storybook garden sprites; original in-project references only; no text or commercial game references.",
+  "assets": [
+    {
+      "id": "plant_pod_slinger",
+      "url": "/assets/pinyin-garden/characters/plant_pod_slinger.png",
+      "prompt": "Original Y-shaped wood slingshot, vine string and pea-pod pouch; warm matte storybook, transparent, no commercial references.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "plant_dew_collector",
+      "url": "/assets/pinyin-garden/characters/plant_dew_collector.png",
+      "prompt": "Use case: illustration-story. One original children's garden defense game sprite. Reference image ONLY for matte storybook illustration style, warm light, rounded outlines and gentle texture; create the different character described here: A teal spiral leaf stalk holding a shallow translucent pale aqua leaf cup, two asymmetric funnel leaves above, small eyes on lower stem and three fine roots. Tall lightweight silhouette. Empty cup. No sun, flower face or loose water drops. Centered full body, neutral pose, 12% transparent padding. True alpha transparency, no ground, no shadow card, no text, logo, watermark, UI, extra characters. Readable small silhouette, upper left light.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "plant_vine_guard",
+      "url": "/assets/pinyin-garden/characters/plant_vine_guard.png",
+      "prompt": "Use case: illustration-story. One original children's garden defense game sprite. Reference image ONLY for matte storybook illustration style, warm light, rounded outlines and gentle texture; create the different character described here: Three thick green vines woven into a vertical diamond shield with visible gaps and small friendly eyes within the weaving, two coiled root feet, a single bent leaf at top. No solid shell or wooden panel. Facing right. Centered full body, neutral pose, 12% transparent padding. True alpha transparency, no ground, no shadow card, no text, logo, watermark, UI, extra characters. Readable small silhouette, upper left light.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "plant_cone_launcher",
+      "url": "/assets/pinyin-garden/characters/plant_cone_launcher.png",
+      "prompt": "Use case: illustration-story. One original children's garden defense game sprite. Reference image ONLY for matte storybook illustration style, warm light, rounded outlines and gentle texture; create the different character described here: A squat friendly tree stump with small focused eyes and wide root feet, one long flexible branch arm curving high backward toward left, with a small EMPTY woven leaf basket at tip, a catapult poised to throw toward right. No barrel, tube or muzzle. Centered full body, neutral pose, 12% transparent padding. True alpha transparency, no ground, no shadow card, no text, logo, watermark, UI, extra characters. Readable small silhouette, upper left light.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "enemy_ink_blob",
+      "url": "/assets/pinyin-garden/characters/enemy_ink_blob.png",
+      "prompt": "Use case: illustration-story. One original children's garden defense game sprite. Reference image ONLY for matte storybook illustration style, warm light, rounded outlines and gentle texture; create the different character described here: A single mischievous deep indigo ink blob, asymmetrical tapered droplet body with one bent tip, broad soft base and two cream oval eyes looking LEFT. No limbs, clothing, teeth, hat or ground ink. Centered full body, neutral pose, 12% transparent padding. True alpha transparency, no ground, no shadow card, no text, logo, watermark, UI, extra characters. Readable small silhouette, upper left light.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "enemy_paper_blob",
+      "url": "/assets/pinyin-garden/characters/enemy_paper_blob.png",
+      "prompt": "Use case: illustration-story. One original children's garden defense game sprite. Reference image ONLY for matte storybook illustration style, warm light, rounded outlines and gentle texture; create the different character described here: A single mischievous deep indigo tapered ink droplet with cream oval eyes looking LEFT, its lower sides wrapped in a folded beige origami paper shell, leaving the eyes and droplet tip exposed. No limbs, hat, teeth, clothes or text. Centered full body, neutral pose, 12% transparent padding. True alpha transparency, no ground, no shadow card, no text, logo, watermark, UI, extra characters. Readable small silhouette, upper left light.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "enemy_scroll",
+      "url": "/assets/pinyin-garden/characters/enemy_scroll.png",
+      "prompt": "Use case: illustration-story. One original children's garden defense game sprite. Reference image ONLY for matte storybook illustration style, warm light, rounded outlines and gentle texture; create the different character described here: A single friendly mischievous chunky parchment scroll creature facing LEFT: cream rolled paper cylinders at each side, dark indigo soft ink body peeking from the center with two cream oval eyes, compact horizontal silhouette. No human limbs, weapons, printed writing or symbols. Centered full body, neutral pose, 12% transparent padding. True alpha transparency, no ground, no shadow card, no text, logo, watermark, UI, extra characters. Readable small silhouette, upper left light.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "projectile_seed",
+      "url": "/assets/pinyin-garden/props/projectile_seed.png",
+      "prompt": "Use case illustration-story. Transparent standalone prop for an original children's garden defense game. A single flat oval teal green seed with pale gold seam, pointing right, no face or trail. Match warm matte paper storybook illustration, medium rounded outlines, soft upper-left light, simple readable silhouette at 40px. Full object centered, 15% transparent padding. Absolutely no glow, no shadow, no gradient or haze outside silhouette, no ground, extra objects, text, logo, UI or watermark. True alpha transparency.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "projectile_cone",
+      "url": "/assets/pinyin-garden/props/projectile_cone.png",
+      "prompt": "Use case illustration-story. Transparent standalone prop for an original children's garden defense game. A single rounded warm brown pinecone with a few large readable scales and one tiny green leaf, oriented right; no fuse, flame or face. Match warm matte paper storybook illustration, medium rounded outlines, soft upper-left light, simple readable silhouette at 40px. Full object centered, 15% transparent padding. Absolutely no glow, no shadow, no gradient or haze outside silhouette, no ground, extra objects, text, logo, UI or watermark. True alpha transparency.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "pickup_dew",
+      "url": "/assets/pinyin-garden/props/pickup_dew.png",
+      "prompt": "Use case illustration-story. Transparent standalone prop for an original children's garden defense game. A single translucent cyan water drop with pointed top, rounded bottom, one small white highlight; no face, rays or aura. Match warm matte paper storybook illustration, medium rounded outlines, soft upper-left light, simple readable silhouette at 40px. Full object centered, 15% transparent padding. Absolutely no glow, no shadow, no gradient or haze outside silhouette, no ground, extra objects, text, logo, UI or watermark. True alpha transparency.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "rescue_windbell",
+      "url": "/assets/pinyin-garden/props/rescue_windbell.png",
+      "prompt": "Use case illustration-story. Transparent standalone prop for an original children's garden defense game. A small freestanding curved wooden frame suspending one pale teal leaf-shaped windbell and two thin ribbons, rooted fixed base, no wheels or glow. Match warm matte paper storybook illustration, medium rounded outlines, soft upper-left light, simple readable silhouette at 40px. Full object centered, 15% transparent padding. Absolutely no glow, no shadow, no gradient or haze outside silhouette, no ground, extra objects, text, logo, UI or watermark. True alpha transparency.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "garden_gate",
+      "url": "/assets/pinyin-garden/props/garden_gate.png",
+      "prompt": "Use case illustration-story. Transparent standalone prop for an original children's garden defense game. A standalone small cream folded-paper nursery arch on two slim teal pillars, friendly original storybook garden structure; no building, text or scenery. Match warm matte paper storybook illustration, medium rounded outlines, soft upper-left light, simple readable silhouette at 40px. Full object centered, 15% transparent padding. Absolutely no glow, no shadow, no gradient or haze outside silhouette, no ground, extra objects, text, logo, UI or watermark. True alpha transparency.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "vine_damage_medium",
+      "url": "/assets/pinyin-garden/props/vine_damage_medium.png",
+      "prompt": "Use case precise-object-edit. Create the SAME complete vine shield character in a lightly damaged state: two small frayed vine ends and loose fibers. Preserve exact identity, pose, diamond silhouette, face, dimensions, composition and root placement. No new objects. Same warm matte storybook style. Real transparent background. Remove all outside glow and haze. No background, shadow, text, logo or watermark.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "vine_damage_heavy",
+      "url": "/assets/pinyin-garden/props/vine_damage_heavy.png",
+      "prompt": "Use case precise-object-edit. Create the SAME complete vine shield character in a heavily worn but still standing state: several frayed vine ends and drooping loose strands, with diamond woven shape still recognizable. Preserve face, pose, canvas, root placement, dimensions and identity. No hard shell cracks. Same warm matte storybook style. Real transparent background. Remove all outside glow and haze. No background, shadow, text, logo or watermark.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "paper_shell",
+      "url": "/assets/pinyin-garden/props/paper_shell.png",
+      "prompt": "Use case precise-object-edit. Extract only the cream folded paper shell armor as a separate sprite, maintaining its exact position and folded edges. Completely remove the purple ink body and face, leaving transparent space. No other objects. Same warm matte storybook style. Real transparent background. Remove all outside glow and haze. No background, shadow, text, logo or watermark.",
+      "reviewStatus": "visual-preview",
+      "animation": "runtime procedural poses; not exported frame atlas"
+    },
+    {
+      "id": "tool_shovel",
+      "url": "/assets/pinyin-garden/props/tool_shovel.png",
+      "prompt": "Original small gardening hand shovel, rounded sage-teal blade, honey-brown wooden D-handle and tiny leaf. Soft hand-painted gouache and watercolor paper grain, cream highlights, gentle dimensional shading, chunky silhouette. Isolated true transparent background, no glow, text, frame or shadow. Readable at 48px.",
+      "reviewStatus": "visual-preview",
+      "tool": "built-in image_gen"
+    }
+  ],
+  "backgrounds": [
+    {
+      "id": "bg_battle_day",
+      "source": "existing project illustration",
+      "promptReference": "docs/specs/pinyin-garden/visual-assets.md B01"
+    },
+    {
+      "id": "bg_battle_evening",
+      "source": "built-in image_gen using bg_battle_day as style reference",
+      "prompt": "Late afternoon creekside nursery, broad calm empty grass field, protected gameplay elements excluded, no grid text logos or UI."
+    }
+  ],
+  "audio": {
+    "source": "original deterministic procedural synthesis",
+    "status": "preview",
+    "manifest": "audio-manifest.json"
+  },
+  "limitations": [
+    "Procedural animation preview is not the complete 129-frame atlas deliverable.",
+    "Some sprites retain soft alpha halos; final art cleanup and device review remain."
+  ]
+}

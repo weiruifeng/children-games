@@ -33,6 +33,7 @@ export function stripTone(pinyin:string):{raw:string;tone:number} {
 }
 // Explicit teaching decompositions. Special spellings use whole-syllable cards.
 const syllables: Record<string,[string,string,string]|null>={
+ a:['','','a'],zhuang:['zh','u','ang'],
  ma:['m','','a'],mi:['m','','i'],mu:['m','','u'],da:['d','','a'],tu:['t','','u'],
  hua:['h','u','a'],gua:['g','u','a'],guo:['g','u','o'],huo:['h','u','o'],shan:['sh','','an'],
  shui:['sh','','ui'],feng:['f','','eng'],yun:null,yu:null,ri:null,yue:null,
