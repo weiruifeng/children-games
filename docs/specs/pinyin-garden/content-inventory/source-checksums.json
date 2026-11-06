@@ -1,0 +1,42 @@
+[
+  {
+    "file": "pinyin.txt",
+    "bytes": 985559,
+    "sha256": "2342a6f98c85dbc3c8d26aef31744876a36326c6466e51e9a0f16898c36c2011"
+  },
+  {
+    "file": "kMandarin_8105.txt",
+    "bytes": 168050,
+    "sha256": "3538219db8ef4809e8de51c82655aedabacbc54f92acbe6a0e6925156f845f76"
+  },
+  {
+    "file": "kHanyuPinlu.txt",
+    "bytes": 78922,
+    "sha256": "260ef08aef066ae5e798ed9933e305094d03a87a5d0bcbced6d740cb9084f2f8"
+  },
+  {
+    "file": "syllable.json",
+    "bytes": 118454,
+    "sha256": "1f73bd91933e39a9bd7e30c3340713aa875423a047fa1e04d6a20fc81788d36e"
+  },
+  {
+    "file": "char.json",
+    "bytes": 677677,
+    "sha256": "eb2f616dbc8aad9d38def5ef3db6cd2fd5e5fafc8bc6954c43b1afe7cf19af47"
+  },
+  {
+    "file": "word.json",
+    "bytes": 1794440,
+    "sha256": "9704bb04596c69f9b03187368b165823c46267070537839af54cf22af603f0bc"
+  },
+  {
+    "file": "standard-full.pdf",
+    "bytes": 51104405,
+    "sha256": "e451fdf0899d9267bbd122db66e7e75bdd2851ad1e6732e47b6e960290d73a63"
+  },
+  {
+    "file": "gf0025-2021.pdf",
+    "bytes": 388929,
+    "sha256": "31e72b86aa26a211a68e795ed6b66447961de7e857b0036ce39aa797fb53bbce"
+  }
+]

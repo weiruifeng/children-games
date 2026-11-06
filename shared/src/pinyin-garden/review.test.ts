@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest';
 import {createReview,knowledgePool,reviewEntries} from './review';
-import {newProfile,parseProfile} from './snapshot';
+import {legacyProfile as newProfile,parseLegacyProfile as parseProfile} from './snapshot';
 import {selectKnowledge,snapshot,startWave,tickGarden} from './simulation';
 import {ENTRIES} from './content';
 import type {LearningAttempt} from './model';

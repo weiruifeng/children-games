@@ -1,0 +1,1028 @@
+{
+  "a": {
+    "url": "/assets/pinyin-garden/pronunciation/a.mp3",
+    "sourceFile": "a.mp3",
+    "bytes": 24913,
+    "sha256": "ec46570183c0909ffbd3e9585f810e06543fe245e165ccdb4f7c3f1ac35bd954"
+  },
+  "a1": {
+    "url": "/assets/pinyin-garden/pronunciation/a1.mp3",
+    "sourceFile": "a1.mp3",
+    "bytes": 7863,
+    "sha256": "8da92f23ecbe7947d5fffd8ea843caa781395f61bd3ca0cf9f3cba7d2b42d988"
+  },
+  "a2": {
+    "url": "/assets/pinyin-garden/pronunciation/a2.mp3",
+    "sourceFile": "a2.mp3",
+    "bytes": 8411,
+    "sha256": "1de37bb68b9c13bb0ff772f260055fbedf9114855dc134970f528a13e1808f28"
+  },
+  "a3": {
+    "url": "/assets/pinyin-garden/pronunciation/a3.mp3",
+    "sourceFile": "a3.mp3",
+    "bytes": 8411,
+    "sha256": "d8711a7aac3d3ef011e7561cd332e6691211a18fad7188148c6659e1a36b0d9b"
+  },
+  "a4": {
+    "url": "/assets/pinyin-garden/pronunciation/a4.mp3",
+    "sourceFile": "a4.mp3",
+    "bytes": 7314,
+    "sha256": "9a76c330190041a5393421d5adbd02b1eb2042c69a52b4527873be5aff0a6efe"
+  },
+  "ai": {
+    "url": "/assets/pinyin-garden/pronunciation/ai.mp3",
+    "sourceFile": "ai.mp3",
+    "bytes": 6034,
+    "sha256": "1d2fb1a82a33d6cedb4a239225e2b4c928c8bd33e648631fb9f4b913843ea631"
+  },
+  "an": {
+    "url": "/assets/pinyin-garden/pronunciation/an.mp3",
+    "sourceFile": "an.mp3",
+    "bytes": 6217,
+    "sha256": "950315c1a0835f962136a41ae0361e599fe89a0c2931bdc6fa28e6112ad7d1bf"
+  },
+  "ang": {
+    "url": "/assets/pinyin-garden/pronunciation/ang.mp3",
+    "sourceFile": "ang.mp3",
+    "bytes": 5669,
+    "sha256": "1413900fc73bc157872dd5048c6520965396db6ca359b3e301168b37873892b8"
+  },
+  "ao": {
+    "url": "/assets/pinyin-garden/pronunciation/ao.mp3",
+    "sourceFile": "ao.mp3",
+    "bytes": 6583,
+    "sha256": "e05c738454da5d6a236e4e82f67485ecab9fdbdee2551b6ed979c34c41f21456"
+  },
+  "b": {
+    "url": "/assets/pinyin-garden/pronunciation/b.mp3",
+    "sourceFile": "b.mp3",
+    "bytes": 8229,
+    "sha256": "bb47c9b66a619a9cad8aa451e4d633910b1b147f03b43fbe2ce3443d141c9d03"
+  },
+  "ba1": {
+    "url": "/assets/pinyin-garden/pronunciation/ba1.mp3",
+    "sourceFile": "ba1.mp3",
+    "bytes": 13223,
+    "sha256": "b64dd90f5c43d465bcfe0e49e9d56ec2af21ef6cbd16e05f937acb27800fdd36"
+  },
+  "ba3": {
+    "url": "/assets/pinyin-garden/pronunciation/ba3.mp3",
+    "sourceFile": "ba3.mp3",
+    "bytes": 17612,
+    "sha256": "c51b80bfc5885626f3dadbb48aba9e500d9807ce161314af5266cff72409de07"
+  },
+  "ba4": {
+    "url": "/assets/pinyin-garden/pronunciation/ba4.mp3",
+    "sourceFile": "ba4.mp3",
+    "bytes": 15731,
+    "sha256": "80f1c97395a58dae69c7ac0cbc882b60793ad83b2bca6e1febbaa63dda7442e6"
+  },
+  "bai2": {
+    "url": "/assets/pinyin-garden/pronunciation/bai2.mp3",
+    "sourceFile": "bai2.mp3",
+    "bytes": 18643,
+    "sha256": "b55c35ef4186190003e431b06a12905ba8dcbad4fbf2d6b3453ede5fbd680569"
+  },
+  "bei1": {
+    "url": "/assets/pinyin-garden/pronunciation/bei1.mp3",
+    "sourceFile": "bei1.mp3",
+    "bytes": 15731,
+    "sha256": "cc2957db2b1bcbe4d15b6cdbc5f9303c41dc312b83ebc1a3b757a7c08214f642"
+  },
+  "c": {
+    "url": "/assets/pinyin-garden/pronunciation/c.mp3",
+    "sourceFile": "c.mp3",
+    "bytes": 8229,
+    "sha256": "783c852f489920849bda0b8a528ae8a81d5f045ff3ec8359564ffc8d1e688811"
+  },
+  "ca1": {
+    "url": "/assets/pinyin-garden/pronunciation/ca1.mp3",
+    "sourceFile": "ca1.mp3",
+    "bytes": 19495,
+    "sha256": "48f24bfb2dd2cb03cb541418c30522fe50fa19e68a08734e82f82122de3e1f91"
+  },
+  "cao3": {
+    "url": "/assets/pinyin-garden/pronunciation/cao3.mp3",
+    "sourceFile": "cao3.mp3",
+    "bytes": 25539,
+    "sha256": "8802b40ee396a34fb228e72bd0a48095a58d6b65a205bb37b05a65d95ee9f2e2"
+  },
+  "ch": {
+    "url": "/assets/pinyin-garden/pronunciation/ch.mp3",
+    "sourceFile": "ch.mp3",
+    "bytes": 6583,
+    "sha256": "dda420e1508844ccdee7126586f3cfc9ccc2bca96acc5caaeb133d31fc77236e"
+  },
+  "chi3": {
+    "url": "/assets/pinyin-garden/pronunciation/chi3.mp3",
+    "sourceFile": "chi3.mp3",
+    "bytes": 9326,
+    "sha256": "7331549470f632c731696687edf09a5fb4f83bb655c9911c353b81425e680ab6"
+  },
+  "chuang2": {
+    "url": "/assets/pinyin-garden/pronunciation/chuang2.mp3",
+    "sourceFile": "chuang2.mp3",
+    "bytes": 19495,
+    "sha256": "b788d05050a704d538844f911b06330c682ff5177beba96ac66199e31e18d6d6"
+  },
+  "chuo1": {
+    "url": "/assets/pinyin-garden/pronunciation/chuo1.mp3",
+    "sourceFile": "chuo1.mp3",
+    "bytes": 18867,
+    "sha256": "aab3c8417e4a796f0ad40ddbf6607a1b2baeb241cd19df923dd6883a60719a4b"
+  },
+  "ci2": {
+    "url": "/assets/pinyin-garden/pronunciation/ci2.mp3",
+    "sourceFile": "ci2.mp3",
+    "bytes": 9326,
+    "sha256": "9277982e8b14a1a5eaf2401519f3652cf6c9f634ea53ca6d361b423f4f7d1eaf"
+  },
+  "cuo1": {
+    "url": "/assets/pinyin-garden/pronunciation/cuo1.mp3",
+    "sourceFile": "cuo1.mp3",
+    "bytes": 19495,
+    "sha256": "62ec5d5de0a6dc5c5fa343c5c6daf1a3c47ea1461d4e5fad94dab43a9ef1c5c0"
+  },
+  "d": {
+    "url": "/assets/pinyin-garden/pronunciation/d.mp3",
+    "sourceFile": "d.mp3",
+    "bytes": 7497,
+    "sha256": "e7c50ef59ec1cfa4c67b7d5449b90cc616041e6a9f88f06fc947324801e65f34"
+  },
+  "da4": {
+    "url": "/assets/pinyin-garden/pronunciation/da4.mp3",
+    "sourceFile": "da4.mp3",
+    "bytes": 13852,
+    "sha256": "3e9a526b3e7c7239aa8f04d46e1cb7b65853947ffb947b13abb33cf78e53a7c2"
+  },
+  "dai4": {
+    "url": "/assets/pinyin-garden/pronunciation/dai4.mp3",
+    "sourceFile": "dai4.mp3",
+    "bytes": 14479,
+    "sha256": "07c6d25f1b611ddb705adce7a2b8f1e6e721d154f7d5bf51b7843338e00f10a7"
+  },
+  "deng3": {
+    "url": "/assets/pinyin-garden/pronunciation/deng3.mp3",
+    "sourceFile": "deng3.mp3",
+    "bytes": 18241,
+    "sha256": "e75ed1a5eeb6420f11ab909bf97afc6f1013ea25bfcf48b8cc2b92922f3ce278"
+  },
+  "di4": {
+    "url": "/assets/pinyin-garden/pronunciation/di4.mp3",
+    "sourceFile": "di4.mp3",
+    "bytes": 9464,
+    "sha256": "a76d4af4ba1b18d9ad82905a750f84e2993697d60b2974baac865b13d9f7bf8e"
+  },
+  "duo3": {
+    "url": "/assets/pinyin-garden/pronunciation/duo3.mp3",
+    "sourceFile": "duo3.mp3",
+    "bytes": 18864,
+    "sha256": "076746aec843fa0d89ab616cbcbdc3dfd0057630db5262aaef4cb0276ea60dfb"
+  },
+  "e": {
+    "url": "/assets/pinyin-garden/pronunciation/e.mp3",
+    "sourceFile": "e.mp3",
+    "bytes": 7680,
+    "sha256": "491d969ac086b39699f5d83301aa7f95442b52aefe0b1a513b09849976e5c531"
+  },
+  "ei": {
+    "url": "/assets/pinyin-garden/pronunciation/ei.mp3",
+    "sourceFile": "ei.mp3",
+    "bytes": 7131,
+    "sha256": "2d52e845d168c1273b36873815b04cb88171877ff70ddac0872b571f6b3004ed"
+  },
+  "en": {
+    "url": "/assets/pinyin-garden/pronunciation/en.mp3",
+    "sourceFile": "en.mp3",
+    "bytes": 5486,
+    "sha256": "8ae457d3323a089c585fe3ab093cfec82f4a313746ad97b0779dbce0fc12d53d"
+  },
+  "eng": {
+    "url": "/assets/pinyin-garden/pronunciation/eng.mp3",
+    "sourceFile": "eng.mp3",
+    "bytes": 6583,
+    "sha256": "9451aa1dbb91efdca60c6a9179cffa7aab88aabac5f35f102902ce734d67720d"
+  },
+  "er": {
+    "url": "/assets/pinyin-garden/pronunciation/er.mp3",
+    "sourceFile": "er.mp3",
+    "bytes": 6400,
+    "sha256": "08f826b43f39976504753f317ea73e9ad9655532129d3ad7300fa3950bfdd7e6"
+  },
+  "er2": {
+    "url": "/assets/pinyin-garden/pronunciation/er2.mp3",
+    "sourceFile": "er2.mp3",
+    "bytes": 6949,
+    "sha256": "2492ba9de4804e464546a100da554d6aa99525b9ff743e893f35c96f57875d87"
+  },
+  "er3": {
+    "url": "/assets/pinyin-garden/pronunciation/er3.mp3",
+    "sourceFile": "er3.mp3",
+    "bytes": 7314,
+    "sha256": "15a87c6284f4ed82e4f797acd62b151984dae82af31b5b6761e3071bb1aac5ee"
+  },
+  "f": {
+    "url": "/assets/pinyin-garden/pronunciation/f.mp3",
+    "sourceFile": "f.mp3",
+    "bytes": 8229,
+    "sha256": "0c824c69939e8b6fab45e3c7b45358312c9222b9b8e4ce17559c5f802c26462f"
+  },
+  "fa1": {
+    "url": "/assets/pinyin-garden/pronunciation/fa1.mp3",
+    "sourceFile": "fa1.mp3",
+    "bytes": 20745,
+    "sha256": "05201251ed6dd3655416e0894e1cfd6709ac864c2c496cd6307aa83607b6860d"
+  },
+  "fa3": {
+    "url": "/assets/pinyin-garden/pronunciation/fa3.mp3",
+    "sourceFile": "fa3.mp3",
+    "bytes": 17610,
+    "sha256": "79faf5c879dd0a25ace1bff0546fd2a888f64e3e61b0e75f6b7859a1f6951ccb"
+  },
+  "fei1": {
+    "url": "/assets/pinyin-garden/pronunciation/fei1.mp3",
+    "sourceFile": "fei1.mp3",
+    "bytes": 16358,
+    "sha256": "269851e6ca93279cf81c39739266df03f3d61d5917d4b0df1543a785230d53d4"
+  },
+  "feng1": {
+    "url": "/assets/pinyin-garden/pronunciation/feng1.mp3",
+    "sourceFile": "feng1.mp3",
+    "bytes": 21778,
+    "sha256": "0330d6b1c404890cc5ce5536ef3d0d28bea0438eae5e3d6fabb261bd8f35c97f"
+  },
+  "g": {
+    "url": "/assets/pinyin-garden/pronunciation/g.mp3",
+    "sourceFile": "g.mp3",
+    "bytes": 6766,
+    "sha256": "d3f6dc4847bbbed94d75723473f4ac0b42e9e05d537eb663ef3bfb186cea2bba"
+  },
+  "gu3": {
+    "url": "/assets/pinyin-garden/pronunciation/gu3.mp3",
+    "sourceFile": "gu3.mp3",
+    "bytes": 20120,
+    "sha256": "74960c57071186d468cdf6377eac124d93e00611e16bfee9253a2dc966733642"
+  },
+  "gua1": {
+    "url": "/assets/pinyin-garden/pronunciation/gua1.mp3",
+    "sourceFile": "gua1.mp3",
+    "bytes": 17612,
+    "sha256": "1b01782202b41c658526b72a733372b9ed9e4d0367a19c59af7e805cd5f6d297"
+  },
+  "gun3": {
+    "url": "/assets/pinyin-garden/pronunciation/gun3.mp3",
+    "sourceFile": "gun3.mp3",
+    "bytes": 20121,
+    "sha256": "4b882b7a5d884ca2f8cfeda16561896432f12446f313f0fd3606078541b91b92"
+  },
+  "guo3": {
+    "url": "/assets/pinyin-garden/pronunciation/guo3.mp3",
+    "sourceFile": "guo3.mp3",
+    "bytes": 19493,
+    "sha256": "3f04cfd6e4fe90573e96b1ef5688240b59057527ede69854074f4415e809a78d"
+  },
+  "h": {
+    "url": "/assets/pinyin-garden/pronunciation/h.mp3",
+    "sourceFile": "h.mp3",
+    "bytes": 8046,
+    "sha256": "f9689baa9a453532fec1c4bb0f9df1a0a66cd27f08b99e8e9c970318ded99d61"
+  },
+  "hao3": {
+    "url": "/assets/pinyin-garden/pronunciation/hao3.mp3",
+    "sourceFile": "hao3.mp3",
+    "bytes": 22000,
+    "sha256": "51604a173c14b2f376206f908e33305fcfdde0ac2b41b7707bef8748c8100049"
+  },
+  "he2": {
+    "url": "/assets/pinyin-garden/pronunciation/he2.mp3",
+    "sourceFile": "he2.mp3",
+    "bytes": 9874,
+    "sha256": "501fd806fa9934cb18c90b65b2d05d0042ad226c8bfc713062887042fb47b638"
+  },
+  "hong2": {
+    "url": "/assets/pinyin-garden/pronunciation/hong2.mp3",
+    "sourceFile": "hong2.mp3",
+    "bytes": 18239,
+    "sha256": "f91ac44e9d25d9131a8e7d57d4b6c4ccad06062d3acb9b9b3cf616a0f1d8b545"
+  },
+  "hua1": {
+    "url": "/assets/pinyin-garden/pronunciation/hua1.mp3",
+    "sourceFile": "hua1.mp3",
+    "bytes": 19493,
+    "sha256": "e506b2a09c149507f993d6ffe203770355b7928e5a60e117232b5326b6ebe377"
+  },
+  "hui2": {
+    "url": "/assets/pinyin-garden/pronunciation/hui2.mp3",
+    "sourceFile": "hui2.mp3",
+    "bytes": 17612,
+    "sha256": "c5bceab4749606a2fd8a0fe86091ef83c824a04207f4e6ac50b019f3bb16b399"
+  },
+  "huo3": {
+    "url": "/assets/pinyin-garden/pronunciation/huo3.mp3",
+    "sourceFile": "huo3.mp3",
+    "bytes": 38078,
+    "sha256": "b0748f1d68dcb56ceec191ba4d1c08160e2f29576811614015c8a08af8153669"
+  },
+  "i": {
+    "url": "/assets/pinyin-garden/pronunciation/i.mp3",
+    "sourceFile": "i.mp3",
+    "bytes": 8411,
+    "sha256": "2bcf87a7fcfa0c99d9a06063c3742597889e731bd4b5fccc1e0718574d642696"
+  },
+  "i3": {
+    "url": "/assets/pinyin-garden/pronunciation/i3.mp3",
+    "sourceFile": "i3.mp3",
+    "bytes": 10057,
+    "sha256": "4aa5f7b8e186005cc69b48e929eef5a7fa4e819d9a416f4de8e098224bdbf06e"
+  },
+  "ie": {
+    "url": "/assets/pinyin-garden/pronunciation/ie.mp3",
+    "sourceFile": "ie.mp3",
+    "bytes": 7314,
+    "sha256": "6decae81decf09bca2b5c29d9bb5b7762f4aa0dab532a28aec8a28b985950942"
+  },
+  "in": {
+    "url": "/assets/pinyin-garden/pronunciation/in.mp3",
+    "sourceFile": "in.mp3",
+    "bytes": 6766,
+    "sha256": "10013a2c2bc6ed92403d73bc08882928b7ec6d1423453e0cbee7b0f263594376"
+  },
+  "ing": {
+    "url": "/assets/pinyin-garden/pronunciation/ing.mp3",
+    "sourceFile": "ing.mp3",
+    "bytes": 8046,
+    "sha256": "1a35ed4a70996419f54c37a6f6df29f6cef24351675f6888ca31555ef7f878f8"
+  },
+  "iu": {
+    "url": "/assets/pinyin-garden/pronunciation/iu.mp3",
+    "sourceFile": "iu.mp3",
+    "bytes": 7497,
+    "sha256": "b5d0bc9b38ed08313d0a566d77a70b42e362250ef6ef4245cb5d629902241481"
+  },
+  "j": {
+    "url": "/assets/pinyin-garden/pronunciation/j.mp3",
+    "sourceFile": "j.mp3",
+    "bytes": 7497,
+    "sha256": "7413cf1755e71d237a7368c2e41413684e3ec8aba45358c9c70e8819a6c05ae9"
+  },
+  "ji1": {
+    "url": "/assets/pinyin-garden/pronunciation/ji1.mp3",
+    "sourceFile": "ji1.mp3",
+    "bytes": 7497,
+    "sha256": "7413cf1755e71d237a7368c2e41413684e3ec8aba45358c9c70e8819a6c05ae9"
+  },
+  "ji3": {
+    "url": "/assets/pinyin-garden/pronunciation/ji3.mp3",
+    "sourceFile": "ji3.mp3",
+    "bytes": 9509,
+    "sha256": "5f5e0d4884e34dd404ef3c18e9f2b7313c99fb6ab15b6dc4eafa441efdbd6ff8"
+  },
+  "jia1": {
+    "url": "/assets/pinyin-garden/pronunciation/jia1.mp3",
+    "sourceFile": "jia1.mp3",
+    "bytes": 16985,
+    "sha256": "7bc8775de2f9f8ef8f3ab3f8cacf5cccdd02ff74b5c16c079dc7b2c8c4426220"
+  },
+  "jiu3": {
+    "url": "/assets/pinyin-garden/pronunciation/jiu3.mp3",
+    "sourceFile": "jiu3.mp3",
+    "bytes": 18864,
+    "sha256": "4b48909ffec3002e22cd53795b75fb430e04123601076e26f645e0a3e114d4e8"
+  },
+  "ju1": {
+    "url": "/assets/pinyin-garden/pronunciation/ju1.mp3",
+    "sourceFile": "ju1.mp3",
+    "bytes": 15102,
+    "sha256": "1d7606827439ae009c79b61d5970395c22a90fdf4e773737741ea43671a22682"
+  },
+  "jue2": {
+    "url": "/assets/pinyin-garden/pronunciation/jue2.mp3",
+    "sourceFile": "jue2.mp3",
+    "bytes": 16356,
+    "sha256": "97b70b30535219422fd736c0598ac14f9b5cc5d8f701084707c30d64e36f078c"
+  },
+  "jun1": {
+    "url": "/assets/pinyin-garden/pronunciation/jun1.mp3",
+    "sourceFile": "jun1.mp3",
+    "bytes": 14475,
+    "sha256": "a9c55ee254696dbe4a06ed67babf17477675a9566743b584be85990cfa44d778"
+  },
+  "k": {
+    "url": "/assets/pinyin-garden/pronunciation/k.mp3",
+    "sourceFile": "k.mp3",
+    "bytes": 7497,
+    "sha256": "3bbfac5843670dd67fa1c855188ec4ca70b700c6406d06a14ca472c22388b563"
+  },
+  "ke1": {
+    "url": "/assets/pinyin-garden/pronunciation/ke1.mp3",
+    "sourceFile": "ke1.mp3",
+    "bytes": 7497,
+    "sha256": "3bbfac5843670dd67fa1c855188ec4ca70b700c6406d06a14ca472c22388b563"
+  },
+  "kua1": {
+    "url": "/assets/pinyin-garden/pronunciation/kua1.mp3",
+    "sourceFile": "kua1.mp3",
+    "bytes": 17612,
+    "sha256": "7478961fc70ea7b71d60f64788b02cb7c58df0098e717a5a9592054bca912220"
+  },
+  "kuo4": {
+    "url": "/assets/pinyin-garden/pronunciation/kuo4.mp3",
+    "sourceFile": "kuo4.mp3",
+    "bytes": 13223,
+    "sha256": "3b86cfab7cab5b206ba1e4170ba25c1975d8a2f9c7b8cb0eddfa9fcad65521f2"
+  },
+  "l": {
+    "url": "/assets/pinyin-garden/pronunciation/l.mp3",
+    "sourceFile": "l.mp3",
+    "bytes": 6766,
+    "sha256": "a4a8472cbbf51158473751f27df32751fd08c62eb6e6b7552f796cd0e817ffaf"
+  },
+  "lin2": {
+    "url": "/assets/pinyin-garden/pronunciation/lin2.mp3",
+    "sourceFile": "lin2.mp3",
+    "bytes": 16358,
+    "sha256": "61a672cedbc1588a4e73a6e81aebb39e3960a606334a35fbb116b0777b08035a"
+  },
+  "liu2": {
+    "url": "/assets/pinyin-garden/pronunciation/liu2.mp3",
+    "sourceFile": "liu2.mp3",
+    "bytes": 24286,
+    "sha256": "c3dfa20821c4713be5af4f7b3a28c185ed976aee4a66d643065ee8548ac6223f"
+  },
+  "lu4": {
+    "url": "/assets/pinyin-garden/pronunciation/lu4.mp3",
+    "sourceFile": "lu4.mp3",
+    "bytes": 16358,
+    "sha256": "14296a3b1e984c5bbb9539eec67626ebe4bf3bf4cb8bb91eb075e79ddcd79091"
+  },
+  "lv4": {
+    "url": "/assets/pinyin-garden/pronunciation/lv4.mp3",
+    "sourceFile": "lv4.mp3",
+    "bytes": 18239,
+    "sha256": "429f35a14f0596bc870ca35096aa964e84aea5d66871be7fcd042d278f2f074a"
+  },
+  "lve4": {
+    "url": "/assets/pinyin-garden/pronunciation/lve4.mp3",
+    "sourceFile": "lve4.mp3",
+    "bytes": 15731,
+    "sha256": "0af23389f6552df2e9cc67704f97111c7244b0a16e35ae385ac90e3b76176138"
+  },
+  "m": {
+    "url": "/assets/pinyin-garden/pronunciation/m.mp3",
+    "sourceFile": "m.mp3",
+    "bytes": 7680,
+    "sha256": "5b9b346e67d8b695709f7c81824d0eadb30770ccb55ce555333269f0f55de9d9"
+  },
+  "ma1": {
+    "url": "/assets/pinyin-garden/pronunciation/ma1.mp3",
+    "sourceFile": "ma1.mp3",
+    "bytes": 20122,
+    "sha256": "6829bb5773af8adfc1cf47a057816f6ffc1ed255597550c9ea4a733165770c8c"
+  },
+  "ma3": {
+    "url": "/assets/pinyin-garden/pronunciation/ma3.mp3",
+    "sourceFile": "ma3.mp3",
+    "bytes": 20120,
+    "sha256": "de8e2bc33b078a661a9d8a18c66f4385c9ebb60910445e087d581b7e50c74484"
+  },
+  "mai3": {
+    "url": "/assets/pinyin-garden/pronunciation/mai3.mp3",
+    "sourceFile": "mai3.mp3",
+    "bytes": 22627,
+    "sha256": "5f12f4613b03632df14f92236b777f152195409497aa344bf9cd825c9b3c6525"
+  },
+  "mang2": {
+    "url": "/assets/pinyin-garden/pronunciation/mang2.mp3",
+    "sourceFile": "mang2.mp3",
+    "bytes": 20120,
+    "sha256": "f84e676c6c9b97a30b65126d7a9d21cd7a1e799625331b9543dec05ef82f7e48"
+  },
+  "mao1": {
+    "url": "/assets/pinyin-garden/pronunciation/mao1.mp3",
+    "sourceFile": "mao1.mp3",
+    "bytes": 15731,
+    "sha256": "846d93c8880a6369532b0b9609005d125e45085e30175dd1022bc2d54fb0885f"
+  },
+  "mei2": {
+    "url": "/assets/pinyin-garden/pronunciation/mei2.mp3",
+    "sourceFile": "mei2.mp3",
+    "bytes": 20524,
+    "sha256": "f44c296eedae96fcd5521cc63f2373f20b6756669fbc6031c7c3383a026165f7"
+  },
+  "men2": {
+    "url": "/assets/pinyin-garden/pronunciation/men2.mp3",
+    "sourceFile": "men2.mp3",
+    "bytes": 16985,
+    "sha256": "f81277b56fd5a833476f661d4c7ffc0493f01377ad1555d31363be54a874e55b"
+  },
+  "mi3": {
+    "url": "/assets/pinyin-garden/pronunciation/mi3.mp3",
+    "sourceFile": "mi3.mp3",
+    "bytes": 23254,
+    "sha256": "fa389b791a1f6ed35c469e8d5068586e1bc49fbc892d6b50548fcd9d7012d902"
+  },
+  "mu4": {
+    "url": "/assets/pinyin-garden/pronunciation/mu4.mp3",
+    "sourceFile": "mu4.mp3",
+    "bytes": 11967,
+    "sha256": "2919459400077e3335550e8721e02fb21983ce8926ebca4946f5ab33d7ebed34"
+  },
+  "n": {
+    "url": "/assets/pinyin-garden/pronunciation/n.mp3",
+    "sourceFile": "n.mp3",
+    "bytes": 7314,
+    "sha256": "e9f413748e34d6b8a54b645f643bdd3b2929573e5e4b33cee8d171f4d22c34a5"
+  },
+  "na2": {
+    "url": "/assets/pinyin-garden/pronunciation/na2.mp3",
+    "sourceFile": "na2.mp3",
+    "bytes": 14475,
+    "sha256": "b051dd162e64743e1744a1fe22561f94e58839a373b80cff7874374824eae62a"
+  },
+  "ni3": {
+    "url": "/assets/pinyin-garden/pronunciation/ni3.mp3",
+    "sourceFile": "ni3.mp3",
+    "bytes": 19491,
+    "sha256": "c952eb7898951bbd9878134511c1d2479c747d33531c59dbf018cce3102ab265"
+  },
+  "niao3": {
+    "url": "/assets/pinyin-garden/pronunciation/niao3.mp3",
+    "sourceFile": "niao3.mp3",
+    "bytes": 27420,
+    "sha256": "02383ed2178b0380585dbfb590107728e3081b81a104a97e505bee75b97e25b6"
+  },
+  "niu2": {
+    "url": "/assets/pinyin-garden/pronunciation/niu2.mp3",
+    "sourceFile": "niu2.mp3",
+    "bytes": 15731,
+    "sha256": "d3ff622f6c5172ebe842cf849c785ba02f3a116964f092b2f7d297c0ed4e7332"
+  },
+  "nv3": {
+    "url": "/assets/pinyin-garden/pronunciation/nv3.mp3",
+    "sourceFile": "nv3.mp3",
+    "bytes": 18866,
+    "sha256": "5da4c769da3d0779c85de1bad4a4f0c462bd70b7a70bce62fc9f33c659d1ad26"
+  },
+  "nve4": {
+    "url": "/assets/pinyin-garden/pronunciation/nve4.mp3",
+    "sourceFile": "nve4.mp3",
+    "bytes": 15104,
+    "sha256": "dc56ea947a1797c345d4009e287f72ef8c235c50e4e1162814aa4c05348eb33f"
+  },
+  "o": {
+    "url": "/assets/pinyin-garden/pronunciation/o.mp3",
+    "sourceFile": "o.mp3",
+    "bytes": 8777,
+    "sha256": "e09204d534601116cdc9a8b971365043a6d4df869eff580e2318933dd4fbb013"
+  },
+  "ong": {
+    "url": "/assets/pinyin-garden/pronunciation/ong.mp3",
+    "sourceFile": "ong.mp3",
+    "bytes": 6217,
+    "sha256": "6c5b7fc25c2f83adc603f2587afc2972929d7583eb111a3caca37c33bef6a56d"
+  },
+  "ou": {
+    "url": "/assets/pinyin-garden/pronunciation/ou.mp3",
+    "sourceFile": "ou.mp3",
+    "bytes": 6400,
+    "sha256": "3d23c1d6039701ffc8a290a5515b189294c6801264cb53017558329ff11b41e6"
+  },
+  "p": {
+    "url": "/assets/pinyin-garden/pronunciation/p.mp3",
+    "sourceFile": "p.mp3",
+    "bytes": 6766,
+    "sha256": "03330c729811bafec19e7ffec8983cc889b76066b0237715c1ba541a4c20be50"
+  },
+  "pi1": {
+    "url": "/assets/pinyin-garden/pronunciation/pi1.mp3",
+    "sourceFile": "pi1.mp3",
+    "bytes": 15731,
+    "sha256": "7f1de87fc3e7a385e77efadaf2ec7e5abb9306580fc652de318024cd0c627823"
+  },
+  "q": {
+    "url": "/assets/pinyin-garden/pronunciation/q.mp3",
+    "sourceFile": "q.mp3",
+    "bytes": 7497,
+    "sha256": "ec6c3c44350a2dcf1c2871601025a546b1eb09059b9c205fbc6ccd649182b442"
+  },
+  "qi3": {
+    "url": "/assets/pinyin-garden/pronunciation/qi3.mp3",
+    "sourceFile": "qi3.mp3",
+    "bytes": 9143,
+    "sha256": "26e77f2ca7632d37cfbf86996cb57814a7e9483c475721dc81b0f3cb4bee987d"
+  },
+  "qia4": {
+    "url": "/assets/pinyin-garden/pronunciation/qia4.mp3",
+    "sourceFile": "qia4.mp3",
+    "bytes": 15731,
+    "sha256": "58e90b165808ddbfa5ec6ff56ca0baf4f17bcb9bdc3b0c27e6b2b12597903052"
+  },
+  "qiong2": {
+    "url": "/assets/pinyin-garden/pronunciation/qiong2.mp3",
+    "sourceFile": "qiong2.mp3",
+    "bytes": 17612,
+    "sha256": "674ecf20935264c8da1530a63c75ccbabbab1d88cc33b77dd319c1aae010356c"
+  },
+  "qu3": {
+    "url": "/assets/pinyin-garden/pronunciation/qu3.mp3",
+    "sourceFile": "qu3.mp3",
+    "bytes": 20747,
+    "sha256": "17dc0be87bc0824e0c431f98aeda30a35d09fe7ec388539e08368f05ce5414bc"
+  },
+  "que4": {
+    "url": "/assets/pinyin-garden/pronunciation/que4.mp3",
+    "sourceFile": "que4.mp3",
+    "bytes": 21151,
+    "sha256": "9d3a22811a58b9d0ab7b6094700d5057c141d8b8b3617edbf222a45c89aa687a"
+  },
+  "qun2": {
+    "url": "/assets/pinyin-garden/pronunciation/qun2.mp3",
+    "sourceFile": "qun2.mp3",
+    "bytes": 16985,
+    "sha256": "3dbfcdec98e3a9ae4a19af7ae486fadb4c8575df72d380771eb7209b7b999faf"
+  },
+  "r": {
+    "url": "/assets/pinyin-garden/pronunciation/r.mp3",
+    "sourceFile": "r.mp3",
+    "bytes": 6949,
+    "sha256": "8bd190253ed7aecf90fefa602f6281e0fb406978bcb154fb5ec4b716be709455"
+  },
+  "re4": {
+    "url": "/assets/pinyin-garden/pronunciation/re4.mp3",
+    "sourceFile": "re4.mp3",
+    "bytes": 14024,
+    "sha256": "a38562d772cdbaf23a54c08312a4746c80db36b5293d02a0914bb230f4cf2371"
+  },
+  "ri4": {
+    "url": "/assets/pinyin-garden/pronunciation/ri4.mp3",
+    "sourceFile": "ri4.mp3",
+    "bytes": 6217,
+    "sha256": "8d9aa4775c932a89261f98dc1bd051890265574b1791f46aef283f0e8cf4cfb9"
+  },
+  "s": {
+    "url": "/assets/pinyin-garden/pronunciation/s.mp3",
+    "sourceFile": "s.mp3",
+    "bytes": 7314,
+    "sha256": "ce01b88f7d083214c269a0909d048fdb483c7d3f19c76a62b7fe73baddee5fba"
+  },
+  "sh": {
+    "url": "/assets/pinyin-garden/pronunciation/sh.mp3",
+    "sourceFile": "sh.mp3",
+    "bytes": 7314,
+    "sha256": "d2c7e6e4cd4fc3910416c2676bcbcc28a1cd9d53481891ec5d76cb64c3cf7670"
+  },
+  "shan1": {
+    "url": "/assets/pinyin-garden/pronunciation/shan1.mp3",
+    "sourceFile": "shan1.mp3",
+    "bytes": 17784,
+    "sha256": "0b11a536f1b8762f35582d32d9c0aaf85d1c5f393c914960d04caa553bca7077"
+  },
+  "shi2": {
+    "url": "/assets/pinyin-garden/pronunciation/shi2.mp3",
+    "sourceFile": "shi2.mp3",
+    "bytes": 8229,
+    "sha256": "920b661827c1e2bd2e24400c9e8573432c61effd22e44c61a6669693b49f820c"
+  },
+  "shu1": {
+    "url": "/assets/pinyin-garden/pronunciation/shu1.mp3",
+    "sourceFile": "shu1.mp3",
+    "bytes": 19040,
+    "sha256": "18f902e822822eb87ccaa41ffbff52afe3c607bb4f868be40770e78be45d7b2e"
+  },
+  "shu4": {
+    "url": "/assets/pinyin-garden/pronunciation/shu4.mp3",
+    "sourceFile": "shu4.mp3",
+    "bytes": 13397,
+    "sha256": "5f2708c3e0aa0cbf20fd9778c4c26441fed6a2a888f7b78b0a44d8e73227445e"
+  },
+  "shui3": {
+    "url": "/assets/pinyin-garden/pronunciation/shui3.mp3",
+    "sourceFile": "shui3.mp3",
+    "bytes": 20921,
+    "sha256": "3d01a70dfa87e4661f4096f85bda09b5798ac066a87c078e5978e4454d009e69"
+  },
+  "shuo1": {
+    "url": "/assets/pinyin-garden/pronunciation/shuo1.mp3",
+    "sourceFile": "shuo1.mp3",
+    "bytes": 18413,
+    "sha256": "9f1ab8fb071ef2db7d7208aef4ecb053b8601448c52ecc397a3c25b3bd5c9621"
+  },
+  "si4": {
+    "url": "/assets/pinyin-garden/pronunciation/si4.mp3",
+    "sourceFile": "si4.mp3",
+    "bytes": 6034,
+    "sha256": "335d42e8cf86002524460785d9c7fdc20f6ef2dd1cbf2978706b5e323bd5d471"
+  },
+  "su4": {
+    "url": "/assets/pinyin-garden/pronunciation/su4.mp3",
+    "sourceFile": "su4.mp3",
+    "bytes": 18413,
+    "sha256": "5f3f2bef7f4a8b841726a70fddf4328916b6067725edc40dc95353fbe4ff0340"
+  },
+  "suo1": {
+    "url": "/assets/pinyin-garden/pronunciation/suo1.mp3",
+    "sourceFile": "suo1.mp3",
+    "bytes": 20921,
+    "sha256": "65235c41a795c99a31c7740b2bc6949d59b51c2700f048f43d06c1a666ba4d75"
+  },
+  "t": {
+    "url": "/assets/pinyin-garden/pronunciation/t.mp3",
+    "sourceFile": "t.mp3",
+    "bytes": 7314,
+    "sha256": "cf7d353f6878b117a5062c3a32967ba6920d50add983e548fab43bb77571cb91"
+  },
+  "tian1": {
+    "url": "/assets/pinyin-garden/pronunciation/tian1.mp3",
+    "sourceFile": "tian1.mp3",
+    "bytes": 19667,
+    "sha256": "25368ff6586dc5b1784a07f5dcfae706c77e4084e5d1caa2db2493536c3096b6"
+  },
+  "tian2": {
+    "url": "/assets/pinyin-garden/pronunciation/tian2.mp3",
+    "sourceFile": "tian2.mp3",
+    "bytes": 18413,
+    "sha256": "57234135916e3ad3ac0a6e95b3d7e8f09b50440d58ea675b43f5907d7e02c2ad"
+  },
+  "tie3": {
+    "url": "/assets/pinyin-garden/pronunciation/tie3.mp3",
+    "sourceFile": "tie3.mp3",
+    "bytes": 20921,
+    "sha256": "d489497e3f814320526fec1c741a8bc9f076a6520a88284d2cd2b5bf55bbf27e"
+  },
+  "tou2": {
+    "url": "/assets/pinyin-garden/pronunciation/tou2.mp3",
+    "sourceFile": "tou2.mp3",
+    "bytes": 18413,
+    "sha256": "7ed3fa77fa887f26894ca6c02497692323111f12586dbc138def6eb9dd47e65c"
+  },
+  "tu3": {
+    "url": "/assets/pinyin-garden/pronunciation/tu3.mp3",
+    "sourceFile": "tu3.mp3",
+    "bytes": 20921,
+    "sha256": "45e1355e249a3ce0c50e46656c96be59917fccac0efad5ccaa0ef269461f1f3e"
+  },
+  "tu4": {
+    "url": "/assets/pinyin-garden/pronunciation/tu4.mp3",
+    "sourceFile": "tu4.mp3",
+    "bytes": 13397,
+    "sha256": "d5840b544871f610a55fdd0342fea38a7da42a76dff38644ab118b10ec7fa001"
+  },
+  "u": {
+    "url": "/assets/pinyin-garden/pronunciation/u.mp3",
+    "sourceFile": "u.mp3",
+    "bytes": 8046,
+    "sha256": "7d94aabada865904725a1d5662884de2ca8c16e7c7140c855b3df051a511e91e"
+  },
+  "ui": {
+    "url": "/assets/pinyin-garden/pronunciation/ui.mp3",
+    "sourceFile": "ui.mp3",
+    "bytes": 6583,
+    "sha256": "1024c88dc1588d5642733c800b72564b7c7ff941445c9b0c94d13911617e27ab"
+  },
+  "un": {
+    "url": "/assets/pinyin-garden/pronunciation/un.mp3",
+    "sourceFile": "un.mp3",
+    "bytes": 6034,
+    "sha256": "0b57b7e651518a3b9aecf7e77a7c816684864abf22a39666417832074ff9d60c"
+  },
+  "v": {
+    "url": "/assets/pinyin-garden/pronunciation/v.mp3",
+    "sourceFile": "v.mp3",
+    "bytes": 21151,
+    "sha256": "777a4ab0f424400fbd2a9ddd467cd46a8335c5b9b333801bb9c9287857854a41"
+  },
+  "v4": {
+    "url": "/assets/pinyin-garden/pronunciation/v4.mp3",
+    "sourceFile": "v4.mp3",
+    "bytes": 7314,
+    "sha256": "93c587c6575e26aace6f865f9caee9f8a4d0f610ab2760b9c9a7f688c84decfb"
+  },
+  "ve": {
+    "url": "/assets/pinyin-garden/pronunciation/ve.mp3",
+    "sourceFile": "ve.mp3",
+    "bytes": 22405,
+    "sha256": "26fa81f923a86e8ae7db6de1c68a12c046c4d21c42a6495ca6165b4b8c7f4274"
+  },
+  "vn": {
+    "url": "/assets/pinyin-garden/pronunciation/vn.mp3",
+    "sourceFile": "vn.mp3",
+    "bytes": 23032,
+    "sha256": "50e3131ceed3828cbaccc834f021213cecef0429adbc3a76efc1ff08e3ee71df"
+  },
+  "w": {
+    "url": "/assets/pinyin-garden/pronunciation/w.mp3",
+    "sourceFile": "w.mp3",
+    "bytes": 6217,
+    "sha256": "a95b28fd1e85e3ed9a32457444279d91078686d6213873d37625f34985445f98"
+  },
+  "wa1": {
+    "url": "/assets/pinyin-garden/pronunciation/wa1.mp3",
+    "sourceFile": "wa1.mp3",
+    "bytes": 18413,
+    "sha256": "dc0895dd0cd4697a26bda709b538752a3cfca98eb047a6728216e66a5ace48fd"
+  },
+  "wo1": {
+    "url": "/assets/pinyin-garden/pronunciation/wo1.mp3",
+    "sourceFile": "wo1.mp3",
+    "bytes": 19040,
+    "sha256": "bda9a6b574c59944161dcd264cb4c39ff0ee97c4ff169e31153fb81a70bc8296"
+  },
+  "wo3": {
+    "url": "/assets/pinyin-garden/pronunciation/wo3.mp3",
+    "sourceFile": "wo3.mp3",
+    "bytes": 22174,
+    "sha256": "f856b592ac3d33420ef4699b3c3278b9c95bdda32e4400c3685a2c81270b80a4"
+  },
+  "wu3": {
+    "url": "/assets/pinyin-garden/pronunciation/wu3.mp3",
+    "sourceFile": "wu3.mp3",
+    "bytes": 8594,
+    "sha256": "5eef0fc4d7f415fd09eae55aef89942b13a9f219f236ef25b4a19ea72662304d"
+  },
+  "x": {
+    "url": "/assets/pinyin-garden/pronunciation/x.mp3",
+    "sourceFile": "x.mp3",
+    "bytes": 8229,
+    "sha256": "a6199061aff9766424fac52f70124987a339f446a1a3cf620439329cdaea05b8"
+  },
+  "xi1": {
+    "url": "/assets/pinyin-garden/pronunciation/xi1.mp3",
+    "sourceFile": "xi1.mp3",
+    "bytes": 8229,
+    "sha256": "a6199061aff9766424fac52f70124987a339f446a1a3cf620439329cdaea05b8"
+  },
+  "xia4": {
+    "url": "/assets/pinyin-garden/pronunciation/xia4.mp3",
+    "sourceFile": "xia4.mp3",
+    "bytes": 15904,
+    "sha256": "a72a66110ca1b74a1870ddec8c926dd48b35cdbcbfa1798a5b9811ac9aaae913"
+  },
+  "xiao3": {
+    "url": "/assets/pinyin-garden/pronunciation/xiao3.mp3",
+    "sourceFile": "xiao3.mp3",
+    "bytes": 24055,
+    "sha256": "66680ef5b6b06888ce14f07da5327455a52c58246d422de237c3c7d98bfdc3ef"
+  },
+  "xie3": {
+    "url": "/assets/pinyin-garden/pronunciation/xie3.mp3",
+    "sourceFile": "xie3.mp3",
+    "bytes": 25309,
+    "sha256": "1f5ab6554da32c7509cfe64a9d4e3043b1269ab2876583f8bc6c6c3c2374915c"
+  },
+  "xing1": {
+    "url": "/assets/pinyin-garden/pronunciation/xing1.mp3",
+    "sourceFile": "xing1.mp3",
+    "bytes": 20921,
+    "sha256": "71663696306ab572fbf1b5153497dd2327f77e19a8ec81de453f73d15313de14"
+  },
+  "xiong2": {
+    "url": "/assets/pinyin-garden/pronunciation/xiong2.mp3",
+    "sourceFile": "xiong2.mp3",
+    "bytes": 19040,
+    "sha256": "6e41de6c144d67ed9b3f134c265cccf016706b0edb6b9bd4946f63f20d88cce5"
+  },
+  "xu1": {
+    "url": "/assets/pinyin-garden/pronunciation/xu1.mp3",
+    "sourceFile": "xu1.mp3",
+    "bytes": 18413,
+    "sha256": "2f466325f232bc0277bedb3785f5eed4f8fbc80e8dbb0cdb89d170ec16630b75"
+  },
+  "xue2": {
+    "url": "/assets/pinyin-garden/pronunciation/xue2.mp3",
+    "sourceFile": "xue2.mp3",
+    "bytes": 18413,
+    "sha256": "1b16b6151da4bf62de348e7ba55f2644fe12b4b415db26b6572af349318d686e"
+  },
+  "y": {
+    "url": "/assets/pinyin-garden/pronunciation/y.mp3",
+    "sourceFile": "y.mp3",
+    "bytes": 7680,
+    "sha256": "4da60157ba7b91010defe34b33e41b8faf5c75290df39d151f3b76d4f97c5a37"
+  },
+  "ya1": {
+    "url": "/assets/pinyin-garden/pronunciation/ya1.mp3",
+    "sourceFile": "ya1.mp3",
+    "bytes": 20698,
+    "sha256": "5a9d1833628d28b85fc43d4871dd03d517bac8fd494164375a891202c5b2eebc"
+  },
+  "ya2": {
+    "url": "/assets/pinyin-garden/pronunciation/ya2.mp3",
+    "sourceFile": "ya2.mp3",
+    "bytes": 15907,
+    "sha256": "7c7cc68e36786302aaa04bc8fe12735ee6d01c30908a8250c54dff745fd5f594"
+  },
+  "ye4": {
+    "url": "/assets/pinyin-garden/pronunciation/ye4.mp3",
+    "sourceFile": "ye4.mp3",
+    "bytes": 6949,
+    "sha256": "f4658cd04d9f73e0a891efb3002e55756e942ea0b2ac38536daf2d1ede1d7605"
+  },
+  "yi1": {
+    "url": "/assets/pinyin-garden/pronunciation/yi1.mp3",
+    "sourceFile": "yi1.mp3",
+    "bytes": 7680,
+    "sha256": "4da60157ba7b91010defe34b33e41b8faf5c75290df39d151f3b76d4f97c5a37"
+  },
+  "yin1": {
+    "url": "/assets/pinyin-garden/pronunciation/yin1.mp3",
+    "sourceFile": "yin1.mp3",
+    "bytes": 5120,
+    "sha256": "6a52fe7480d7886f86135c0c50ecdd2af4b04404339a782b32328881f408a5da"
+  },
+  "ying1": {
+    "url": "/assets/pinyin-garden/pronunciation/ying1.mp3",
+    "sourceFile": "ying1.mp3",
+    "bytes": 7314,
+    "sha256": "b7b19ebd4f150f19da1acaf1a34083a9167603c848f8d533228c1c24e495b60f"
+  },
+  "yu2": {
+    "url": "/assets/pinyin-garden/pronunciation/yu2.mp3",
+    "sourceFile": "yu2.mp3",
+    "bytes": 8960,
+    "sha256": "e6f44086bd38a5d8710eef810af7f5ee50f80d149aaa46a7f2115a37a5ce6265"
+  },
+  "yu3": {
+    "url": "/assets/pinyin-garden/pronunciation/yu3.mp3",
+    "sourceFile": "yu3.mp3",
+    "bytes": 9691,
+    "sha256": "27122389b54171dd1693118b9bb1b8a7fa1d746a7f9b3af0602dffe2fb5d4b35"
+  },
+  "yuan2": {
+    "url": "/assets/pinyin-garden/pronunciation/yuan2.mp3",
+    "sourceFile": "yuan2.mp3",
+    "bytes": 8411,
+    "sha256": "e0df49cc690a2f775c65c1c15de5b5a18fdcf971c29e0d058cf81cd66c234ca7"
+  },
+  "yue4": {
+    "url": "/assets/pinyin-garden/pronunciation/yue4.mp3",
+    "sourceFile": "yue4.mp3",
+    "bytes": 6217,
+    "sha256": "80be4ef8635f5392946f599767f4044a1b8f19bb32d71f1532980f08d3aa5e7f"
+  },
+  "yun2": {
+    "url": "/assets/pinyin-garden/pronunciation/yun2.mp3",
+    "sourceFile": "yun2.mp3",
+    "bytes": 7680,
+    "sha256": "775e34c4b009f57f328c5523f29e64f5ff28b69f217a9e2eb0bbdd627358b1db"
+  },
+  "z": {
+    "url": "/assets/pinyin-garden/pronunciation/z.mp3",
+    "sourceFile": "z.mp3",
+    "bytes": 7680,
+    "sha256": "001820da929c55c9f230f02ab2574ecb71cca16de4d7ffdbeef1e335ce84116b"
+  },
+  "zh": {
+    "url": "/assets/pinyin-garden/pronunciation/zh.mp3",
+    "sourceFile": "zh.mp3",
+    "bytes": 7314,
+    "sha256": "9b9de365fd1bcd564ad82f7338685b23bc76442a60c3279a23903e71ee9b720b"
+  },
+  "zhi1": {
+    "url": "/assets/pinyin-garden/pronunciation/zhi1.mp3",
+    "sourceFile": "zhi1.mp3",
+    "bytes": 7314,
+    "sha256": "9b9de365fd1bcd564ad82f7338685b23bc76442a60c3279a23903e71ee9b720b"
+  },
+  "zhuang4": {
+    "url": "/assets/pinyin-garden/pronunciation/zhuang4.mp3",
+    "sourceFile": "zhuang4.mp3",
+    "bytes": 14653,
+    "sha256": "303d910528abee8747eb6b1030939174a2e68b4281758696a005bab066d4c0b4"
+  },
+  "zhuo1": {
+    "url": "/assets/pinyin-garden/pronunciation/zhuo1.mp3",
+    "sourceFile": "zhuo1.mp3",
+    "bytes": 16534,
+    "sha256": "11421f16a5b5d222007444f4b42ec1a5dfde9a0965fdabe5c99174d1129c6bf0"
+  },
+  "zi1": {
+    "url": "/assets/pinyin-garden/pronunciation/zi1.mp3",
+    "sourceFile": "zi1.mp3",
+    "bytes": 7680,
+    "sha256": "001820da929c55c9f230f02ab2574ecb71cca16de4d7ffdbeef1e335ce84116b"
+  },
+  "zi3": {
+    "url": "/assets/pinyin-garden/pronunciation/zi3.mp3",
+    "sourceFile": "zi3.mp3",
+    "bytes": 9326,
+    "sha256": "a9fcc737b4508c10969bb4594029f936c361629f7aa6e50ee367f1d55d4f38ab"
+  },
+  "zu3": {
+    "url": "/assets/pinyin-garden/pronunciation/zu3.mp3",
+    "sourceFile": "zu3.mp3",
+    "bytes": 19669,
+    "sha256": "b97a2acf7b5cd3f1da4e04b9185278e3031002813985a778d5c6510a1c16f1d4"
+  },
+  "zui4": {
+    "url": "/assets/pinyin-garden/pronunciation/zui4.mp3",
+    "sourceFile": "zui4.mp3",
+    "bytes": 15907,
+    "sha256": "07398fb10cc15b28183ae5358a1b69642ac930c78f85dc21ec817a070da6c3df"
+  },
+  "zuo4": {
+    "url": "/assets/pinyin-garden/pronunciation/zuo4.mp3",
+    "sourceFile": "zuo4.mp3",
+    "bytes": 18190,
+    "sha256": "67025f0312b7691032621c3efc6b50ee7dc6a60543ede6ceb1617313b0da2a50"
+  }
+}

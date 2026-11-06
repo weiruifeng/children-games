@@ -1,7 +1,7 @@
 import {describe,it,expect} from 'vitest';
 import {ENTRY_MAP,LEVELS} from './content';
 import {createGarden,startWave,placePlant,selectKnowledge,submitTask,tickGarden,snapshot,hasSharedAmmo,removePlant} from './simulation';
-import {parseState,parseProfile,newProfile} from './snapshot';
+import {parseState,parseLegacyProfile as parseProfile,legacyProfile as newProfile} from './snapshot';
 import type {GardenState} from './model';
 function enemy(s:GardenState,row:number,entryId='char-1',x=1150){s.enemies.push({id:s.nextId++,row,entryId,x,kind:'enemy_scroll',hp:240,armor:0,attackTimer:0});}
 function unlock(s:GardenState,id:string){selectKnowledge(s,id);while(!s.task!.finished){s.task!.parts={...ENTRY_MAP[id].parts[s.task!.index]};s.task!.choice=ENTRY_MAP[id].text;submitTask(s);}}

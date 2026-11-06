@@ -50,10 +50,10 @@ export function createGardenGame(parent:HTMLElement,bridge:GardenBridge,reduced:
     if(p.ammo)this.label(`ammo${p.id}`,`${p.signature} · ${p.ammo}`,x,y-78,19,'#325849','#fff9de');
    }
    for(const e of s.enemies){
-    const t=s.task?.entryId===e.entryId;this.label(`enemy${e.id}`,`${ENTRY_MAP[e.entryId].text}${hasSharedAmmo(s,e.entryId)?' ✓':''}`,e.x,rowY(e.row)-85,32,t?'#b66a2a':'#34434f',t?'#fff0bb':'#fff9e8');
+    const t=s.task?.entryId===e.entryId;this.label(`enemy${e.id}`,`${s.lessonId&&!s.levelId?ENTRY_MAP[e.entryId].pinyin.join(' '):ENTRY_MAP[e.entryId].text}${hasSharedAmmo(s,e.entryId)?' ✓':''}`,e.x,rowY(e.row)-85,32,t?'#b66a2a':'#34434f',t?'#fff0bb':'#fff9e8');
     g.fillStyle(0x423f62,.2);g.fillRoundedRect(e.x-28,rowY(e.row)+40,56,5,2);g.fillStyle(e.armor?0xc19d62:0x6c6688);g.fillRoundedRect(e.x-28,rowY(e.row)+40,56*(e.hp+e.armor)/(e.kind==='enemy_scroll'?240:e.kind==='enemy_paper_blob'?160:80),5,2);
    }
-   for(const p of s.projectiles){this.label(`bullet${p.id}`,p.signature,p.x,p.y-30,24,'#356641','#fff5bc');g.lineStyle(5,0xf4cf63,.65);g.lineBetween(p.x-35,p.y,p.x-10,p.y);}
+   for(const p of s.projectiles){this.label(`bullet${p.id}`,p.signature.replace(/^symbol:/,''),p.x,p.y-30,24,'#356641','#fff5bc');g.lineStyle(5,0xf4cf63,.65);g.lineBetween(p.x-35,p.y,p.x-10,p.y);}
 
    this.entities.update(s,this.pulse,reduced());
    this.label('path','墨团从这里来 ←',1165,140,15,'#708274');

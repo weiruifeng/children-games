@@ -1,10 +1,10 @@
 import {describe,it,expect} from 'vitest';
 import {ENTRIES,partsFor,composeParts,markTone,validateContent} from './content';
 import {createGarden,startWave,placePlant,selectPlant,selectTarget,submitTask,tickGarden,starsFor,snapshot,hasSharedAmmo} from './simulation';
-import {newProfile,parseProfile} from './snapshot';
+import {legacyProfile as newProfile,parseLegacyProfile as parseProfile} from './snapshot';
 function target(){const s=createGarden();startWave(s);placePlant(s,'plant_pod_slinger',1,0);s.enemies.push({id:s.nextId++,kind:'enemy_ink_blob',row:1,x:800,hp:80,armor:0,entryId:'char-1',attackTimer:0});selectPlant(s,s.plants[0].id);selectTarget(s,s.enemies[0].id);return s;}
 describe('pinyin-garden content',()=>{
- it('covers all declared entries and legal decompositions',()=>{expect(ENTRIES).toHaveLength(42);expect(()=>validateContent()).not.toThrow();});
+ it('covers all declared entries and legal decompositions',()=>{expect(ENTRIES.filter(e=>!e.readingId&&(e.type==='character'||e.type==='word'))).toHaveLength(42);expect(()=>validateContent()).not.toThrow();});
  it('marks compound vowels and keeps ü distinct',()=>{expect(markTone('niu',2)).toBe('niú');expect(markTone('shui',3)).toBe('shuǐ');expect(markTone('lü',4)).toBe('lǜ');expect(composeParts(partsFor('guā'))).toBe('guā');expect(composeParts(partsFor('yuè'))).toBe('yuè');});
  it('rejects wrong teaching split and unsupported syllables',()=>{expect(composeParts({initial:'m',medial:'',final:'ü',tone:3,whole:''})).toBeNull();expect(composeParts({initial:'g',medial:'',final:'ua',tone:1,whole:''})).toBeNull();});
 });

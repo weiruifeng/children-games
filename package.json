@@ -12,9 +12,10 @@
     "dev:web": "npm run dev -w web",
     "dev:rescue": "npm run dev -w web -- --open /experiments/dino-rescue/",
     "dev:server": "npm run start:dev -w server",
-    "build": "npm run build -w shared && npm run build -w web && npm run build -w server",
+    "build": "npm run validate:garden-content && npm run build -w shared && npm run build -w web && npm run build -w server",
     "type-check": "npm run type-check -w shared && npm run type-check -w web && npm run type-check -w server",
-    "dev:pinyin": "npm run dev -w web -- --open /experiments/pinyin-garden/"
+    "dev:pinyin": "npm run dev -w web -- --open /experiments/pinyin-garden/",
+    "validate:garden-content": "node scripts/validate-garden-content.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

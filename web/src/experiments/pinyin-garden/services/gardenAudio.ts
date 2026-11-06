@@ -1,3 +1,4 @@
+import {SpeechChannel,pronunciationUrls,canPronounce} from './pronunciation';
 import manifest from '../../../../public/assets/pinyin-garden/audio-manifest.json';
 import type {GardenState} from '@children-games/shared';
 export type Music = keyof typeof manifest.music;
@@ -21,6 +22,22 @@ export class EventCursor {
 }
 export class GardenAudio {
  private context:AudioContext|null=null;
+ private speechGain:GainNode|null=null;private speechOn=true;private speechVolume=.8;private speechActive=false;
+ private speech:SpeechChannel<AudioBuffer>|null=null;
+ private speechFailure:()=>void=()=>{};
+ setSpeechFailure(handler:()=>void){this.speechFailure=handler;}
+ configureSpeech(enabled:boolean,volume:number){
+  if(!enabled||volume===0)this.speech?.stop();this.speechOn=enabled;this.speechVolume=volume;
+  if(this.context&&this.speechGain)this.speechGain.gain.setTargetAtTime(this.muted?0:volume,this.context.currentTime,.03);
+ }
+ pronounce(pinyin:string[]){
+  if(!this.speechOn||this.speechVolume===0||this.muted||this.hidden||this.disposed)return;
+  this.unlock();
+  if(!canPronounce(pinyin)){this.stopSpeech();this.speechFailure();return;}
+  void this.speech?.play(pronunciationUrls(pinyin));
+ }
+ stopSpeech(){this.speech?.stop();}
+
  private duckGain:GainNode|null=null;
  private musicGain:GainNode|null=null;private sfxGain:GainNode|null=null;
  private buffers=new Map<string,Promise<AudioBuffer>>();
@@ -39,6 +56,8 @@ export class GardenAudio {
    if(!this.context){
     this.context=new AudioContext();this.musicGain=this.context.createGain();this.sfxGain=this.context.createGain();
     const compressor=this.context.createDynamicsCompressor();compressor.threshold.value=-18;compressor.ratio.value=6;
+    this.speechGain=this.context.createGain();this.speechGain.connect(compressor);
+    this.speech=new SpeechChannel<AudioBuffer>({load:url=>this.buffer(url),enabled:()=>!this.disposed&&!this.muted&&!this.hidden&&this.speechOn&&this.speechVolume>0,start:buffer=>{const source=this.context!.createBufferSource();source.buffer=buffer;source.connect(this.speechGain!);let finish:()=>void=()=>{};const finished=new Promise<void>(resolve=>{finish=resolve;});source.onended=()=>{source.disconnect();finish();};source.start();return {finished,stop:()=>{try{source.stop();}catch{}source.disconnect();finish();}};},mix:active=>{this.speechActive=active;if(this.context&&this.duckGain){const gain=this.duckGain.gain,now=this.context.currentTime;gain.cancelScheduledValues(now);gain.setTargetAtTime(active?.25:1,now,.04);}}},()=>this.speechFailure());
     this.duckGain=this.context.createGain();this.musicGain.connect(this.duckGain);this.duckGain.connect(compressor);this.sfxGain.connect(compressor);compressor.connect(this.context.destination);
     this.volumes();
     this.context.onstatechange=()=>this.status(this.context?.state==='running');
@@ -63,14 +82,15 @@ export class GardenAudio {
   if(!this.context)return;
   this.musicGain!.gain.setTargetAtTime(this.muted?0:this.musicVolume*MUSIC_MIX_GAIN,this.context.currentTime,.03);
   this.sfxGain!.gain.setTargetAtTime(this.muted?0:this.sfxVolume,this.context.currentTime,.03);
+  if(this.speechGain)this.speechGain.gain.setTargetAtTime(this.muted?0:this.speechVolume,this.context.currentTime,.03);
  }
  configure(track:Music|null,paused:boolean,music:number,sfx:number,muted:boolean){
   const changed=track!==this.wanted;
-  if(changed||paused!==this.paused||muted!==this.muted){this.stopMusic();this.stopEffects();}
+  if(changed||paused!==this.paused||muted!==this.muted){this.stopMusic();this.stopEffects();this.stopSpeech();}
   if(changed){this.wanted=track;this.offset=0;this.ended=false;}
   this.paused=paused;this.muted=muted;this.musicVolume=music;this.sfxVolume=sfx;this.volumes();this.startMusic();
  }
- visibility(hidden:boolean){this.hidden=hidden;if(hidden){this.stopMusic();this.stopEffects();}else this.startMusic();}
+ visibility(hidden:boolean){this.hidden=hidden;if(hidden){this.stopMusic();this.stopEffects();this.stopSpeech();}else this.startMusic();}
  private stopMusic(){
   this.revision++;
   if(this.source){this.offset+=this.context!.currentTime-this.started;this.source.onended=null;this.source.stop();this.source.disconnect();this.source=null;}
@@ -106,10 +126,10 @@ export class GardenAudio {
   const now=this.context.currentTime;const gain=this.duckGain.gain;
   gain.cancelScheduledValues(now);
   gain.setTargetAtTime(.4,now,.015);
-  gain.setTargetAtTime(1,now+.22,.16);
+  gain.setTargetAtTime(this.speechActive?.25:1,now+.22,.16);
  }
  private stopEffects(){
   if(this.context&&this.duckGain){const now=this.context.currentTime;this.duckGain.gain.cancelScheduledValues(now);this.duckGain.gain.setValueAtTime(1,now);}
   this.epoch++;for(const voice of this.voices){voice.stop();voice.disconnect();}this.voices.clear();}
- dispose(){this.disposed=true;this.stopMusic();this.stopEffects();if(this.context){this.context.onstatechange=null;void this.context.close();}}
+ dispose(){this.disposed=true;this.stopMusic();this.stopEffects();this.stopSpeech();if(this.context){this.context.onstatechange=null;void this.context.close();}}
 }

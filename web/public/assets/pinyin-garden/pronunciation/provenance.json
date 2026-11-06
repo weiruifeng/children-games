@@ -1,0 +1,25 @@
+{
+  "source": "User-provided local PinYinSound, git remote https://github.com/cmguo/PinYinSound",
+  "selection": "Only components and syllables referenced by shipped lesson and legacy content",
+  "verification": "File existence and hashes verified; pronunciation quality not yet human-reviewed",
+  "umlaut": "v/ve/vn file family selected consistently; Unicode alternatives kept intact in the source",
+  "files": 171,
+  "missing": [
+    "chi",
+    "ci",
+    "ri",
+    "shi",
+    "si",
+    "wu",
+    "ye",
+    "yi",
+    "yin",
+    "ying",
+    "yu",
+    "yuan",
+    "yue",
+    "yun",
+    "zhi",
+    "zi"
+  ]
+}

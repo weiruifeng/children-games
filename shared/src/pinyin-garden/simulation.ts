@@ -1,3 +1,7 @@
+import {planLesson} from './lessonPlanner';
+import {CHARACTER_PACK,CHARACTER_LEVEL_MAP} from './characterCatalog';
+import type {LearningAttempt} from './model';
+import {LESSONS,optionsFor,taskOptions} from './curriculum';
 import {knowledgePool} from './review';
 import {allowedPlants,composeParts,ENTRY_MAP,LEVELS,PLANTS,signature,type PlantKind,type Parts,type EnemyKind} from './content';
 import {BOARD,cellX,rowY,emptyParts,type GardenState,type Enemy,type Plant} from './model';
@@ -5,6 +9,16 @@ export function createGarden(level=1,seed=173):GardenState {
  if(!LEVELS[level-1])throw new Error('未知关卡');
  return {version:1,level,seed,stage:'ready',wave:0,time:0,waveTime:0,betweenTime:12,spawned:0,nextSpawn:0,dew:250,hearts:3,rescues:[false,false,false],plants:[],enemies:[],projectiles:[],drops:[],cooldowns:{plant_pod_slinger:0,plant_dew_collector:0,plant_vine_guard:0,plant_cone_launcher:0},sharedAmmo:[],drafts:{},selectedPlant:null,task:null,paused:false,helpOpen:false,slow:false,dropTimer:0,score:0,earned:[],results:{},attempts:[],attackedRows:[],strategy:false,nextId:1,eventId:0,events:[],message:'先种下伙伴，再开始这一波。'};
 }
+/** The level field remains the original battle stage; curriculum never changes combat numbers. */
+function createRunId():string {
+ const crypto=globalThis.crypto;
+ return crypto&&typeof crypto.randomUUID==='function'?crypto.randomUUID():`${Date.now()}-${Math.random()}`;
+}
+export function createLessonGarden(lessonId=1,battleStage=1,seed=173,runId=createRunId()):GardenState {
+ if(!LESSONS[lessonId-1])throw Error('未知课程');
+ return {...createGarden(battleStage,seed),lessonId,runId};
+}
+export function createCharacterGarden(levelId:string,battleStage=1,attempts:LearningAttempt[]=[],runId=createRunId()):GardenState {return {...createGarden(battleStage),levelId,runId,packVersion:CHARACTER_PACK,learningPlan:planLesson(levelId,runId,attempts),revealed:[],audioUsed:[]};}
 function event(s:GardenState,type:string,x=640,y=400,value?:string){s.events.push({id:++s.eventId,type,x,y,value});if(s.events.length>40)s.events.shift();}
 function reward(s:GardenState,key:string,points:number){if(!s.earned.includes(key)){s.earned.push(key);s.score+=points;}}
 function random(s:GardenState){s.seed=(Math.imul(1664525,s.seed)+1013904223)>>>0;return s.seed/4294967296;}
@@ -44,7 +58,8 @@ export function selectKnowledge(s:GardenState,entryId:string):boolean {
  if(s.paused||s.helpOpen||s.stage!=='playing'||!knowledgePool(s).includes(entryId))return false;
  if(s.task)s.drafts[s.task.entryId]=s.task;
  const entry=ENTRY_MAP[entryId];
- s.task=s.drafts[entryId]??{key:`wave-${s.wave}:ammo-${signature(entry)}`,plantId:0,enemyId:0,entryId,index:0,parts:emptyParts(),help:0,errors:0,finished:false,mode:s.level===4&&Number(entryId.split('-')[1])%2===0?'choose':'compose',choice:''};
+ s.task=s.drafts[entryId]??{key:`${s.runId??'legacy'}:wave-${s.wave}:ammo-${signature(entry)}`,plantId:0,enemyId:0,entryId,index:0,parts:emptyParts(),help:entry.guided?1:0,errors:0,finished:false,mode:!s.levelId&&!s.lessonId&&s.level===4&&Number(entryId.split('-')[1])%2===0?'choose':'compose',choice:''};
+ if(entry.type==='symbol')s.task.parts.tone=0;
  s.drafts[entryId]=s.task;
  if(hasSharedAmmo(s,entryId)){s.task.finished=true;s.task.index=entry.parts.length-1;s.task.parts={...entry.parts[s.task.index]};}
  s.message=s.task.finished?'本波全队无限使用':'拼好一次，全队共享。';return true;
@@ -54,12 +69,14 @@ export function selectTarget(s:GardenState,id:number):boolean {
 }
 export function choosePart(s:GardenState,key:keyof Parts,value:string|number):void {
  if(!s.task||s.task.finished||s.paused||s.helpOpen)return;
- if(key==='tone'){if(typeof value!=='number'||value<1||value>4)return;s.task.parts.tone=value;}
+ const entry=ENTRY_MAP[s.task.entryId];
+ if((s.lessonId||s.levelId)&&!optionsFor(s,entry,key).includes(value))return;
+ if(key==='tone'){if(typeof value!=='number'||value<1||value>5)return;s.task.parts.tone=value;}
  else if(typeof value==='string')s.task.parts[key]=value;
  event(s,key==='tone'?'slot_tone':key==='initial'?'slot_initial':'slot_final');
 }
 export function requestHelp(s:GardenState):void {
- if(!s.task||s.task.finished||s.paused)return;s.task.help=Math.min(3,s.task.help+1);s.helpOpen=true;
+ if(!s.task||s.task.finished||s.paused)return;s.task.help=Math.min(3,s.task.help+1);s.helpOpen=true;if(s.levelId)s.revealed=[...new Set([...(s.revealed??[]),`${s.wave}:${s.task.entryId}`])];
  s.message='慢慢看，花园已经暂停了。';
 }
 export function applyDemonstration(s:GardenState):void {
@@ -70,9 +87,12 @@ export function submitTask(s:GardenState,now=Date.now()):boolean {
  const t=s.task;if(!t||t.finished||s.paused||s.helpOpen)return false;
  if(s.stage!=='playing')return false;
  const entry=ENTRY_MAP[t.entryId];const correct=t.mode==='choose'?t.choice===entry.text:composeParts(t.parts)===entry.pinyin[t.index];
- const id=`${t.key}:${t.index}`;if(correct||t.errors===0)s.attempts.push({level:s.level,mode:s.reviewPool?'review':'battle',retry:!!s.retryCount,taskId:id,entryId:entry.id,syllable:t.index,correct,assisted:t.help>0,repeated:s.attempts.some(a=>a.taskId===id&&a.correct),at:now});
+ const visible=!!s.lessonId||!!s.revealed?.includes(`${s.wave}:${t.entryId}`);
+ const optionCount=s.levelId?Math.min(...Object.entries(entry.parts[t.index]).filter(([,v])=>!!v).map(([k])=>taskOptions(s,entry,t.index,k as keyof Parts).length)):2;
+ const assisted=t.help>0||visible;
+ const id=`${t.key}:${t.index}`;if(correct||t.errors===0)s.attempts.push({runId:s.runId,levelId:s.levelId,track:s.levelId?CHARACTER_LEVEL_MAP[s.levelId].track:undefined,readingId:entry.readingId,wave:s.wave,audioUsed:s.audioUsed?.includes(`${s.wave}:${entry.id}`),optionCount,lessonId:s.lessonId,referenceVisible:visible,firstTryCorrect:correct&&t.errors===0&&(!s.levelId||!assisted&&optionCount>1&&!s.retryCount),level:s.level,mode:s.reviewPool?'review':'battle',retry:!!s.retryCount,taskId:id,entryId:entry.id,syllable:t.index,correct,assisted:assisted,repeated:s.attempts.some(a=>a.taskId===id&&a.correct),at:now});
  if(!correct){t.errors=Math.max(1,t.errors);s.message=t.mode==='choose'?'再看看拼音，换一个字试试。':composeParts(t.parts)?'声母、韵母或声调还需要调整。':'这组还不能组成支持的音节。';event(s,'needs_edit');return false;}
- if(!s.results[id]){s.results[id]={independent:t.errors===0&&t.help===0};reward(s,`task:${id}`,100+(s.results[id].independent?50:0));}
+ if(!s.results[id]){s.results[id]={independent:t.errors===0&&t.help===0&&(!s.levelId||!assisted&&optionCount>1&&!s.retryCount)};reward(s,`task:${id}`,100+(s.results[id].independent?50:0));}
  if(s.level===2&&s.enemies.some(en=>s.plants.some(pl=>pl.kind==='plant_vine_guard'&&pl.row===en.row&&Math.abs(en.x-cellX(pl.col))<65)))s.strategy=true;
  if(t.index<entry.parts.length-1){t.index++;t.parts=emptyParts();t.errors=0;t.help=0;s.message='第一个拼好了，接着拼下一个。';event(s,'syllable_ready');return true;}
  t.finished=true;if(!hasSharedAmmo(s,entry.id))s.sharedAmmo.push(entry.id);
@@ -98,12 +118,13 @@ function matching(s:GardenState,p:Pick<Plant,'row'|'signature'|'target'>,x:numbe
 }
 function spawn(s:GardenState):void {
  const l=LEVELS[s.level-1];const count=l.counts[s.wave];
- const captain=s.level===5&&s.wave===2&&s.spawned===count-1;
+ const words=knowledgePool(s).filter(id=>ENTRY_MAP[id].type==='word');
+ const captain=s.level===5&&s.wave===2&&s.spawned===count-1&&words.length>0;
  const kind:EnemyKind=captain?'enemy_scroll':s.spawned<l.armored[s.wave]?'enemy_paper_blob':'enemy_ink_blob';
  const row=l.rows[Math.floor(random(s)*l.rows.length)];
  if(s.enemies.some(e=>e.row===row&&e.x>BOARD.spawnX-100))return;
  const sampled=knowledgePool(s)[Math.floor(random(s)*knowledgePool(s).length)];
- const entryId=s.level===1&&s.wave===0&&s.spawned===0?'char-1':sampled;
+ const entryId=s.learningPlan?(s.learningPlan.waves[s.wave].newEntries[s.spawned]??sampled):captain?words[0]:!s.lessonId&&s.level===1&&s.wave===0&&s.spawned===0?'char-1':!s.reviewPool&&s.lessonId===1&&s.wave===0&&s.spawned===0?'symbol-a':sampled;
  s.enemies.push({id:s.nextId++,kind,row,x:BOARD.spawnX,hp:kind==='enemy_scroll'?240:80,armor:kind==='enemy_paper_blob'?80:0,entryId,attackTimer:0});s.spawned++;s.nextSpawn=s.waveTime+l.interval;
  if(captain)event(s,'scroll_enter');
 }
@@ -121,7 +142,7 @@ export function tickGarden(s:GardenState,realDelta:number):void {
   p.timer+=dt;
   if(p.kind==='plant_dew_collector'&&p.timer>=8){p.timer=-4;s.drops.push({id:s.nextId++,x:cellX(p.col)+35,y:rowY(p.row)-28,age:0,value:25});event(s,'dew_spawn',cellX(p.col),rowY(p.row));}
   if(p.kind==='plant_pod_slinger'||p.kind==='plant_cone_launcher'){
-   const target=s.enemies.filter(e=>e.row===p.row&&e.x>cellX(p.col)&&hasSharedAmmo(s,e.entryId)&&(p.kind==='plant_cone_launcher'||ENTRY_MAP[e.entryId].type==='character')).sort((a,b)=>a.x-b.x)[0];
+   const target=s.enemies.filter(e=>e.row===p.row&&e.x>cellX(p.col)&&hasSharedAmmo(s,e.entryId)&&(p.kind==='plant_cone_launcher'||ENTRY_MAP[e.entryId].type!=='word')).sort((a,b)=>a.x-b.x)[0];
    p.firing=!!target;p.ammo=0;
    if(target&&p.timer>=(p.kind==='plant_cone_launcher'?3:.8)){
     p.target=target.id;p.signature=signature(ENTRY_MAP[target.entryId]);p.timer=0;

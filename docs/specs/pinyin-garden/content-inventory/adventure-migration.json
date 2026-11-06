@@ -1,0 +1,821 @@
+{
+  "levels": 226,
+  "readings": 1274,
+  "distribution": {
+    "5": 38,
+    "6": 176,
+    "4": 4,
+    "3": 2,
+    "2": 3
+  },
+  "shortAdventures": [
+    {
+      "id": "encounter-02-02",
+      "chapter": 2,
+      "track": "challenge",
+      "name": "奇遇挑战 2",
+      "targets": [
+        "reading-e1",
+        "reading-o1",
+        "reading-o3"
+      ],
+      "short": true
+    },
+    {
+      "id": "encounter-03-01",
+      "chapter": 3,
+      "track": "challenge",
+      "name": "奇遇挑战 1",
+      "targets": [
+        "reading-bo4",
+        "reading-bu1"
+      ],
+      "short": true
+    },
+    {
+      "id": "encounter-08-01",
+      "chapter": 8,
+      "track": "challenge",
+      "name": "奇遇挑战 1",
+      "targets": [
+        "reading-cha3",
+        "reading-chua1"
+      ],
+      "short": true
+    },
+    {
+      "id": "encounter-12-02",
+      "chapter": 12,
+      "track": "challenge",
+      "name": "奇遇挑战 2",
+      "targets": [
+        "reading-mie1",
+        "reading-tie4",
+        "reading-yue3"
+      ],
+      "short": true
+    },
+    {
+      "id": "encounter-16-01",
+      "chapter": 16,
+      "track": "challenge",
+      "name": "奇遇挑战 1",
+      "targets": [
+        "reading-m2",
+        "reading-n2"
+      ],
+      "short": true
+    }
+  ],
+  "oldToNew": {
+    "foundation-01": [
+      "foundation-01"
+    ],
+    "foundation-02": [
+      "foundation-01"
+    ],
+    "foundation-03": [
+      "foundation-01"
+    ],
+    "foundation-04": [
+      "foundation-04"
+    ],
+    "foundation-05": [
+      "foundation-04"
+    ],
+    "foundation-06": [
+      "foundation-06"
+    ],
+    "main-a1": [
+      "adventure-02-01"
+    ],
+    "challenge-e3": [
+      "encounter-02-01",
+      "encounter-02-02"
+    ],
+    "challenge-o3": [
+      "encounter-02-02"
+    ],
+    "main-ba1": [
+      "adventure-03-01"
+    ],
+    "main-bi3": [
+      "adventure-03-02"
+    ],
+    "main-fa1": [
+      "adventure-03-03"
+    ],
+    "main-fu2": [
+      "adventure-03-04"
+    ],
+    "main-ma4": [
+      "adventure-03-05"
+    ],
+    "main-mo3": [
+      "adventure-03-06"
+    ],
+    "main-pa2": [
+      "adventure-03-07"
+    ],
+    "main-po1": [
+      "adventure-03-08",
+      "adventure-03-09"
+    ],
+    "main-pu4": [
+      "adventure-03-09"
+    ],
+    "challenge-bo4": [
+      "encounter-03-01"
+    ],
+    "main-da1": [
+      "adventure-04-01"
+    ],
+    "main-di2": [
+      "adventure-04-02"
+    ],
+    "main-du4": [
+      "adventure-04-03"
+    ],
+    "main-li3": [
+      "adventure-04-04"
+    ],
+    "main-lv4": [
+      "adventure-04-05"
+    ],
+    "main-ni4": [
+      "adventure-04-06"
+    ],
+    "main-ta3": [
+      "adventure-04-07",
+      "adventure-04-08"
+    ],
+    "main-ti4": [
+      "adventure-04-08",
+      "adventure-04-09"
+    ],
+    "main-li1": [
+      "adventure-04-09"
+    ],
+    "challenge-de1": [
+      "encounter-04-01"
+    ],
+    "challenge-nv4": [
+      "encounter-04-01"
+    ],
+    "main-duo1": [
+      "adventure-05-01"
+    ],
+    "main-ge2": [
+      "adventure-05-02"
+    ],
+    "main-gua3": [
+      "adventure-05-03"
+    ],
+    "main-ha1": [
+      "adventure-05-04"
+    ],
+    "main-hu3": [
+      "adventure-05-05"
+    ],
+    "main-huo2": [
+      "adventure-05-06"
+    ],
+    "main-ke2": [
+      "adventure-05-07"
+    ],
+    "main-kua1": [
+      "adventure-06-01"
+    ],
+    "main-luo3": [
+      "adventure-05-08"
+    ],
+    "main-tuo3": [
+      "adventure-05-09"
+    ],
+    "challenge-dia3": [
+      "encounter-06-01"
+    ],
+    "main-ji1": [
+      "adventure-06-02"
+    ],
+    "main-jia3": [
+      "adventure-06-03"
+    ],
+    "main-qi1": [
+      "adventure-06-04"
+    ],
+    "main-qia4": [
+      "adventure-06-05"
+    ],
+    "main-xi2": [
+      "adventure-06-06",
+      "adventure-06-07"
+    ],
+    "main-xu1": [
+      "adventure-06-07"
+    ],
+    "challenge-qia2": [
+      "encounter-06-01"
+    ],
+    "main-ca1": [
+      "adventure-07-01"
+    ],
+    "main-cu4": [
+      "adventure-07-02"
+    ],
+    "main-se4": [
+      "adventure-07-03"
+    ],
+    "main-su4": [
+      "adventure-07-04"
+    ],
+    "main-zi1": [
+      "adventure-07-05",
+      "adventure-07-06"
+    ],
+    "main-zuo2": [
+      "adventure-07-06"
+    ],
+    "challenge-ci1": [
+      "encounter-07-01"
+    ],
+    "challenge-zuo1": [
+      "encounter-07-01"
+    ],
+    "main-cha1": [
+      "adventure-08-01"
+    ],
+    "main-chi1": [
+      "adventure-08-02"
+    ],
+    "main-chu3": [
+      "adventure-08-03"
+    ],
+    "main-ri4": [
+      "adventure-08-04"
+    ],
+    "main-sha3": [
+      "adventure-08-05"
+    ],
+    "main-shi1": [
+      "adventure-08-06"
+    ],
+    "main-shu3": [
+      "adventure-08-07"
+    ],
+    "main-zha1": [
+      "adventure-08-08"
+    ],
+    "main-zhe3": [
+      "adventure-08-09",
+      "adventure-08-10"
+    ],
+    "main-zhu1": [
+      "adventure-08-10",
+      "adventure-08-11"
+    ],
+    "main-zhuo1": [
+      "adventure-08-11"
+    ],
+    "supplement-sha2": [
+      "adventure-08-11"
+    ],
+    "challenge-cha3": [
+      "encounter-08-01"
+    ],
+    "main-wa1": [
+      "adventure-09-01"
+    ],
+    "main-wo4": [
+      "adventure-09-02"
+    ],
+    "main-ya2": [
+      "adventure-09-03"
+    ],
+    "main-yi4": [
+      "adventure-09-04"
+    ],
+    "main-ai1": [
+      "adventure-10-01"
+    ],
+    "main-bai3": [
+      "adventure-10-02"
+    ],
+    "main-cai2": [
+      "adventure-10-03"
+    ],
+    "main-chuai3": [
+      "adventure-10-04"
+    ],
+    "main-dai3": [
+      "adventure-10-05"
+    ],
+    "main-fei2": [
+      "adventure-10-06"
+    ],
+    "main-gei3": [
+      "adventure-10-07"
+    ],
+    "main-gui4": [
+      "adventure-10-08"
+    ],
+    "main-huai4": [
+      "adventure-10-09"
+    ],
+    "main-kai3": [
+      "adventure-10-10"
+    ],
+    "main-lai4": [
+      "adventure-10-11"
+    ],
+    "main-mai3": [
+      "adventure-10-12"
+    ],
+    "main-nai4": [
+      "adventure-10-13"
+    ],
+    "main-pei1": [
+      "adventure-10-14"
+    ],
+    "main-shai1": [
+      "adventure-10-15"
+    ],
+    "main-shui2": [
+      "adventure-10-16"
+    ],
+    "main-sui4": [
+      "adventure-10-17"
+    ],
+    "main-tui3": [
+      "adventure-10-18"
+    ],
+    "main-wei3": [
+      "adventure-10-19"
+    ],
+    "main-zhai1": [
+      "adventure-10-20"
+    ],
+    "main-zui3": [
+      "adventure-10-21"
+    ],
+    "supplement-rui3": [
+      "adventure-10-21"
+    ],
+    "challenge-chuai4": [
+      "encounter-10-01"
+    ],
+    "challenge-ei1": [
+      "encounter-10-02",
+      "encounter-10-03"
+    ],
+    "challenge-kui3": [
+      "encounter-10-03"
+    ],
+    "main-ao1": [
+      "adventure-11-01"
+    ],
+    "main-bao4": [
+      "adventure-11-02"
+    ],
+    "main-chao1": [
+      "adventure-11-03"
+    ],
+    "main-chou4": [
+      "adventure-11-04"
+    ],
+    "main-diao4": [
+      "adventure-11-05"
+    ],
+    "main-gao1": [
+      "adventure-11-06"
+    ],
+    "main-hao2": [
+      "adventure-11-07"
+    ],
+    "main-jiao1": [
+      "adventure-11-08"
+    ],
+    "main-kao3": [
+      "adventure-11-09"
+    ],
+    "main-lao2": [
+      "adventure-11-10"
+    ],
+    "main-liu1": [
+      "adventure-11-11"
+    ],
+    "main-lou4": [
+      "adventure-11-12"
+    ],
+    "main-miao4": [
+      "adventure-11-13"
+    ],
+    "main-nao4": [
+      "adventure-11-14"
+    ],
+    "main-ou3": [
+      "adventure-11-15"
+    ],
+    "main-piao4": [
+      "adventure-11-16"
+    ],
+    "main-qiu1": [
+      "adventure-11-17"
+    ],
+    "main-rou4": [
+      "adventure-11-18"
+    ],
+    "main-shao3": [
+      "adventure-11-19"
+    ],
+    "main-sou4": [
+      "adventure-11-20"
+    ],
+    "main-tiao2": [
+      "adventure-11-21"
+    ],
+    "main-xiao1": [
+      "adventure-11-22"
+    ],
+    "main-xiu4": [
+      "adventure-11-23"
+    ],
+    "main-you2": [
+      "adventure-11-24"
+    ],
+    "main-zao4": [
+      "adventure-11-25",
+      "adventure-11-26"
+    ],
+    "main-zhou2": [
+      "adventure-11-26",
+      "adventure-11-27"
+    ],
+    "main-mao3": [
+      "adventure-11-27"
+    ],
+    "challenge-jiao2": [
+      "encounter-11-01"
+    ],
+    "challenge-diao3": [
+      "encounter-11-01",
+      "encounter-11-02"
+    ],
+    "challenge-miao1": [
+      "encounter-11-02",
+      "encounter-11-03"
+    ],
+    "challenge-ou4": [
+      "encounter-11-03",
+      "encounter-11-04"
+    ],
+    "challenge-tou3": [
+      "encounter-11-04"
+    ],
+    "main-bie1": [
+      "adventure-12-01"
+    ],
+    "main-er3": [
+      "adventure-12-02"
+    ],
+    "main-jue2": [
+      "adventure-12-03"
+    ],
+    "main-nve4": [
+      "adventure-12-04"
+    ],
+    "main-que4": [
+      "adventure-12-05"
+    ],
+    "main-xie4": [
+      "adventure-12-06",
+      "adventure-12-07"
+    ],
+    "main-ye2": [
+      "adventure-12-07",
+      "adventure-12-08"
+    ],
+    "main-nie4": [
+      "adventure-12-08"
+    ],
+    "challenge-jue4": [
+      "encounter-12-01",
+      "encounter-12-02"
+    ],
+    "challenge-yue2": [
+      "encounter-12-02"
+    ],
+    "main-an1": [
+      "adventure-13-01"
+    ],
+    "main-ben3": [
+      "adventure-13-02"
+    ],
+    "main-can1": [
+      "adventure-13-03"
+    ],
+    "main-chan3": [
+      "adventure-13-04"
+    ],
+    "main-chuan3": [
+      "adventure-13-05"
+    ],
+    "main-cun1": [
+      "adventure-13-06"
+    ],
+    "main-dian1": [
+      "adventure-13-07"
+    ],
+    "main-dun1": [
+      "adventure-13-08"
+    ],
+    "main-fan3": [
+      "adventure-13-09"
+    ],
+    "main-gan1": [
+      "adventure-13-10"
+    ],
+    "main-guan4": [
+      "adventure-13-11"
+    ],
+    "main-han4": [
+      "adventure-13-12"
+    ],
+    "main-huan3": [
+      "adventure-13-13"
+    ],
+    "main-jian3": [
+      "adventure-13-14"
+    ],
+    "main-juan3": [
+      "adventure-13-15"
+    ],
+    "main-kan4": [
+      "adventure-13-16"
+    ],
+    "main-kun4": [
+      "adventure-13-17"
+    ],
+    "main-lian4": [
+      "adventure-13-18"
+    ],
+    "main-lun1": [
+      "adventure-13-19"
+    ],
+    "main-men1": [
+      "adventure-13-20"
+    ],
+    "main-min2": [
+      "adventure-13-21"
+    ],
+    "main-nian4": [
+      "adventure-13-22"
+    ],
+    "main-pen1": [
+      "adventure-13-23"
+    ],
+    "main-pin2": [
+      "adventure-13-24"
+    ],
+    "main-qian4": [
+      "adventure-13-25"
+    ],
+    "main-quan3": [
+      "adventure-13-26"
+    ],
+    "main-ren3": [
+      "adventure-13-27"
+    ],
+    "main-san4": [
+      "adventure-13-28"
+    ],
+    "main-shen2": [
+      "adventure-13-29"
+    ],
+    "main-suan1": [
+      "adventure-13-30"
+    ],
+    "main-tan3": [
+      "adventure-13-31"
+    ],
+    "main-tun1": [
+      "adventure-13-32"
+    ],
+    "main-wen1": [
+      "adventure-13-33"
+    ],
+    "main-xian3": [
+      "adventure-13-34"
+    ],
+    "main-xuan3": [
+      "adventure-13-35"
+    ],
+    "main-yan2": [
+      "adventure-13-36"
+    ],
+    "main-yin4": [
+      "adventure-13-37"
+    ],
+    "main-yun2": [
+      "adventure-13-38"
+    ],
+    "main-zhan1": [
+      "adventure-13-39"
+    ],
+    "main-zhuan1": [
+      "adventure-13-40",
+      "adventure-13-41"
+    ],
+    "main-zun1": [
+      "adventure-13-41",
+      "adventure-13-42"
+    ],
+    "main-shun3": [
+      "adventure-13-42"
+    ],
+    "supplement-lin1": [
+      "adventure-13-42"
+    ],
+    "challenge-zan3": [
+      "encounter-13-01"
+    ],
+    "challenge-cuan1": [
+      "encounter-13-01",
+      "encounter-13-02"
+    ],
+    "challenge-gen3": [
+      "encounter-13-03"
+    ],
+    "challenge-nan1": [
+      "encounter-13-04",
+      "encounter-13-05"
+    ],
+    "challenge-tian4": [
+      "encounter-13-05",
+      "encounter-13-06"
+    ],
+    "challenge-xin3": [
+      "encounter-13-06"
+    ],
+    "main-ang2": [
+      "adventure-14-01"
+    ],
+    "main-bing1": [
+      "adventure-14-02"
+    ],
+    "main-ceng4": [
+      "adventure-14-03"
+    ],
+    "main-cheng2": [
+      "adventure-14-04"
+    ],
+    "main-chong4": [
+      "adventure-14-05"
+    ],
+    "main-cong2": [
+      "adventure-14-06"
+    ],
+    "main-deng4": [
+      "adventure-14-07"
+    ],
+    "main-dong4": [
+      "adventure-14-08"
+    ],
+    "main-feng2": [
+      "adventure-14-09"
+    ],
+    "main-geng1": [
+      "adventure-14-10"
+    ],
+    "main-guang1": [
+      "adventure-14-11"
+    ],
+    "main-hong1": [
+      "adventure-14-12"
+    ],
+    "main-huang4": [
+      "adventure-14-13"
+    ],
+    "main-jing4": [
+      "adventure-14-14"
+    ],
+    "main-kong1": [
+      "adventure-14-15"
+    ],
+    "main-lang2": [
+      "adventure-14-16"
+    ],
+    "main-liang2": [
+      "adventure-14-17"
+    ],
+    "main-long2": [
+      "adventure-14-18"
+    ],
+    "main-meng3": [
+      "adventure-14-19"
+    ],
+    "main-niang2": [
+      "adventure-14-20"
+    ],
+    "main-pang1": [
+      "adventure-14-21"
+    ],
+    "main-peng4": [
+      "adventure-14-22"
+    ],
+    "main-qiang4": [
+      "adventure-14-23"
+    ],
+    "main-rang3": [
+      "adventure-14-24"
+    ],
+    "main-sang1": [
+      "adventure-14-25"
+    ],
+    "main-shang4": [
+      "adventure-14-26"
+    ],
+    "main-shuang3": [
+      "adventure-14-27"
+    ],
+    "main-tang3": [
+      "adventure-14-28"
+    ],
+    "main-tong1": [
+      "adventure-14-29"
+    ],
+    "main-wang3": [
+      "adventure-14-30"
+    ],
+    "main-xiang4": [
+      "adventure-14-31"
+    ],
+    "main-xiong2": [
+      "adventure-14-32"
+    ],
+    "main-ying2": [
+      "adventure-14-33"
+    ],
+    "main-zang1": [
+      "adventure-14-34"
+    ],
+    "main-zhang4": [
+      "adventure-14-35"
+    ],
+    "main-zhong4": [
+      "adventure-14-36"
+    ],
+    "main-ang1": [
+      "adventure-14-37"
+    ],
+    "supplement-rong1": [
+      "adventure-14-37"
+    ],
+    "challenge-heng4": [
+      "encounter-14-01"
+    ],
+    "challenge-hang3": [
+      "encounter-14-02"
+    ],
+    "challenge-lang1": [
+      "encounter-14-02",
+      "encounter-14-03"
+    ],
+    "challenge-nang3": [
+      "encounter-14-03",
+      "encounter-14-04"
+    ],
+    "challenge-weng4": [
+      "encounter-14-04"
+    ],
+    "main-de5": [
+      "adventure-15-01"
+    ],
+    "main-ya5": [
+      "adventure-15-02"
+    ],
+    "supplement-a5": [
+      "adventure-15-02",
+      "adventure-15-03"
+    ],
+    "supplement-wa5": [
+      "adventure-15-03",
+      "adventure-15-04"
+    ],
+    "supplement-zi5": [
+      "adventure-15-04"
+    ],
+    "challenge-guo5": [
+      "encounter-15-01"
+    ],
+    "challenge-m2": [
+      "encounter-16-01"
+    ],
+    "main-guo5": [
+      "adventure-15-04"
+    ],
+    "supplement-zhuai4": [
+      "adventure-10-21"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+import {useState} from 'react';
+import {CHARACTER_LEVELS,CHARACTER_LEVEL_MAP,LEVELS,ENTRY_MAP,READING_MAP,type Profile} from '@children-games/shared';
+import {GardenModal} from './GardenModal';
+import {GardenIcon} from './GardenIcon';
+import {PartnerIcon} from './PartnerIcon';
+import {regionName,regionHint,battleNames} from './adventureRegions';
+type Track='foundation'|'main'|'challenge';
+export function AdventureHome({profile,onSelect,onEnter,onBattle,onCollection,onSlots}:{profile:Profile;onSelect:(id:string)=>void;onEnter:(id:string,resume?:boolean)=>void;onBattle:(id:number)=>void;onCollection:(tab:'partners'|'words')=>void;onSlots:()=>void}){
+ const [modal,setModal]=useState<'map'|'battle'|null>(null);const [track,setTrack]=useState<Track>('main');const [chapter,setChapter]=useState<number|null>(null);const [page,setPage]=useState(0);
+ const level=CHARACTER_LEVEL_MAP[profile.selectedLevel]??CHARACTER_LEVELS[0];
+ const chapters=[...new Set(CHARACTER_LEVELS.filter(l=>l.track===track).map(l=>l.chapter))];
+ const choices=chapter===null?chapters:CHARACTER_LEVELS.filter(l=>l.chapter===chapter&&l.track===track);
+ const pages=Math.max(1,Math.ceil(choices.length/6));const current=Math.min(page,pages-1);
+ const nearby=[level,...CHARACTER_LEVELS.filter(l=>l.track===level.track&&l.id!==level.id&&l.chapter>level.chapter).filter((l,i,a)=>i===a.findIndex(x=>x.chapter===l.chapter))].slice(0,3);
+ const resume=profile.checkpoint?.levelId===level.id&&profile.checkpoint.level===profile.battleStage;
+ const select=(id:string)=>{onSelect(id);setModal(null);};
+ const openMap=()=>{setTrack(level.track as Track);setChapter(null);setPage(0);setModal('map');};
+ const stars=Object.values(profile.stars).flat().filter(Boolean).length;
+ return <main className="adventure-home"><section className="adventure-scene" aria-label="花园冒险地图"><div className="adventure-heading"><div><span className="home-label">{profile.name}</span><h1>花园等你来守护</h1><p>拼好种子弹药，伙伴就会出手。</p></div><button className="adventure-difficulty" onClick={()=>setModal('battle')}><GardenIcon name="star"/>{battleNames[profile.battleStage-1]} ▾</button></div>
+ {nearby.map((l,i)=><button key={l.id} className={`adventure-node node-${i} ${i===0?'current':''}`} onClick={()=>select(l.id)} aria-label={`选择${regionName(l.chapter)}`}><GardenIcon name={i===1?'bulb':'star'}/><span>{regionName(l.chapter)}</span></button>)}
+ <div className="adventure-buddy"><PartnerIcon kind="plant_pod_slinger" size={180}/></div><span className="adventure-speech">准备好了，随时出发！</span>
+ <article className="adventure-mission"><div className="mission-label"><span>这次守护</span><button onClick={openMap}>换条路线 ›</button></div><h2>{regionName(level.chapter)}</h2><p>{level.track==='foundation'?'字母训练 · ':level.track==='challenge'?'奇遇挑战 · ':''}{regionHint(level.chapter)}</p><p>{level.short&&level.track==='challenge'?'短篇奇遇 · ':''}{level.track==='foundation'?'认字母，准备弹药':'每局轮换合适的字卡'} · 3 波守护</p><button className="primary" onClick={()=>onEnter(level.id,!!resume)}><GardenIcon name="play"/>{resume?'继续守护':'出发守护'}</button></article></section>
+ <nav className="adventure-dock" aria-label="花园入口"><div><button onClick={openMap}><GardenIcon name="home"/>冒险地图</button><button onClick={()=>onCollection('partners')}><GardenIcon name="book"/>我的伙伴</button><button onClick={()=>onCollection('words')}><GardenIcon name="star"/>花园收藏</button></div><button className="garden-switch" onClick={onSlots}>✦ {stars} 颗花园星 · 切换花园</button></nav>
+ {modal&&<GardenModal label={modal==='map'?'冒险地图':'选择战场'} className="adventure-modal"><header className="adventure-modal-head"><h2>{modal==='map'?(chapter===null?'选一条冒险路线':regionName(chapter)):'今天想守护多热闹的花园？'}</h2><button aria-label="关闭" onClick={()=>setModal(null)}>×</button></header><div className="adventure-modal-body">
+ {modal==='battle'?<><p>五档都可以直接选择。战场更热闹，学习内容不会自动变难。</p><div className="battle-choices">{LEVELS.map(l=><button key={l.id} aria-pressed={profile.battleStage===l.id} className={profile.battleStage===l.id?'active':''} onClick={()=>onBattle(l.id)}><GardenIcon name="star"/><strong>{battleNames[l.id-1]}</strong><small>{l.rows.length} 条路线 · 第 {l.id} 档</small></button>)}</div><p className="adventure-note">对应伙伴已就位，星星用来收藏花园礼物。切换档位后从新一局开始。</p></>:<><p className="adventure-note">每条路线都能尝试；刚开始认识拼音，可以先去字母训练场。</p><div className="tabs adventure-tabs">{([['foundation','字母训练'],['main','花园冒险'],['challenge','奇遇挑战']] as const).map(([id,label])=><button key={id} aria-pressed={track===id} className={track===id?'active':''} onClick={()=>{setTrack(id);setChapter(null);setPage(0);}}>{label}</button>)}</div>{chapter!==null&&<button className="region-back" onClick={()=>{setChapter(null);setPage(0);}}>‹ 返回地区</button>}
+ <div className="adventure-courses">{chapter===null?chapters.slice(current*6,current*6+6).map(c=><button key={c} onClick={()=>{setChapter(c);setPage(0);}}><GardenIcon name="star"/><strong>{regionName(c)}</strong><small>{regionHint(c)}</small></button>):CHARACTER_LEVELS.filter(l=>l.chapter===chapter&&l.track===track).slice(current*6,current*6+6).map((l,i)=>{const preview=l.track==='foundation'?l.targets.join(' '):l.targets.map(id=>{const r=READING_MAP[id];return r.entries.find(e=>ENTRY_MAP[e.id])?.text??'';}).join(' · ');return <button key={l.id} onClick={()=>select(l.id)}><small>{l.short&&l.track==='challenge'?'短篇奇遇':'守护任务'} {current*6+i+1}{profile.levelStars[l.id]?.[0]?' · 已守住':''}</small><strong>{preview}</strong><small>{l.track==='foundation'?'字母种子':`${l.targets.length} 个目标 · 每局换卡`} ↗</small></button>;})}</div></>}
+ </div><footer className="adventure-modal-foot">{modal==='map'?<><button disabled={current===0} onClick={()=>setPage(current-1)}>‹ 上一页</button><span>{current+1} / {pages}</span><button disabled={current>=pages-1} onClick={()=>setPage(current+1)}>下一页 ›</button></>:<button className="primary" onClick={()=>setModal(null)}>就选这一档</button>}</footer></GardenModal>}
+ </main>;
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "file": "common-3500.txt",
+    "bytes": 52399,
+    "sha256": "4aac5efd4e149898e00829b16394e7c74aa2d78b7382ed2a069cbf69bf188858"
+  },
+  {
+    "file": "dictionary-characters.txt",
+    "bytes": 985559,
+    "sha256": "2342a6f98c85dbc3c8d26aef31744876a36326c6466e51e9a0f16898c36c2011"
+  },
+  {
+    "file": "preferred-readings.txt",
+    "bytes": 168050,
+    "sha256": "3538219db8ef4809e8de51c82655aedabacbc54f92acbe6a0e6925156f845f76"
+  },
+  {
+    "file": "teaching-characters.json",
+    "bytes": 476748,
+    "sha256": "c90d6dfb273fa006f9542ddc36303aab6362b54ad0e0caf2182d689f480528b1"
+  }
+]
