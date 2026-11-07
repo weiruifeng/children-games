@@ -1,5 +1,9 @@
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import './styles/global.css';
+import LearningHome from './pages/LearningHome';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(<App />);
+// Static preview servers may fall back to this entry for a directory URL without '/'.
+if (window.location.pathname === '/experiments/pinyin-garden') {
+  window.location.replace(`/experiments/pinyin-garden/${window.location.search}${window.location.hash}`);
+} else {
+  ReactDOM.createRoot(document.getElementById('root')!).render(<LearningHome />);
+}
