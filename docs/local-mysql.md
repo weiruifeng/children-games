@@ -1,5 +1,7 @@
 # 本地 MySQL 开发环境
 
+> 本文仅说明仓库中保留的旧Studio作品库，不是拼音花园云存档的建表或上线步骤。花园数据库方案见[网站化Spec](specs/pinyin-garden/website-account-cloud-save.md)。
+
 本项目的 Game Studio 持久化功能使用本机 MySQL。以下帐号仅用于本地开发，不可用于测试、预发或生产环境。
 
 ## 已约定的连接信息

@@ -1,7 +1,7 @@
 import {describe,it,expect} from 'vitest';
 import {readFileSync} from 'node:fs';
 import {CHARACTER_IDS,characterUrl,PROP_IDS,propUrl,BACKGROUNDS} from './manifest';
-import audio from '../../../../public/assets/pinyin-garden/audio-manifest.json';
+import audio from './audio-manifest.json';
 const read=(url:string)=>readFileSync(new URL(`../../../../public${url}`,import.meta.url));
 describe('garden shipped assets',()=>{
  it('ships all character and prop PNGs with alpha, and both backgrounds',()=>{

@@ -9,7 +9,7 @@ const n=z.number().finite();const positive=n.nonnegative();const id=n.int().posi
 const row=n.int().min(0).max(2);const col=n.int().min(0).max(5);
 const taskSchema=z.object({key:z.string().max(150),plantId:positive.int(),enemyId:positive.int(),entryId:z.string().refine(v=>!!ENTRY_MAP[v]),index:positive.int().max(1),parts:z.object({initial:z.string().max(8),medial:z.string().max(8),final:z.string().max(8),whole:z.string().max(8),tone:n.int().min(0).max(5).nullable()}).strict(),help:positive.int().max(3),errors:positive.int(),finished:z.boolean(),mode:z.enum(['compose','choose']),choice:z.string().max(20)}).strict().refine(t=>t.index<ENTRY_MAP[t.entryId].parts.length);
 const stateSchema=z.object({
- levelId:z.string().optional(),packVersion:z.string().optional(),learningPlan:z.object({seed:positive.int(),waves:z.array(z.object({answers:z.record(z.string().max(1000)),entries:z.array(z.string()).max(6),newEntries:z.array(z.string()).max(2),scope:z.array(z.string()).max(150),options:z.record(z.record(z.array(z.union([z.string(),n]))))}).strict()).length(3)}).strict().optional(),revealed:z.array(z.string()).max(100).optional(),audioUsed:z.array(z.string()).max(100).optional(),
+ levelId:z.string().optional(),packVersion:z.string().optional(),learningPlan:z.object({seed:positive.int(),waves:z.array(z.object({answers:z.record(z.string(),z.string().max(1000)),entries:z.array(z.string()).max(6),newEntries:z.array(z.string()).max(2),scope:z.array(z.string()).max(150),options:z.record(z.string(),z.record(z.string(),z.array(z.union([z.string(),n]))))}).strict()).length(3)}).strict().optional(),revealed:z.array(z.string()).max(100).optional(),audioUsed:z.array(z.string()).max(100).optional(),
  lessonId:n.int().min(1).max(14).optional(),runId:z.string().min(1).max(80).optional(),
  retryCount:positive.int().optional(),reviewPool:z.array(z.string().refine(v=>!!ENTRY_MAP[v])).min(1).max(10).optional(),version:z.literal(1),level:n.int().min(1).max(5),seed:positive.int(),stage:z.enum(['ready','playing','between','won','lost']),wave:n.int().min(0).max(2),time:positive,waveTime:positive,betweenTime:positive,spawned:positive.int().max(7),nextSpawn:positive,
  dew:positive.max(1e6),hearts:n.int().min(0).max(3),rescues:z.array(z.boolean()).length(3),
@@ -18,9 +18,9 @@ const stateSchema=z.object({
  projectiles:z.array(z.object({id,row,x:n,y:n,target:id,signature:z.string().max(60),heavy:z.boolean()}).strict()).max(100),
  drops:z.array(z.object({id,x:n,y:n,age:positive,value:positive.max(100)}).strict()).max(100),
  cooldowns:z.object({plant_pod_slinger:positive,plant_dew_collector:positive,plant_vine_guard:positive,plant_cone_launcher:positive}).strict(),
- sharedAmmo:z.array(z.string().refine(v=>!!ENTRY_MAP[v])).max(500).default([]),drafts:z.record(taskSchema).default({}),
+ sharedAmmo:z.array(z.string().refine(v=>!!ENTRY_MAP[v])).max(500).default([]),drafts:z.record(z.string(),taskSchema).default({}),
  selectedPlant:id.nullable(),task:taskSchema.nullable(),paused:z.boolean(),helpOpen:z.literal(false),slow:z.boolean(),dropTimer:positive,score:positive.int().max(1e9),earned:z.array(z.string().max(100)).max(10000),
- results:z.record(z.object({independent:z.boolean()}).strict()),attempts:z.array(z.object({runId:z.string().optional(),levelId:z.string().optional(),track:z.string().optional(),readingId:z.string().optional(),wave:n.int().min(0).max(2).optional(),audioUsed:z.boolean().optional(),optionCount:positive.int().optional(),lessonId:n.int().min(1).max(14).optional(),referenceVisible:z.boolean().optional(),firstTryCorrect:z.boolean().optional(),level:n.int().min(1).max(5).optional(),mode:z.enum(['battle','review']).optional(),retry:z.boolean().optional(),taskId:z.string(),entryId:z.string().refine(v=>!!ENTRY_MAP[v]),syllable:n.int().min(0).max(1),correct:z.boolean(),assisted:z.boolean(),repeated:z.boolean(),at:positive}).strict()).max(50000),
+ results:z.record(z.string(),z.object({independent:z.boolean()}).strict()),attempts:z.array(z.object({eventId:z.string().max(80).optional(),runId:z.string().optional(),levelId:z.string().optional(),track:z.string().optional(),readingId:z.string().optional(),wave:n.int().min(0).max(2).optional(),audioUsed:z.boolean().optional(),optionCount:positive.int().optional(),lessonId:n.int().min(1).max(14).optional(),referenceVisible:z.boolean().optional(),firstTryCorrect:z.boolean().optional(),level:n.int().min(1).max(5).optional(),mode:z.enum(['battle','review']).optional(),retry:z.boolean().optional(),taskId:z.string(),entryId:z.string().refine(v=>!!ENTRY_MAP[v]),syllable:n.int().min(0).max(1),correct:z.boolean(),assisted:z.boolean(),repeated:z.boolean(),at:positive}).strict()).max(50000),
  attackedRows:z.array(row).max(3),strategy:z.boolean(),nextId:id,eventId:positive.int(),events:z.array(z.never()).length(0),message:z.string().max(500),
 }).strict();
 export interface LegacyProfile {version:1;packVersion:'garden-1';name:string;unlocked:number;stars:Record<string,boolean[]>;best:Record<string,number>;checkpoint:GardenState|null;waveStart:GardenState|null;attempts:LearningAttempt[];settings:{music:number;sfx:number;slow:boolean;reducedMotion:boolean};}
@@ -39,7 +39,7 @@ export function parseState(value:unknown):GardenState{
  return s as GardenState;
 }
 export function parseLegacyProfile(input:unknown):LegacyProfile {
- const raw=z.object({version:z.literal(1),packVersion:z.literal('garden-1'),name:z.string().min(1).max(20),unlocked:n.int().min(1).max(5),stars:z.record(z.array(z.boolean()).length(3)),best:z.record(positive.int().max(1e9)),checkpoint:z.unknown(),waveStart:z.unknown().optional(),attempts:stateSchema.shape.attempts,settings:z.object({music:n.min(0).max(1),sfx:n.min(0).max(1),slow:z.boolean(),reducedMotion:z.boolean()}).strict()}).strict().parse(input);
+ const raw=z.object({version:z.literal(1),packVersion:z.literal('garden-1'),name:z.string().min(1).max(20),unlocked:n.int().min(1).max(5),stars:z.record(z.string(),z.array(z.boolean()).length(3)),best:z.record(z.string(),positive.int().max(1e9)),checkpoint:z.unknown(),waveStart:z.unknown().optional(),attempts:stateSchema.shape.attempts,settings:z.object({music:n.min(0).max(1),sfx:n.min(0).max(1),slow:z.boolean(),reducedMotion:z.boolean()}).strict()}).strict().parse(input);
  if(Object.keys(raw.stars).some(k=>!['1','2','3','4','5'].includes(k)))throw new Error('未知关卡成就');
  const checkpoint=raw.checkpoint===null?null:parseState(raw.checkpoint);
  const waveStart=raw.waveStart==null?null:parseState(raw.waveStart);
@@ -63,10 +63,10 @@ export function newProfile(name:string):Profile {
  stars:{},lessonStars:{},best:{},checkpoint:null,waveStart:null,attempts:[],
  settings:{music:.35,sfx:.6,slow:false,reducedMotion:false,speech:true,speechVolume:.8}};
 }
-const stars=z.record(z.array(z.boolean()).length(3));
+const stars=z.record(z.string(),z.array(z.boolean()).length(3));
 const profileSchema=z.object({version:z.literal(2),packVersion:z.literal(CURRICULUM_VERSION),name:z.string().min(1).max(20),
  unlocked:n.int().min(1).max(5),battleStage:n.int().min(1).max(5),lessonUnlocked:n.int().min(1).max(14),lessonLimit:n.int().min(1).max(14),selectedLesson:n.int().min(1).max(14),
- stars,lessonStars:stars,best:z.record(positive.int().max(1e9)),checkpoint:z.unknown(),waveStart:z.unknown(),attempts:stateSchema.shape.attempts,
+ stars,lessonStars:stars,best:z.record(z.string(),positive.int().max(1e9)),checkpoint:z.unknown(),waveStart:z.unknown(),attempts:stateSchema.shape.attempts,
  settings:z.object({music:n.min(0).max(1),sfx:n.min(0).max(1),slow:z.boolean(),reducedMotion:z.boolean(),speech:z.boolean(),speechVolume:n.min(0).max(1)}).strict(),legacyArchive:z.unknown().optional(),
 }).strict();
 const profileV3Schema=profileSchema.extend({version:z.literal(3),packVersion:z.literal(CHARACTER_PACK),selectedLevel:z.string().refine(id=>!!CHARACTER_LEVEL_MAP[id]?.published),levelStars:stars,previousArchive:z.unknown().optional()}).strict();

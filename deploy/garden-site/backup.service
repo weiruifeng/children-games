@@ -1,0 +1,11 @@
+[Unit]
+Description=Encrypted garden backup
+OnFailure=garden-backup-alert.service
+[Service]
+Type=oneshot
+User=garden-backup
+WorkingDirectory=/srv/garden/current
+EnvironmentFile=/etc/garden/backup.env
+ExecStart=/usr/bin/node server/scripts/garden-backup.mjs backup
+UMask=0077
+NoNewPrivileges=true

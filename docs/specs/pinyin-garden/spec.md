@@ -10,14 +10,14 @@
 |---|---|
 | 本 Spec | 新版产品行为、数据契约和验收标准；冲突时以本版为准 |
 | [实施 Plan](implementation-plan.md) | 增量开发顺序、依赖、验证和实际完成状态 |
-| [当前实现说明](curriculum.md) | 改造前14课、可见拼音样板、点击发音与v2存档的实现基线 |
+| [网站化 Spec](website-account-cloud-save.md) | 首页与花园发布边界、账号、邀请注册、数据库与后端职责 |
 | [题库整理总览](content-inventory/README.md) | 最新候选数量、来源和常用字分层 |
 | [结构化候选](content-inventory/inventory.json) | 待审校的字音、音频、关卡容量草案，不可直接当正式题库导入 |
 | [迁移清单](content-inventory/challenge-moves.md) | 非常用字摘出、整项读音迁移和首选字调整 |
 | [课程草案](content-inventory/level-plan.md) / [覆盖报告](content-inventory/coverage-report.md) | 每波候选及待审缺口；数量以审核后的清单更新 |
 | [美术手册](visual-assets.md) / [音频手册](audio-assets.md) | 既有素材参考，不触发本轮重新制作；学习语音范围以本 Spec 为准 |
 
-旧文档见 [历史 Spec](history/20261106-before-character-curriculum-spec.md) 和 [历史 Plan](history/20261106-before-character-curriculum-implementation-plan.md)。历史测试通过数不能作为本版验收结果。
+旧五关历史 Spec/Plan 与14课基线说明已清理；需要追溯时查看 Git 历史。历史测试通过数不能作为本版验收结果。
 
 当前已接入：原五档战场、共享弹药、隐藏答案汉字挑战、已发布课程开放、三类内容隔离、固定整局抽题及v3存档迁移。当前发布226关（3个字母训练、195个普通冒险、28个奇遇）、1274项读音，20项排除保留原因，407种基础拼式均有覆盖。候选1294项全部保留在台账。文字资料验证与人工音频听审独立，完整进展以Plan第9节为准。
 

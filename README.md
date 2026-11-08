@@ -1,54 +1,50 @@
-# 儿童游戏创造 Agent
+# 挖机的学习小世界 · 拼音花园
 
-面向儿童的小游戏创造原型：说出想玩的内容，系统会追问必要信息、生成可玩的收集类游戏，并支持在原游戏基础上继续修改。
+正式网站保留学习首页、Waji和拼音花园，提供邀请码注册、登录、管理员后台与MySQL云存档。拼音花园运行不依赖模型或模型密钥。学习事件与游戏快照分开保存；三个花园按账号隔离，支持冲突处理、旧档迁移与完整备份。
 
-## 当前能力
+## 网站本地运行
 
-- 三个内置小游戏，包含收集物、障碍、危险区和追逐敌人。
-- 文本与浏览器语音识别输入。
-- 多轮对话生成；单个会话最多追问两次。
-- 基于同一会话修改游戏；生成失败时回退到默认游戏或上一版游戏。
-- 前端通过 SSE 展示接收、生成与校验三个阶段。
+使用Node.js 24（`.nvmrc`）与MySQL。创建独立花园数据库，并设置 `MYSQL_HOST`、`MYSQL_PORT`、`MYSQL_DATABASE`、`MYSQL_USER`、`MYSQL_PASSWORD`。生产配置示例见 [部署目录](deploy/garden-site/README.md)，不要使用旧Studio开发数据库作为正式花园库。
 
-## 本地运行
+```bash
+npm ci
+npm run migrate:garden
+npm run build:garden-site
+npm run bootstrap:admin
+npm run start:garden-site
+```
 
-需要 Node.js 20+（版本见 [`.nvmrc`](./.nvmrc)）。
+另一个终端运行 `npm run dev:garden-site`，打开 `http://localhost:5173/`。本地API默认3009端口；`PUBLIC_ORIGIN`须与浏览器实际origin完全一致。管理员登录 `/admin/` 发码，普通用户在 `/garden/` 注册。部署时使用HTTPS同域代理，生产Cookie才设置Secure。
 
-1. 安装依赖：`npm install`
-2. 复制 `server/.env.example` 为 `server/.env`，填入 OpenAI 兼容 LLM 的地址和密钥。
-   本地 MySQL 配置和固定的开发帐号也在该模板中；初始化说明见[本地 MySQL](docs/local-mysql.md)。
-3. 启动前后端：`npm run dev`
-4. 打开 `http://localhost:5173`
+仅维护旧匿名试玩版时可运行 `npm run dev:web` 或 `npm run dev:pinyin`，地址为 `/experiments/pinyin-garden/`；这份匿名档仍只在浏览器，网站版可以显式导入它，不自动删除。
 
-开发环境下 Web 会把 `/api` 请求代理到 `http://localhost:3009`。语音识别依赖浏览器的 Web Speech API；不支持或未授权时，仍可直接输入文字。
-
-## 横版冒险实验
-
-“小恐龙救朋友”提供三个触屏关卡、就近重试和受约束的 AI 玩法修改。
-运行 `npm run dev` 后打开 [横版试玩](http://localhost:5173/experiments/dino-rescue/)。
-只试玩可用 `npm run dev:rescue`；AI 修改需要运行后端并配置模型。
-玩法契约、OpenGame 复用范围和试玩方法见 [实验说明](docs/opengame-rescue-pilot.md)。
-
-## 验证
+## 验证与发布
 
 ```bash
 npm run type-check
-npm run build
-npm run test -w web
-npm run test -w server
+npm test -w web
+npm test -w server
+# 仅对显式配置的 *_test 隔离库运行
+GARDEN_DB_TEST=1 npm run test:garden-integration -w server
+npm run build:garden-site
+node scripts/check-garden-release.mjs
 ```
 
-## 当前边界
+发布前端目录是 `web/dist-garden`，后端入口是 `server/dist/server/src/garden-main.js`。全仓库 `npm run build` 仍用于保留代码回归，包含其他实验，不能把它的 `web/dist` 当作网站上线目录。
 
-原有创造主流程目前只支持 `collect`；横版冒险作为独立实验入口运行。
-作品和版本库使用 MySQL，对话 session 仍在内存中。
-通用 Dodge/Jump 模板、BGM、TTS 和更复杂的敌人行为仍在后续范围内。
+可复用浏览器测试：`npm run test:garden-e2e -w web`。使用测试管理员环境变量或私有 `GARDEN_E2E_ADMIN_FILE`；首次安装浏览器运行 `npx playwright install chromium`。CI通过仅允许测试库的seed脚本创建临时管理员，不写入生产默认密码。
 
-## 拼音花园塔防实验
+## 文档
 
-运行 `npm run dev:pinyin`，打开 `/experiments/pinyin-garden/`。该入口只需要前端静态文件，不依赖后端、数据库或模型密钥。
+- [网站化Spec](docs/specs/pinyin-garden/website-account-cloud-save.md)：数据归属、接口和同步契约。
+- [实施Plan](docs/specs/pinyin-garden/website-implementation-plan.md)：里程碑与外部上线条件。
+- [本地验收记录](docs/specs/pinyin-garden/website-acceptance.md)：执行证据、覆盖范围和待上线事项。
+- [部署与备份手册](deploy/garden-site/README.md)：HTTPS、数据库权限、备份、恢复、回滚。
+- [花园维护说明](docs/pinyin-garden.md)、[玩法Spec](docs/specs/pinyin-garden/spec.md)、[课程实施记录](docs/specs/pinyin-garden/implementation-plan.md)。
+- [题库来源与覆盖](docs/specs/pinyin-garden/content-inventory/README.md)：审核原始证据及许可证，保留在仓库。
 
-已接入五关共享弹药战斗、四伙伴三敌人、原创插画、音乐音效、本地三存档、星星装饰和通关后的字词复习。汉字拼音学习读音仍待补充；当前动画和配乐为可玩预览，精修动画图集尚未完成。
-iPad 局域网试玩可运行 `npm run dev -w web -- --host 0.0.0.0 --port 5174`，使用电脑当时的局域网 IP 访问。同一设备换 IP/域名会使用不同的浏览器存档，请先导出备份。
+## 保留但不上线的代码
 
-维护、资源来源、已知限制和静态部署见 [拼音花园说明](docs/pinyin-garden.md)。
+游戏创造、对话、Studio和恐龙实验保留源码与原有数据。网站专用构建及GardenSiteModule不加载这些模块；旧生成、对话、作品接口为404。只有维护这些旧功能时才涉及模型配置及 [Studio数据库说明](docs/local-mysql.md)、[恐龙复用说明](docs/opengame-rescue-pilot.md)。
+
+当前交付是可本地验收的上线准备实现，尚未部署到真实域名。生产数据库、独立备份目标、告警接收方和真实iPad验收需要在发布环境落实。

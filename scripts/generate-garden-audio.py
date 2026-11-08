@@ -58,3 +58,6 @@ for num,name,variants,duration in rows:
     manifest['sfx'][name]={'urls':files,'duration':float(duration),'status':'preview'}
 (OUT/'audio-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 print(f"Generated {len(manifest['music'])} music previews and {sum(len(x['urls']) for x in manifest['sfx'].values())} sound previews")
+
+# Importable runtime index; keep the public copy for existing static consumers.
+(OUT.parents[2]/'src/experiments/pinyin-garden/assets/audio-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')

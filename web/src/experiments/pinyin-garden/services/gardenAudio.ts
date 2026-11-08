@@ -1,5 +1,6 @@
+import {assetUrl} from '../assets/assetUrl';
 import {SpeechChannel,pronunciationUrls,canPronounce} from './pronunciation';
-import manifest from '../../../../public/assets/pinyin-garden/audio-manifest.json';
+import manifest from '../assets/audio-manifest.json';
 import type {GardenState} from '@children-games/shared';
 export type Music = keyof typeof manifest.music;
 type Sound = keyof typeof manifest.sfx;
@@ -75,7 +76,7 @@ export class GardenAudio {
  }
  private buffer(url:string){
   let pending=this.buffers.get(url);
-  if(!pending){pending=fetch(url).then(r=>{if(!r.ok)throw Error(`Audio ${r.status}`);return r.arrayBuffer();}).then(b=>this.context!.decodeAudioData(b)).catch(e=>{this.buffers.delete(url);throw e;});this.buffers.set(url,pending);}
+  if(!pending){pending=fetch(assetUrl(url)).then(r=>{if(!r.ok)throw Error(`Audio ${r.status}`);return r.arrayBuffer();}).then(b=>this.context!.decodeAudioData(b)).catch(e=>{this.buffers.delete(url);throw e;});this.buffers.set(url,pending);}
   return pending;
  }
  private volumes(){

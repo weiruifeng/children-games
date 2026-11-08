@@ -1,7 +1,8 @@
+import {assetUrl} from '../assets/assetUrl';
 import {pronunciationKey,READING_MAP,type Entry} from '@children-games/shared';
 import manifest from '../assets/pronunciation-manifest.json';
 export function pronunciationUrls(pinyin:string[],neutral=false):string[]{
- return pinyin.map(p=>manifest[(neutral?pronunciationKey(p)+'5':pronunciationKey(p)) as keyof typeof manifest]?.url).filter((url):url is string=>!!url);
+ return pinyin.map(p=>manifest[(neutral?pronunciationKey(p)+'5':pronunciationKey(p)) as keyof typeof manifest]?.url).filter((url):url is string=>!!url).map(assetUrl);
 }
 export function canPronounce(pinyin:string[]):boolean{return pinyin.length>0&&pronunciationUrls(pinyin).length===pinyin.length;}
 interface Playback {stop:()=>void;finished:Promise<void>}

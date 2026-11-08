@@ -4,7 +4,7 @@ export interface Plant {id:number;kind:PlantKind;row:number;col:number;hp:number
 export interface Enemy {id:number;kind:EnemyKind;row:number;x:number;hp:number;armor:number;entryId:string;attackTimer:number;}
 export interface Projectile {id:number;row:number;x:number;y:number;target:number;signature:string;heavy:boolean;}
 export interface Drop {id:number;x:number;y:number;age:number;value:number;}
-export interface LearningAttempt {runId?:string;levelId?:string;track?:string;readingId?:string;wave?:number;audioUsed?:boolean;optionCount?:number;lessonId?:number;referenceVisible?:boolean;firstTryCorrect?:boolean;level?:number;mode?:'battle'|'review';retry?:boolean;taskId:string;entryId:string;syllable:number;correct:boolean;assisted:boolean;repeated:boolean;at:number;}
+export interface LearningAttempt {eventId?:string;runId?:string;levelId?:string;track?:string;readingId?:string;wave?:number;audioUsed?:boolean;optionCount?:number;lessonId?:number;referenceVisible?:boolean;firstTryCorrect?:boolean;level?:number;mode?:'battle'|'review';retry?:boolean;taskId:string;entryId:string;syllable:number;correct:boolean;assisted:boolean;repeated:boolean;at:number;}
 export interface Task {key:string;plantId:number;enemyId:number;entryId:string;index:number;parts:Parts;help:number;errors:number;finished:boolean;mode:'compose'|'choose';choice:string;}
 export interface GardenEvent {id:number;type:string;x:number;y:number;value?:string;}
 export interface GardenState {

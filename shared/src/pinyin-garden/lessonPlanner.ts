@@ -81,7 +81,7 @@ export function readingFacts(attempts:LearningAttempt[],readingId:string){
  const eligible=rows.filter(a=>!a.assisted&&!a.referenceVisible&&!a.repeated&&!a.retry&&(a.optionCount??0)>1);
  const independent=eligible.filter(a=>a.correct&&a.firstTryCorrect);
  const runs=[...new Map(eligible.map(a=>[a.runId,a])).values()].sort((a,b)=>a.at-b.at).slice(-3);
- const days=new Set(runs.map(a=>new Date(a.at).toLocaleDateString('en-CA')));
+ const days=new Set(runs.map(a=>new Date(a.at).toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'})));
  const entries=new Set(runs.map(a=>a.entryId));
- return {attempts:rows.length,independent:independent.length,assisted:rows.filter(a=>a.correct&&a.assisted).length,repeatedIndependent:runs.length===3&&runs.every(a=>a.correct&&a.firstTryCorrect)&&days.size>=2&&(READING_MAP[readingId].entries.filter(entryVerified).length<2||entries.size>=2)};
+ return {attempts:rows.length,independent:independent.length,assisted:rows.filter(a=>a.correct&&a.assisted).length,repeatedIndependent:runs.length===3&&runs.every(a=>a.correct&&a.firstTryCorrect)&&days.size>=2&&((READING_MAP[readingId]?.entries.filter(entryVerified).length??0)<2||entries.size>=2)};
 }

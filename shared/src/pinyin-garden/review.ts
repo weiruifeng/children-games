@@ -26,6 +26,6 @@ export function createReview(attempts:LearningAttempt[],now=Date.now(),lessonId?
 export function learningFacts(attempts:LearningAttempt[],entryId:string){
  const rows=attempts.filter(a=>a.entryId===entryId);
  const independent=rows.filter(a=>a.correct&&!a.assisted&&!a.repeated&&a.firstTryCorrect===true&&!!a.levelId&&!a.referenceVisible&&!a.retry&&(a.optionCount??0)>1);
- const days=new Set(independent.map(a=>new Date(a.at).toLocaleDateString('en-CA')));
+ const days=new Set(independent.map(a=>new Date(a.at).toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'})));
  return {attempts:rows.length,independent:independent.length,assisted:rows.filter(a=>a.assisted).length,days:days.size,last:rows.reduce((n,a)=>Math.max(n,a.at),0)};
 }

@@ -1,0 +1,1 @@
+export function assetUrl(path:string){const base=import.meta.env?.VITE_GARDEN_ASSET_BASE_URL as string|undefined;if(!base)return path.startsWith('/')?path:'/assets/pinyin-garden/'+path;return base.replace(/\/$/,'')+'/'+path.replace(/^\/assets\/pinyin-garden\//,'').replace(/^\//,'');}

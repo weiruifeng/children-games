@@ -1,0 +1,44 @@
+name: Garden website
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: integration-only-password
+          MYSQL_DATABASE: children_games_garden_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pintegration-only-password"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_USER: root
+      MYSQL_PASSWORD: integration-only-password
+      MYSQL_DATABASE: children_games_garden_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --registry=https://registry.npmjs.org
+      - run: npm run migrate:garden
+      - run: npm run type-check
+      - run: npm test -w web
+      - run: npm test -w server
+      - run: npm run test:garden-integration -w server
+        env:
+          GARDEN_DB_TEST: '1'
+      - run: npm run build:garden-site
+      - run: node scripts/check-garden-release.mjs
+      - run: npx playwright install --with-deps chromium
+      - run: node server/scripts/seed-garden-test-admin.mjs
+        env:
+          GARDEN_E2E_ADMIN_FILE: ${{ github.workspace }}/.workbench/ci-garden/admin.json
+      - run: npm run test:garden-e2e -w web
+        env:
+          GARDEN_E2E_START: '1'
+          GARDEN_E2E_ADMIN_FILE: ${{ github.workspace }}/.workbench/ci-garden/admin.json

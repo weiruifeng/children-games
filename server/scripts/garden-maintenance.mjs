@@ -1,0 +1,4 @@
+import mysql from 'mysql2/promise';
+if(!process.env.MYSQL_DATABASE)throw Error('Explicit MYSQL_DATABASE required');
+const c=await mysql.createConnection({host:process.env.MYSQL_HOST??'127.0.0.1',port:Number(process.env.MYSQL_PORT??3306),user:process.env.MYSQL_USER,password:process.env.MYSQL_PASSWORD??'',database:process.env.MYSQL_DATABASE});
+try{for(const sql of ['DELETE FROM garden_session WHERE expires_at<UTC_TIMESTAMP() - INTERVAL 1 DAY','DELETE FROM garden_rate_limit WHERE expires_at<UTC_TIMESTAMP()','DELETE FROM garden_mutation WHERE created_at<UTC_TIMESTAMP() - INTERVAL 30 DAY','DELETE FROM garden_admin_audit WHERE created_at<UTC_TIMESTAMP() - INTERVAL 180 DAY','DELETE FROM garden_password_reset WHERE expires_at<UTC_TIMESTAMP() - INTERVAL 1 DAY'])await c.query(sql);console.log('Expired operational records cleaned; profiles, events and archives retained.');}finally{await c.end();}

@@ -1,0 +1,17 @@
+[Unit]
+Description=Garden website API
+After=network.target
+[Service]
+Type=simple
+User=garden
+WorkingDirectory=/srv/garden/current
+EnvironmentFile=/etc/garden/site.env
+ExecStart=/usr/bin/node server/dist/server/src/garden-main.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+[Install]
+WantedBy=multi-user.target

@@ -15,12 +15,17 @@
     "build": "npm run validate:garden-content && npm run build -w shared && npm run build -w web && npm run build -w server",
     "type-check": "npm run type-check -w shared && npm run type-check -w web && npm run type-check -w server",
     "dev:pinyin": "npm run dev -w web -- --open /experiments/pinyin-garden/",
-    "validate:garden-content": "node scripts/validate-garden-content.mjs"
+    "validate:garden-content": "node scripts/validate-garden-content.mjs",
+    "build:garden-site": "npm run validate:garden-content && npm run build -w shared && npm run build:garden-site -w web && npm run build -w server",
+    "start:garden-site": "npm run start:garden-site -w server",
+    "dev:garden-site": "npm run dev:garden-site -w web",
+    "migrate:garden": "npm run migrate:garden -w server",
+    "bootstrap:admin": "npm run bootstrap:admin -w server"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   }
 }

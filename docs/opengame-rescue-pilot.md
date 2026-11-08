@@ -1,5 +1,7 @@
 # OpenGame 横版冒险实验
 
+> 小恐龙实验不进入本次首页/拼音花园发布包。本文仅保留用于维护现有源码与追溯OpenGame复用范围；网站发布边界见[上线Spec](specs/pinyin-garden/website-account-cloud-save.md)。
+
 ## 目标与当前范围
 
 验证“稳定的玩法骨架 + AI 关卡/能力变化”是否比原来的 Collect 配置
