@@ -43,6 +43,7 @@ describe('original realtime combat with all course/battle combinations',()=>{
  for(const lesson of LESSONS)for(const battle of [1,2,3,4,5])it(`lesson ${lesson.id}, original battlefield ${battle} completes three waves`,()=>{
   const s=createLessonGarden(lesson.id,battle,173+lesson.id*71);startWave(s);
   const attack=battle>=3?'plant_cone_launcher':'plant_pod_slinger';
+  placePlant(s,'plant_dew_collector',LEVELS[battle-1].rows[0],1);
   for(let step=0;step<30000&&s.stage!=='won'&&s.stage!=='lost';step++){
    if(s.stage==='between')startWave(s);
    for(const row of LEVELS[battle-1].rows)if(!s.plants.some(p=>p.row===row&&p.kind===attack))placePlant(s,attack,row,0);

@@ -12,6 +12,8 @@ export function fail(status:number,code:string,message:string,details?:unknown):
 export function json<T=any>(v:unknown):T{return (typeof v==='string'?JSON.parse(v):v) as T;}
 export interface Actor {id:string;username:string;role:string;sessionId:string;csrf:string}
 export type SiteRequest=Request&{actor?:Actor};
-export const cookieName=()=>process.env.NODE_ENV==='production'?'__Host-garden_session':'garden_dev_session';
+export type AuthScope='parent'|'admin';
+export const authScope=(path:string):AuthScope=>path.toLowerCase().startsWith('/api/admin/')?'admin':'parent';
+export const cookieName=(scope:AuthScope='parent')=>`${process.env.NODE_ENV==='production'?'__Host-garden':'garden_dev'}_${scope}_session`;
 export const cookieOptions=()=>({httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax' as const,path:'/'});
 export const userView=(u:any)=>({id:u.id,username:u.username_normalized,role:u.user_role});

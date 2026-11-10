@@ -1,13 +1,11 @@
 # 拼音花园内容收录：常用字分层版
 
-2026-11-06 更新。已按用户要求把非常用字摘出普通练习；原 inventory.json、review.html 和逐关草案保留为历史来源；当前运行时使用 shared/src/pinyin-garden/data，已接入全量文字课程。最新核销见 text-audit.json：1274可练、20排除、0待完善，1294分母不变，241关。
+更新：2026-11-10。运行内容在 `shared/src/pinyin-garden/data/`；当前包 `garden-adventure-4` 为226关、1274可练读音、20排除项，1294分母不变。inventory.json 和原始分组是来源证据，不是当前关卡编排。
 
 ## 查看结果
 
-- [可搜索审阅页](review.html)：默认只看主线，可切换补充、挑战，并筛选“有同音挑战字”的项目。
 - [非常用字与读音迁移清单](challenge-moves.md)：哪些字摘出、哪些读音整项转移、哪些首选字替换。
-- [汉字读音总表](reading-catalog.md)与[逐关三波安排](level-plan.md)。
-- [覆盖和剩余缺口](coverage-report.md)与[结构化数据](inventory.json)。
+- [结构化来源](inventory.json)、[文本核验记录](text-audit.json)与游戏内覆盖视图。
 
 ## 新划分
 
@@ -51,12 +49,6 @@
 下载日期与文件哈希见[source-checksums.json](source-checksums.json)。GitHub提交API未成功返回版本，因此以pinyin.txt自带版本号与内容SHA-256追溯，不编造提交号。
 
 
-
-## 状态与临时材料
-
-本轮更新的是题库分层、关卡安排和审阅页，游戏攻防与现有存档均未改动。下一步接入游戏时按本版分层，不能再沿用“只要有录音就进主线”的旧规则。
-
-临时脚本、旧版备份与验收截图在 `.workbench/20261106-garden-content-inventory/`，复核后可清理；正式交付物与游戏构建不依赖该目录。旧build.py/report.py生成的是第一版，不应覆盖本版；本轮脚本为reclassify.py。
 
 ## 冒险版更新（2026-11-06）
 

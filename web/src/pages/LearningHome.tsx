@@ -1,3 +1,7 @@
+import {resources} from '../resources/manager';
+import {useResources} from '../resources/useResources';
+import {ResourceLoader} from '../resources/ResourceLoader';
+import {useEffect} from 'react';
 import {assetUrl} from '../experiments/pinyin-garden/assets/assetUrl';
 import {useState} from 'react';
 import {WajiGreeting,WajiIcon} from '../ui/Waji';
@@ -5,7 +9,10 @@ import './learning-home.css';
 const gardenUrl=import.meta.env.VITE_GARDEN_SITE?'/garden/':'/experiments/pinyin-garden/';
 export default function LearningHome(){
   const [reduced,setReduced]=useState(()=>{try{return localStorage.getItem('waji-reduced-motion')==='true';}catch{return false;}});
+  const [retry,setRetry]=useState(0);const progress=useResources(resources.group('learning-home'),'learning-home',retry);
+  useEffect(()=>{if(progress.phase!=='ready')return;const timer=setTimeout(()=>void resources.prefetchAll(),1500);return()=>clearTimeout(timer);},[progress.phase]);
   const toggleMotion=()=>{const next=!reduced;setReduced(next);try{localStorage.setItem('waji-reduced-motion',String(next));}catch{}};
+  if(progress.phase!=='ready')return <div className={reduced?'reduced-motion':''}><ResourceLoader progress={progress} onRetry={()=>setRetry(n=>n+1)} title="正在打开学习小世界"><a href={gardenUrl}>进入花园</a></ResourceLoader></div>;
   return <div className={`learning-world ${reduced?'reduced-motion':''}`}>
     <header className="world-header"><a className="world-brand" href="/" aria-label="挖机的学习小世界首页"><WajiIcon/><span>挖机的学习小世界</span></a><button className="world-motion-toggle" aria-pressed={reduced} onClick={toggleMotion}>减少动态{reduced?'：开':'：关'}</button></header>
     <main className="world-main" aria-labelledby="world-title">

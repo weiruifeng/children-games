@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import {cellX,rowY,type GardenState} from '@children-games/shared';
+import {cellX,rowY,hasDewCollector,type GardenState} from '@children-games/shared';
 type View={image:Phaser.GameObjects.Image;hp:number;kind:string;hit:number;fire:number;exit:number|null;exitScaleX:number;exitScaleY:number;seen:boolean};
 /** Visuals follow simulation events; they never apply damage or award points. */
 export class EntityViews {
@@ -28,7 +28,7 @@ export class EntityViews {
   };
   prop('gate','garden_gate',100,375,145,220);
   const dewSource=this.scene.textures.get('pickup_dew').getSourceImage();const dewSize=52*1280/Math.max(1,this.scene.game.canvas.getBoundingClientRect().width);const dewScale=Math.min(dewSize/dewSource.width,dewSize/dewSource.height);
-  for(const d of s.drops)prop(`drop${d.id}`,'pickup_dew',d.x,d.y-5,dewSource.width*dewScale,dewSource.height*dewScale);
+  for(const d of s.drops)prop(`drop${d.id}`,'pickup_dew',d.x,d.y-5,dewSource.width*dewScale,dewSource.height*dewScale,hasDewCollector(s)?1:.4);
   for(const b of s.projectiles)prop(`bullet${b.id}`,b.heavy?'projectile_cone':'projectile_seed',b.x,b.y,b.heavy?44:28,b.heavy?44:23);
   for(const [i,e] of this.sparks.entries())if(e.type==='armor_break'&&time-e.at<.65)prop(`shell${i}`,'paper_shell',e.x+(time-e.at)*30,e.y-30+(time-e.at)*50,130,130,1-(time-e.at)/.65);
   for(const [key,image] of this.props)if(!active.has(key)){image.destroy();this.props.delete(key);}

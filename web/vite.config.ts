@@ -2,9 +2,13 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 
+// @ts-ignore build-time assets
+import {gardenResourcesPlugin} from '../scripts/garden-resource-build.mjs';
+
 // iPad-first：host: true 让 iPad 能通过局域网访问 dev server
 export default defineConfig({
-  plugins: [react()],
+  plugins: [gardenResourcesPlugin(), react()],
+  cacheDir: fileURLToPath(new URL('./node_modules/.vite-play', import.meta.url)),
   build: {
     rollupOptions: {
       input: {

@@ -2,17 +2,17 @@ import {Inject,Body,Controller,Get,Post,Put,Patch,Param,Query,Req,Res,HttpCode} 
 import type {Response} from 'express';
 import {AuthService} from './auth.service';
 import {GardenService} from './garden.service';
-import {cookieName,cookieOptions,type SiteRequest} from './core';
+import {cookieName,cookieOptions,authScope,type SiteRequest} from './core';
 @Controller()
 export class SiteController {
  constructor(@Inject(AuthService) private auth:AuthService,@Inject(GardenService) private garden:GardenService){}
  @Get('health') health(){return {ok:true};}
  @Get('ready') async ready(){await this.auth.rows('SELECT 1 FROM garden_user LIMIT 1');return {ok:true};}
  @Post('auth/register') register(@Body() b:unknown){return this.auth.register(b);}
- @Post('auth/login') @HttpCode(200) async login(@Body() b:unknown,@Res({passthrough:true}) res:Response){const result=await this.auth.login(b);res.cookie(cookieName(),result.raw,{...cookieOptions(),expires:result.expires});return {user:result.user};}
- @Get('auth/me') me(@Req() r:SiteRequest){return {user:{id:r.actor!.id,username:r.actor!.username,role:r.actor!.role},csrfToken:r.actor!.csrf};}
- @Post('auth/logout') @HttpCode(204) async logout(@Req() r:SiteRequest,@Res({passthrough:true}) res:Response){await this.auth.logout(r.actor!);res.clearCookie(cookieName(),cookieOptions());}
- @Post('auth/change-password') @HttpCode(204) change(@Req() r:SiteRequest,@Body() b:unknown){return this.auth.change(r.actor!,b);}
+ @Post(['auth/login','admin/auth/login']) @HttpCode(200) async login(@Body() b:unknown,@Req() r:SiteRequest,@Res({passthrough:true}) res:Response){const result=await this.auth.login(b,authScope(r.path));res.cookie(cookieName(authScope(r.path)),result.raw,{...cookieOptions(),expires:result.expires});return {user:result.user};}
+ @Get(['auth/me','admin/auth/me']) me(@Req() r:SiteRequest){return {user:{id:r.actor!.id,username:r.actor!.username,role:r.actor!.role},csrfToken:r.actor!.csrf};}
+ @Post(['auth/logout','admin/auth/logout']) @HttpCode(204) async logout(@Req() r:SiteRequest,@Res({passthrough:true}) res:Response){await this.auth.logout(r.actor!);res.clearCookie(cookieName(authScope(r.path)),cookieOptions());}
+ @Post(['auth/change-password','admin/auth/change-password']) @HttpCode(204) change(@Req() r:SiteRequest,@Body() b:unknown){return this.auth.change(r.actor!,b);}
  @Post('auth/reset-password') @HttpCode(204) reset(@Body() b:unknown){return this.auth.reset(b);}
  @Get('admin/invitations') invites(@Query() q:Record<string,unknown>){return this.auth.adminList('invitations',q);}
  @Get('admin/users') users(@Query() q:Record<string,unknown>){return this.auth.adminList('users',q);}

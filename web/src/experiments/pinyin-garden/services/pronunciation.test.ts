@@ -1,3 +1,4 @@
+import {resources} from '../../../resources/manager';
 import {describe,it,expect,vi} from 'vitest';
 import {ENTRIES} from '@children-games/shared';
 import {SpeechChannel,canPronounce,pronunciationUrls} from './pronunciation';
@@ -12,7 +13,7 @@ function rig(){const pending=new Map<string,ReturnType<typeof deferred<string>>>
 }
 describe('click pronunciation',()=>{
  it('maps umlaut, compound vowels and whole syllables to existing files',()=>{
-  expect(pronunciationUrls(['mǎ','shuǐ','niú','lǜ','nüè','jū','yǔ']).map(s=>s.split('/').pop())).toEqual(['ma3.mp3','shui3.mp3','niu2.mp3','lv4.mp3','nve4.mp3','ju1.mp3','yu3.mp3']);
+  expect(pronunciationUrls(['mǎ','shuǐ','niú','lǜ','nüè','jū','yǔ']).map(s=>resources.resource(s).id.split('/').pop())).toEqual(['ma3.mp3','shui3.mp3','niu2.mp3','lv4.mp3','nve4.mp3','ju1.mp3','yu3.mp3']);
   for(const e of ENTRIES.filter(e=>!e.readingId))expect(canPronounce(e.pinyin),e.pinyin.join(' ')).toBe(true);
   for(const item of Object.values(manifest)){const p=resolve('public',item.url.slice(1));expect(existsSync(p),p).toBe(true);expect(createHash('sha256').update(readFileSync(p)).digest('hex')).toBe(item.sha256);}
  });

@@ -13,7 +13,8 @@
     "build:garden-site": "tsc -b && vite build --config vite.garden.config.ts",
     "dev:garden-site": "vite --config vite.garden.config.ts",
     "preview:garden-site": "vite preview --config vite.garden.config.ts",
-    "test:garden-e2e": "playwright test --config playwright.garden.config.ts"
+    "test:garden-e2e": "playwright test --config playwright.garden.config.ts",
+    "test:resources": "playwright test --config playwright.resources.config.ts"
   },
   "dependencies": {
     "@children-games/shared": "*",
@@ -27,6 +28,7 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "fake-indexeddb": "^6.2.7",
+    "sharp": "^0.35.5",
     "typescript": "~5.6.2",
     "vite": "^6.3.5",
     "vitest": "^3.0.0"

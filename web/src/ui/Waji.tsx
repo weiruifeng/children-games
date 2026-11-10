@@ -1,3 +1,4 @@
+import {assetUrl} from '../experiments/pinyin-garden/assets/assetUrl';
 import {useState} from 'react';
 import './waji.css';
 
@@ -11,12 +12,12 @@ const labels: Record<Mood,string> = {victory:'挖机全身庆祝',welcome:'挖�
 /** Transparent artwork. Animation is decorative and never controls game timing. */
 export function Waji({mood='welcome',animate=false,className=''}:{mood?:Mood;animate?:boolean;className?:string}) {
   return <svg className={`waji waji-${mood} ${animate?'waji-motion':''} ${className}`} viewBox={crops[mood]} role="img" aria-label={labels[mood]}>
-    <image href="/assets/waji/characters.png" width="1280" height="1280"/>
+    <image href={assetUrl('/assets/waji/characters.png')} width="1280" height="1280"/>
   </svg>;
 }
 export function WajiIcon({className=''}:{className?:string}) {
   return <svg className={`waji-icon ${className}`} viewBox="496 574 303 286" role="img" aria-label="拼音花园">
-    <image href="/assets/waji/reference.png" width="1536" height="1024"/>
+    <image href={assetUrl('/assets/waji/reference.png')} width="1536" height="1024"/>
   </svg>;
 }
 const greetings=['点点我，打个招呼','嗨！今天也一起发现新东西吧！','准备好了，我们一起出发！'];

@@ -7,7 +7,7 @@ export const ENEMY_IDS = ['enemy_ink_blob','enemy_paper_blob','enemy_scroll'] as
 export type EnemyKind = typeof ENEMY_IDS[number];
 export const PLANTS: Record<PlantKind,{name:string;cost:number;hp:number;cooldown:number;description:string}> = {
   plant_pod_slinger:{name:'豆荚弹弓手',cost:100,hp:100,cooldown:4,description:'使用全队共享拼音卡，持续发射种子。'},
-  plant_dew_collector:{name:'露珠收集器',cost:50,hp:80,cooldown:5,description:'自动收集露珠，让更多伙伴加入。'},
+  plant_dew_collector:{name:'露珠收集器',cost:50,hp:80,cooldown:5,description:'在场才能收集露珠，还能额外产出，记得保护好。'},
   plant_vine_guard:{name:'藤编盾卫',cost:50,hp:500,cooldown:8,description:'挡住墨团，安心准备弹药。'},
   plant_cone_launcher:{name:'松果投石手',cost:150,hp:120,cooldown:8,description:'共享音节或完整词语，持续投出范围松果弹。'},
 };

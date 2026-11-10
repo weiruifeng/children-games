@@ -22,7 +22,7 @@ describe('pinyin-garden full campaign simulation',()=>{
  for(let level=1;level<=5;level++)it(`can complete level ${level} with legal planting and answers`,()=>{
   const s=createGarden(level,173+level*71);const rows=level===1?[1]:level===2?[0,1]:[0,1,2];
   const attack=level===5?'plant_cone_launcher':'plant_pod_slinger';
-  startWave(s);placePlant(s,attack,rows[0],0);
+  startWave(s);placePlant(s,'plant_dew_collector',rows[0],1);placePlant(s,attack,rows[0],0);
   for(let step=0;step<60000&&s.stage!=='won'&&s.stage!=='lost';step++){
    if(s.stage==='between')startWave(s);
    for(const r of rows)if(!s.plants.some(p=>p.row===r&&p.kind===attack))placePlant(s,attack,r,0);

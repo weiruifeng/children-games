@@ -1,0 +1,34 @@
+/* Loading owns a viewport-sized surface, never the board's 2:1 aspect ratio. */
+.resource-loading-screen{box-sizing:border-box;min-width:0;min-height:100vh;min-height:100dvh;width:100%;padding:24px 16px;padding:max(24px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));display:flex;flex-direction:column;align-items:center}
+.resource-loading-screen[data-presentation=pending] .resource-loader{visibility:hidden}
+.resource-loader{box-sizing:border-box;flex:none;display:flex;flex-direction:column;align-items:center;gap:14px;margin-block:auto;width:100%;max-width:480px;padding:28px 24px;background:#fff9e9;border:2px solid #bcc791;border-radius:24px;color:#38543b;text-align:center;box-shadow:0 12px 28px #405b2914;outline:none;font-family:"PingFang SC","Microsoft YaHei",sans-serif;overflow-wrap:anywhere}
+.resource-loader h2{font-size:24px;line-height:1.35;margin:0;max-width:100%}
+.resource-loader p{margin:0;line-height:1.6;max-width:100%}
+.resource-loader .resource-note{font-size:13px;color:#677b56}
+.resource-sprout{flex:none;color:#6c9554;width:56px;aspect-ratio:64/56}
+.resource-sprout svg{display:block;width:100%;height:100%}
+.resource-track{box-sizing:border-box;flex:none;width:100%;height:14px;padding:2px;overflow:hidden;border:1px solid #d4ddbb;border-radius:999px;background:#e5e9d1}
+.resource-track span{display:block;height:100%;border-radius:999px;background:#85aa66;transition:width .16s linear}
+.resource-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;width:100%;min-width:0}
+.resource-actions button,.resource-actions a,.resource-settings button{box-sizing:border-box;font:inherit;line-height:1.4;min-height:44px;max-width:100%;border:1px solid #a3b982;background:#f2efd6;border-radius:12px;padding:9px 14px;color:#38543b;cursor:pointer;transition:transform .12s,background .12s}
+.resource-loader .resource-actions>*{flex:0 1 auto;min-width:0;font-size:16px;white-space:normal;text-decoration:none}
+.resource-loader .resource-actions .primary{background:#64874e;color:#fffbe6;border-color:#4c6e39}
+.resource-actions button:active,.resource-actions a:active,.resource-settings button:active{transform:scale(.97);background:#dce9b8}
+.resource-failed{animation:resource-error .16s both}
+.resource-settings{padding:16px 0;color:#38543b}
+.resource-settings p{font-size:14px;line-height:1.65}
+.resource-settings .resource-actions{justify-content:flex-start}
+.resource-settings progress{width:100%}
+.resource-complete{animation:resource-error .16s both}
+.resource-overlay{position:fixed;inset:0;height:100vh;height:100dvh;min-height:0;z-index:60;overflow:auto;background:#e4ebd5}
+.resource-update-note{font-size:13px;color:#62794c}
+.resource-inline-error{color:#9d513d}
+.resource-loader button:focus-visible,.resource-loader a:focus-visible,.resource-settings button:focus-visible{outline:3px solid #bd9137;outline-offset:3px}
+@keyframes resource-error{from{opacity:.3}to{opacity:1}}
+.reduced-motion .resource-loader *,.reduced-motion .resource-settings *,.reduced-motion .resource-failed{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){.resource-loader *,.resource-settings *,.resource-failed{animation:none!important;transition:none!important}}
+@media(max-width:480px){.resource-loading-screen{padding-inline:12px}.resource-loader{padding:24px 18px;gap:12px}.resource-loader h2{font-size:22px}.resource-settings .resource-actions{flex-direction:column}}
+@media(max-height:440px){.resource-loading-screen{padding-block:12px}.resource-loader{padding:18px 24px;gap:10px}.resource-sprout{width:40px}.resource-loader h2{font-size:22px}}
+.resource-update-hint{position:fixed;right:12px;bottom:12px;z-index:20;max-width:220px;min-height:44px;border:1px solid #a3b982;border-radius:12px;padding:8px 12px;background:#fff9e9;color:#38543b;font-size:13px}
+.battle-screen .resource-update-hint{display:none}
+[data-reduced-motion="true"] .resource-settings *,[data-reduced-motion="true"] .resource-loader *,[data-reduced-motion="true"] .resource-failed{animation:none!important;transition:none!important}

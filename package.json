@@ -20,7 +20,8 @@
     "start:garden-site": "npm run start:garden-site -w server",
     "dev:garden-site": "npm run dev:garden-site -w web",
     "migrate:garden": "npm run migrate:garden -w server",
-    "bootstrap:admin": "npm run bootstrap:admin -w server"
+    "bootstrap:admin": "npm run bootstrap:admin -w server",
+    "local:garden": "node scripts/dev-garden-local.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

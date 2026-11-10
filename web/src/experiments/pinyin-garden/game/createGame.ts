@@ -2,29 +2,33 @@ import {CHARACTER_IDS,characterUrl,BACKGROUNDS,PROP_IDS,propUrl} from '../assets
 import {boardAction} from '../ui/boardInteraction';
 import {EntityViews} from './entityViews';
 import Phaser from 'phaser';
-import {BOARD,cellX,rowY,ENTRY_MAP,hasSharedAmmo,PLANTS,tickGarden,type GardenState,type PlantKind} from '@children-games/shared';
-export interface GardenBridge {actorPixels:()=>number;inputBlocked?:()=>boolean;feedback:(message:string)=>void;shovel?:()=>boolean;freeze?:()=>boolean;placement?:()=>{kind:PlantKind;row:number;col:number;valid:boolean}|null;state:()=>GardenState;change:()=>void;assetError?:(failed:boolean)=>void;cell:(row:number,col:number)=>void;plant:(id:number)=>void;enemy:(id:number)=>void;drop:(id:number)=>void;}
+import {BOARD,cellX,rowY,ENTRY_MAP,hasSharedAmmo,hasDewCollector,PLANTS,tickGarden,type GardenState,type PlantKind} from '@children-games/shared';
+export interface GardenBridge {actorPixels:()=>number;inputBlocked?:()=>boolean;feedback:(message:string)=>void;shovel?:()=>boolean;freeze?:()=>boolean;placement?:()=>{kind:PlantKind;row:number;col:number;valid:boolean}|null;state:()=>GardenState;change:()=>void;ready?:()=>void;assetError?:(message:string)=>void;cell:(row:number,col:number)=>void;plant:(id:number)=>void;enemy:(id:number)=>void;drop:(id:number)=>void;}
 export function createGardenGame(parent:HTMLElement,bridge:GardenBridge,reduced:()=>boolean):Phaser.Game {
  class GardenScene extends Phaser.Scene {
-  private entities!:EntityViews;private failed=false;
-  preload(){for(const id of CHARACTER_IDS)this.load.image(id,characterUrl(id));for(const id of PROP_IDS)this.load.image(id,propUrl(id));this.load.image('garden-bg',bridge.state().level>=4?BACKGROUNDS.evening:BACKGROUNDS.day);this.load.on('loaderror',()=>{this.failed=true;bridge.assetError?.(true);});}
+  private entities!:EntityViews;private failed=false;private rendered=false;private waitMs=0;private drawing=false;
+  preload(){for(const id of CHARACTER_IDS)this.load.image(id,characterUrl(id));for(const id of PROP_IDS)this.load.image(id,propUrl(id));this.load.image('garden-bg',bridge.state().level>=4?BACKGROUNDS.evening:BACKGROUNDS.day);this.load.on('loaderror',()=>{this.failed=true;bridge.assetError?.('有些花园图片还没准备好，请重新准备。');});}
   private g!:Phaser.GameObjects.Graphics;
   private textMap=new Map<string,Phaser.GameObjects.Text>();
   private pulse=0;private accumulator=0;private refresh=0;
-  create(){if(this.failed)return;bridge.assetError?.(false);this.add.image(640,320,'garden-bg').setDisplaySize(1280,640).setDepth(-1);this.g=this.add.graphics();this.entities=new EntityViews(this,this.add.graphics().setDepth(2),()=>bridge.actorPixels()*1280/Math.max(1,this.game.canvas.getBoundingClientRect().width));this.input.on('pointerdown',(pointer:Phaser.Input.Pointer)=>{
+  create(){try{if(this.failed)return;this.add.image(640,320,'garden-bg').setDisplaySize(1280,640).setDepth(-1);this.g=this.add.graphics();this.entities=new EntityViews(this,this.add.graphics().setDepth(2),()=>bridge.actorPixels()*1280/Math.max(1,this.game.canvas.getBoundingClientRect().width));this.game.canvas.addEventListener('webglcontextlost',this.contextLost);this.game.canvas.addEventListener('webglcontextrestored',this.contextRestored);this.events.once('shutdown',()=>{this.game.canvas.removeEventListener('webglcontextlost',this.contextLost);this.game.canvas.removeEventListener('webglcontextrestored',this.contextRestored);});this.input.on('pointerdown',(pointer:Phaser.Input.Pointer)=>{
    const s=bridge.state();if(s.paused||s.helpOpen||s.stage!=='playing'||bridge.inputBlocked?.())return;
    const hit=boardAction(s,pointer.x,pointer.y,bridge.shovel?.()??false,this.game.canvas.getBoundingClientRect().width/1280);
    if(!hit)return;
    if(hit.type==='empty-shovel'){bridge.feedback('点一下要挖走的伙伴');return;}
    if(hit.type==='cell')bridge.cell(hit.row,hit.col);else bridge[hit.type](hit.id);
-  });}
+  });}catch{this.failed=true;bridge.assetError?.('战场还没准备好，请重新准备。');}}
+  private contextLost=(event:Event)=>{event.preventDefault();this.failed=true;bridge.assetError?.('画板暂时中断，进度已暂停，请重新准备。');};
+  private contextRestored=()=>{bridge.assetError?.('画板已恢复，请重新准备后继续。');};
   label(key:string,text:string,x:number,y:number,size:number,color:string,bg?:string){
    let label=this.textMap.get(key);if(!label){label=this.add.text(x,y,text,{fontFamily:'"PingFang SC", "Microsoft YaHei", sans-serif',fontSize:size,color,backgroundColor:bg,padding:{x:8,y:5},fontStyle:'bold'}).setOrigin(.5).setDepth(3);this.textMap.set(key,label);}
    label.setText(text).setPosition(x,y).setVisible(true);return label;
   }
   update(_time:number,delta:number){
-   if(this.failed||!this.g)return;
-   const s=bridge.state();this.accumulator+=Math.min(delta,100)/1000;while(this.accumulator>=1/60){if(!bridge.freeze?.())tickGarden(s,1/60);this.accumulator-=1/60;}
+   if(this.failed||!this.g)return;try{
+   const bounds=this.game.canvas.getBoundingClientRect();if(bounds.width<=0||bounds.height<=0){if(!document.hidden){this.waitMs+=delta;if(this.waitMs>10000&&!this.failed){this.failed=true;bridge.assetError?.('画板尺寸还没准备好，请重新准备。');}}return;}
+   if(!this.rendered&&!this.drawing){this.drawing=true;this.game.events.once('postrender',()=>{this.drawing=false;if(!this.failed){this.rendered=true;bridge.ready?.();}});}
+   const s=bridge.state();this.accumulator+=Math.min(delta,100)/1000;while(this.accumulator>=1/60){if(this.rendered&&!bridge.freeze?.())tickGarden(s,1/60);this.accumulator-=1/60;}
    this.refresh+=delta;if(this.refresh>100){this.refresh=0;bridge.change();}
    if(!s.paused&&!s.helpOpen&&!bridge.freeze?.())this.pulse+=delta/1000;
    for(const label of this.textMap.values())label.setVisible(false);
@@ -40,8 +44,8 @@ export function createGardenGame(parent:HTMLElement,bridge:GardenBridge,reduced:
    const cssScale=this.game.canvas.getBoundingClientRect().width/1280;
    for(const d of s.drops){
     // An outlined game number floats under the droplet; no rectangular UI label.
-    const label=this.label(`dew${d.id}`,`+${d.value}`,d.x,d.y+30/Math.max(.1,cssScale),22,'#fff4bd');
-    label.setFontSize(18/Math.max(.1,cssScale)).setPadding(3).setStroke('#467d62',3/Math.max(.1,cssScale)).setShadow(0,2/Math.max(.1,cssScale),'#294f4380',0,false,true);
+    const available=hasDewCollector(s);const label=this.label(`dew${d.id}`,available?`+${d.value}`:'待收集器',d.x,d.y+30/Math.max(.1,cssScale),22,available?'#fff4bd':'#e4ebd5');
+    label.setFontSize((available?18:12)/Math.max(.1,cssScale)).setPadding(3).setStroke('#467d62',3/Math.max(.1,cssScale)).setShadow(0,2/Math.max(.1,cssScale),'#294f4380',0,false,true);
    }
    for(const p of s.plants){const x=cellX(p.col),y=rowY(p.row);if(s.selectedPlant===p.id){g.lineStyle(4,0xfdf8cf);g.strokeRoundedRect(x-65,y-58,130,105,16);}
     if(bridge.shovel?.()){g.lineStyle(5,0xffd35e);g.strokeRoundedRect(x-69,y-62,138,124,14);}
@@ -58,6 +62,7 @@ export function createGardenGame(parent:HTMLElement,bridge:GardenBridge,reduced:
    this.entities.update(s,this.pulse,reduced());
    this.label('path','墨团从这里来 ←',1165,140,15,'#708274');
    for(const [key,label] of this.textMap)if(!label.visible){label.destroy();this.textMap.delete(key);}
+   }catch{this.failed=true;bridge.assetError?.('画板绘制暂时中断，进度已暂停，请重新准备。');}
   }
  }
  return new Phaser.Game({type:Phaser.AUTO,parent,width:1280,height:640,backgroundColor:'#e5edcf',scene:GardenScene,scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},render:{antialias:true},audio:{noAudio:true}});

@@ -1,8 +1,9 @@
+import {resources} from '../../../resources/manager';
 import {describe,it,expect} from 'vitest';
 import {readFileSync} from 'node:fs';
 import {CHARACTER_IDS,characterUrl,PROP_IDS,propUrl,BACKGROUNDS} from './manifest';
 import audio from './audio-manifest.json';
-const read=(url:string)=>readFileSync(new URL(`../../../../public${url}`,import.meta.url));
+const read=(url:string)=>readFileSync(new URL(`../../../../public${url.startsWith('/assets/garden/')?resources.resource(url).id:url}`,import.meta.url));
 describe('garden shipped assets',()=>{
  it('ships all character and prop PNGs with alpha, and both backgrounds',()=>{
   for(const url of [...CHARACTER_IDS.map(characterUrl),...PROP_IDS.map(propUrl),...Object.values(BACKGROUNDS)]){

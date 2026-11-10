@@ -41,6 +41,7 @@ describe('character curriculum v3',()=>{
  });
  for(const lesson of published)for(const battle of [1,2,3,4,5])it(`${lesson.id} battlefield ${battle}: all new targets spawn and three waves finish`,()=>{
   const s=createCharacterGarden(lesson.id,battle,[],'campaign');startWave(s);const seen=new Set<string>();
+  placePlant(s,'plant_dew_collector',LEVELS[battle-1].rows[0],1);
   for(let step=0;step<30000&&s.stage!=='won'&&s.stage!=='lost';step++){
    if(s.stage==='between')startWave(s);
    const attack=battle>=3?'plant_cone_launcher':'plant_pod_slinger';

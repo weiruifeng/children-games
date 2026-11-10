@@ -2,8 +2,9 @@ import {Injectable,Inject} from '@nestjs/common';
 import * as argon from 'argon2';
 import {z} from 'zod';
 import {DatabaseService,type SqlConnection,type RowDataPacket} from '../database/database.service';
-import {code,digest,fail,id,normalizeCode,token,userView,type Actor} from './core';
-export const username=z.string().regex(/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/).transform(v=>v.toLowerCase());
+import {code,digest,fail,id,normalizeCode,token,userView,type Actor,type AuthScope} from './core';
+export const username=z.string().regex(/^[\p{Script=Han}a-zA-Z][\p{Script=Han}a-zA-Z0-9_]{1,31}$/u,'用户名需要2至32个字，支持中文、字母、数字和下划线，以中文或字母开头').transform(v=>v.toLowerCase());
+export const parentPassword=z.string().refine(v=>[...v].length>=6&&[...v].length<=32,'密码需要6至32个字符');
 export const password=z.string().refine(v=>[...v].length>=15&&[...v].length<=128,'密码需要15至128个字符');
 const hash=(p:string)=>argon.hash(p,{type:argon.argon2id,memoryCost:19456,timeCost:2,parallelism:1});
 export async function audit(c:SqlConnection,actor:string,action:string,target:string){await c.execute('INSERT INTO garden_admin_audit (id,actor_id,action_name,target_id) VALUES (?,?,?,?)',[id(),actor,action,target]);}
@@ -22,7 +23,7 @@ export class AuthService {
   if(row.request_count>max)fail(429,'RATE_LIMITED','操作太频繁，请稍后重试',{retryAfter:Math.max(1,start+seconds-Math.floor(Date.now()/1000))});
  }
  async register(body:unknown){
-  const b=z.object({username,password,invitationCode:z.string().max(100)}).strict().parse(body),uid=id(),ph=await hash(b.password);
+  const b=z.object({username,password:parentPassword,invitationCode:z.string().max(100)}).strict().parse(body),uid=id(),ph=await hash(b.password);
   try{await this.db.withTransaction(async c=>{
    const [rows]=await c.execute<RowDataPacket[]>('SELECT * FROM garden_invitation WHERE code_hash=? FOR UPDATE',[digest(normalizeCode(b.invitationCode))]);const invite=rows[0];
    if(!invite||invite.revoked_at||invite.used_at||new Date(invite.expires_at).getTime()<=Date.now())fail(400,'INVALID_INVITATION','邀请码无效或已经使用');
@@ -32,10 +33,11 @@ export class AuthService {
   });}catch(e:any){if(e.code==='ER_DUP_ENTRY')fail(409,'USERNAME_TAKEN','用户名已被使用');throw e;}
   return {userId:uid};
  }
- async login(body:unknown){
+ async login(body:unknown,scope:AuthScope='parent'){
   const b=z.object({username,password:z.string().max(512)}).strict().parse(body);await this.rate('login-user:'+b.username,10,900);
   const [u]=await this.rows('SELECT * FROM garden_user WHERE username_normalized=?',[b.username]);
   if(!u||u.user_status!=='active'||!await argon.verify(u.password_hash,b.password))fail(401,'INVALID_CREDENTIALS','账号或密码不正确');
+  if((u.user_role==='admin')!==(scope==='admin'))fail(403,'WRONG_LOGIN_ENTRY',scope==='admin'?'此入口仅限管理员，请前往拼音花园登录。':'管理员账号不能登录游戏，请前往管理后台。');
   const raw=token(),csrf=token(),sid=id(),now=new Date(),expires=new Date(Date.now()+(u.user_role==='admin'?12*3600:30*86400)*1000);
   await this.db.withTransaction(async c=>{
    const [current]=await c.execute<RowDataPacket[]>('SELECT user_status,password_hash FROM garden_user WHERE id=? FOR UPDATE',[u.id]);
@@ -52,11 +54,11 @@ export class AuthService {
   return {id:u.id,username:u.username_normalized,role:u.user_role,sessionId:u.session_id,csrf:u.csrf_secret};
  }
  async logout(a:Actor){await this.db.withTransaction(async c=>{await c.execute('UPDATE garden_session SET revoked_at=? WHERE id=?',[new Date(),a.sessionId]);});}
- async change(a:Actor,body:unknown){const b=z.object({currentPassword:z.string().max(512),newPassword:password}).strict().parse(body);const ph=await hash(b.newPassword);
+ async change(a:Actor,body:unknown){const b=z.object({currentPassword:z.string().max(512),newPassword:a.role==='admin'?password:parentPassword}).strict().parse(body);const ph=await hash(b.newPassword);
   await this.db.withTransaction(async c=>{const [r]=await c.execute<RowDataPacket[]>('SELECT password_hash FROM garden_user WHERE id=? FOR UPDATE',[a.id]);if(!await argon.verify(r[0].password_hash,b.currentPassword))fail(400,'INVALID_PASSWORD','当前密码不正确');await this.setPassword(c,a.id,ph);});
  }
  private async setPassword(c:SqlConnection,uid:string,ph:string){await c.execute('UPDATE garden_user SET password_hash=? WHERE id=?',[ph,uid]);await c.execute('UPDATE garden_session SET revoked_at=? WHERE user_id=?',[new Date(),uid]);await c.execute('UPDATE garden_password_reset SET revoked_at=? WHERE user_id=?',[new Date(),uid]);}
- async reset(body:unknown){const b=z.object({resetCode:z.string().max(100),newPassword:password}).strict().parse(body),ph=await hash(b.newPassword);
+ async reset(body:unknown){const b=z.object({resetCode:z.string().max(100),newPassword:parentPassword}).strict().parse(body),ph=await hash(b.newPassword);
   // User lock precedes token lock in all password operations.
   const [candidate]=await this.rows('SELECT user_id FROM garden_password_reset WHERE token_hash=?',[digest(normalizeCode(b.resetCode))]);if(!candidate)fail(400,'INVALID_RESET','重置码无效');
   await this.db.withTransaction(async c=>{await c.execute('SELECT id FROM garden_user WHERE id=? FOR UPDATE',[candidate.user_id]);const [r]=await c.execute<RowDataPacket[]>('SELECT * FROM garden_password_reset WHERE token_hash=? FOR UPDATE',[digest(normalizeCode(b.resetCode))]);const t=r[0];if(!t||t.revoked_at||t.consumed_at||new Date(t.expires_at).getTime()<=Date.now())fail(400,'INVALID_RESET','重置码无效或过期');await this.setPassword(c,t.user_id,ph);await c.execute('UPDATE garden_password_reset SET consumed_at=? WHERE id=?',[new Date(),t.id]);});
@@ -64,7 +66,7 @@ export class AuthService {
  async createAdmin(name:string,pass:string){const n=username.parse(name),ph=await hash(password.parse(pass));await this.db.withTransaction(async c=>{
   const guard=digest('bootstrap-admin');await c.execute("INSERT INTO garden_rate_limit (bucket_key,window_start,request_count,expires_at) VALUES (?,0,0,'9999-01-01') ON DUPLICATE KEY UPDATE request_count=request_count",[guard]);
   await c.execute('SELECT bucket_key FROM garden_rate_limit WHERE bucket_key=? AND window_start=0 FOR UPDATE',[guard]);
-  const [r]=await c.execute<RowDataPacket[]>("SELECT id FROM garden_user WHERE user_role='admin'");if(r.length)throw Error('管理员已经存在');const uid=id();await c.execute("INSERT INTO garden_user (id,username_normalized,password_hash,user_role) VALUES (?,?,?,'admin')",[uid,n,ph]);for(let slot=1;slot<=3;slot++)await c.execute('INSERT INTO garden_profile (id,user_id,slot_number) VALUES (?,?,?)',[id(),uid,slot]);await audit(c,uid,'bootstrap',uid);
+  const [r]=await c.execute<RowDataPacket[]>("SELECT id FROM garden_user WHERE user_role='admin'");if(r.length)throw Error('管理员已经存在');const uid=id();await c.execute("INSERT INTO garden_user (id,username_normalized,password_hash,user_role) VALUES (?,?,?,'admin')",[uid,n,ph]);await audit(c,uid,'bootstrap',uid);
  });}
  async recoverAdmin(name:string,pass:string){const n=username.parse(name),ph=await hash(password.parse(pass));await this.db.withTransaction(async c=>{const [r]=await c.execute<RowDataPacket[]>("SELECT id FROM garden_user WHERE username_normalized=? AND user_role='admin' FOR UPDATE",[n]);if(!r[0])throw Error('管理员不存在');await this.setPassword(c,r[0].id,ph);await audit(c,r[0].id,'admin.password-recovery',r[0].id);});}
  async adminList(kind:'users'|'invitations'|'audit',query:Record<string,unknown>){

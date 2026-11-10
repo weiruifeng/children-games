@@ -99,7 +99,13 @@ export function submitTask(s:GardenState,now=Date.now()):boolean {
  for(const p of s.plants)if(p.kind==='plant_pod_slinger'||p.kind==='plant_cone_launcher')p.timer=Math.max(p.timer,p.kind==='plant_cone_launcher'?3:.8);
  s.message=`${signature(entry)} · 全队可用！`;event(s,'ammo_shared',640,170,signature(entry));return true;
 }
-export function collectDrop(s:GardenState,id:number):void {if(s.paused||s.helpOpen)return;const d=s.drops.find(d=>d.id===id);if(!d)return;s.dew+=d.value;s.drops=s.drops.filter(d=>d.id!==id);event(s,'dew_collect',d.x,d.y,String(d.value));}
+/** Collection depends on simulation actors, never on a fading renderer sprite. */
+export function hasDewCollector(s:GardenState):boolean {return s.plants.some(p=>p.kind==='plant_dew_collector'&&p.hp>0);}
+export function collectDrop(s:GardenState,id:number):boolean {
+ if(s.stage!=='playing'||s.paused||s.helpOpen||s.hearts<=0||!hasDewCollector(s))return false;
+ const d=s.drops.find(d=>d.id===id);if(!d)return false;
+ s.dew+=d.value;s.drops=s.drops.filter(d=>d.id!==id);event(s,'dew_collect',d.x,d.y,String(d.value));return true;
+}
 function kill(s:GardenState,e:Enemy,matched:boolean):void {
  if(!s.enemies.some(en=>en.id===e.id))return;
  reward(s,`kill:${e.id}`,e.kind==='enemy_scroll'?200:e.kind==='enemy_paper_blob'?100:50);s.dew+=e.kind==='enemy_scroll'?30:e.kind==='enemy_paper_blob'?15:10;
@@ -136,7 +142,7 @@ export function tickGarden(s:GardenState,realDelta:number):void {
  s.time+=dt;s.waveTime+=dt;s.dropTimer+=dt;
  for(const k of Object.keys(s.cooldowns) as PlantKind[])s.cooldowns[k]=Math.max(0,s.cooldowns[k]-dt);
  if(s.dropTimer>=10){s.dropTimer-=10;s.drops.push({id:s.nextId++,x:350+random(s)*650,y:200+random(s)*340,age:0,value:25});event(s,'dew_spawn');}
- for(const d of [...s.drops]){d.age+=dt;if(d.age>=8)collectDrop(s,d.id);}
+ for(const d of s.drops)d.age+=dt;
  if(s.spawned<LEVELS[s.level-1].counts[s.wave]&&s.waveTime>=s.nextSpawn&&s.enemies.length<6)spawn(s);
  for(const p of s.plants){
   p.timer+=dt;
@@ -173,6 +179,8 @@ export function tickGarden(s:GardenState,realDelta:number):void {
    if(s.hearts===0)break;
   }
  }
+ // Resolve automatic collection after attacks: a collector defeated this frame cannot harvest.
+ for(const d of [...s.drops])if(d.age>=8&&!collectDrop(s,d.id))s.drops=s.drops.filter(drop=>drop.id!==d.id);
  if(s.hearts<=0){s.hearts=0;s.stage='lost';s.task=null;s.message='爱心用完了，从这一波再试一次吧。';event(s,'retry');return;}
  if(s.spawned===LEVELS[s.level-1].counts[s.wave]&&!s.enemies.length){reward(s,`wave:${s.wave}`,100);s.task=null;
   if(s.wave===2){s.stage='won';reward(s,'hearts',s.hearts*100);if(s.level===1&&s.hearts===3)s.strategy=true;event(s,'victory');}

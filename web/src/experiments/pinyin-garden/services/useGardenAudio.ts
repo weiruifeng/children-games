@@ -5,7 +5,7 @@ export function useGardenAudio(page:string,run:GardenState,settings:Profile['set
  const [speechError,setSpeechError]=useState('');const [ready,setReady]=useState(false);const [muted,setMuted]=useState(false);
  const audio=useRef<GardenAudio>();const cursor=useRef(new EventCursor());
  useEffect(()=>{
-  const player=new GardenAudio(setReady);audio.current=player;player.setSpeechFailure(()=>setSpeechError('这段声音暂不可用，可以继续拼卡片。'));
+  const player=new GardenAudio(setReady);audio.current=player;player.setSpeechFailure(()=>setSpeechError('这段读音暂不可用，请重新准备或关闭朗读后继续。'));
   const unlock=()=>player.unlock();
   const key=(e:KeyboardEvent)=>{if(e.key==='Enter'||e.key===' ')unlock();};
   const visibility=()=>player.visibility(document.hidden);
@@ -22,5 +22,5 @@ export function useGardenAudio(page:string,run:GardenState,settings:Profile['set
   const events=cursor.current.take(run);if(page==='battle')for(const event of events)player.play(event);
  });
  useEffect(()=>{audio.current?.stopSpeech();},[page,run]);
- return {ready,muted,speechError,pronounce:(pinyin:string[])=>{setSpeechError('');audio.current?.pronounce(pinyin);},toggle:()=>{if(muted){setMuted(false);audio.current?.unlock();}else if(!ready)audio.current?.unlock();else setMuted(true);},preview:()=>audio.current?.play('ui_select')};
+ return {ready,muted,speechError,unlock:()=>audio.current?.unlock(),prepareSpeech:(urls:string[])=>{setSpeechError('');return audio.current!.prepareSpeech(urls);},pronounce:(pinyin:string[])=>{setSpeechError('');audio.current?.pronounce(pinyin);},toggle:()=>{audio.current?.retryOptional();if(muted){setMuted(false);audio.current?.unlock();}else if(!ready)audio.current?.unlock();else setMuted(true);},preview:()=>audio.current?.play('ui_select')};
 }

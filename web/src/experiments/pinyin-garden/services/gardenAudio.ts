@@ -1,4 +1,4 @@
-import {assetUrl} from '../assets/assetUrl';
+import {resources} from '../../../resources/manager';
 import {SpeechChannel,pronunciationUrls,canPronounce} from './pronunciation';
 import manifest from '../assets/audio-manifest.json';
 import type {GardenState} from '@children-games/shared';
@@ -44,11 +44,12 @@ export class GardenAudio {
  private buffers=new Map<string,Promise<AudioBuffer>>();
  private source:AudioBufferSourceNode|null=null;
  private voices=new Set<AudioBufferSourceNode>();
+ private unavailableMusic=new Set<Music>();
  private wanted:Music|null=null;private offset=0;private started=0;private ended=false;
  private revision=0;private epoch=0;private disposed=false;
  private paused=false;private muted=false;private hidden=false;
  private musicVolume=.35;private sfxVolume=.6;
- private lastSounds=new Map<string,number>();private preloaded=false;
+ private lastSounds=new Map<string,number>();private requiredSpeech=new Set<string>();private decodeQueue:Promise<unknown>=Promise.resolve();
  constructor(private status:(ready:boolean)=>void){}
  private get blocked(){return this.paused||this.muted||this.hidden;}
  unlock(){
@@ -63,20 +64,24 @@ export class GardenAudio {
     this.volumes();
     this.context.onstatechange=()=>this.status(this.context?.state==='running');
    }
-   if(this.context.state==='running'){this.preload();this.startMusic();return;}
+   if(this.context.state==='running'){this.status(true);this.startMusic();return;}
    // Resume within the user gesture, before loading any files.
    void this.context.resume().then(()=>{if(this.disposed)return;this.status(true);this.startMusic();
-    this.preload();
+
    }).catch(()=>this.status(false));
   }catch{this.status(false);}
  }
- private preload(){
-  if(this.preloaded)return;this.preloaded=true;
-  for(const sound of Object.values(manifest.sfx))for(const url of sound.urls)void this.buffer(url).catch(()=>{});
+ async prepareSpeech(urls:string[]){
+  if(this.context?.state!=='running')throw Error('请点一下开启声音');
+  this.requiredSpeech=new Set(urls.map(url=>resources.resource(url).id));
+  for(const url of urls){if(this.disposed)throw Error('声音已关闭');await this.buffer(url);}
+  for(const key of this.buffers.keys())if(!this.requiredSpeech.has(key)&&this.buffers.size>64)this.buffers.delete(key);
  }
  private buffer(url:string){
-  let pending=this.buffers.get(url);
-  if(!pending){pending=fetch(assetUrl(url)).then(r=>{if(!r.ok)throw Error(`Audio ${r.status}`);return r.arrayBuffer();}).then(b=>this.context!.decodeAudioData(b)).catch(e=>{this.buffers.delete(url);throw e;});this.buffers.set(url,pending);}
+  url=resources.resource(url).id;let pending=this.buffers.get(url);
+  if(!pending){pending=resources.bytes(url).then(b=>{
+   const run=this.decodeQueue.catch(()=>{}).then(()=>{if(!this.context||this.disposed)throw Error('声音已关闭');const started=performance.now();return this.context.decodeAudioData(b).then(decoded=>{resources.diagnostic('audio-decode',{resource:url,ms:Math.round(performance.now()-started)});return decoded;});});this.decodeQueue=run;return run;
+  }).catch(e=>{this.buffers.delete(url);throw e;});this.buffers.set(url,pending);}
   return pending;
  }
  private volumes(){
@@ -92,12 +97,13 @@ export class GardenAudio {
   this.paused=paused;this.muted=muted;this.musicVolume=music;this.sfxVolume=sfx;this.volumes();this.startMusic();
  }
  visibility(hidden:boolean){this.hidden=hidden;if(hidden){this.stopMusic();this.stopEffects();this.stopSpeech();}else this.startMusic();}
+ retryOptional(){this.unavailableMusic.clear();}
  private stopMusic(){
   this.revision++;
   if(this.source){this.offset+=this.context!.currentTime-this.started;this.source.onended=null;this.source.stop();this.source.disconnect();this.source=null;}
  }
  private startMusic(){
-  if(this.disposed||this.blocked||!this.wanted||this.source||this.ended||this.context?.state!=='running')return;
+  if(this.disposed||this.blocked||!this.wanted||this.unavailableMusic.has(this.wanted)||this.source||this.ended||this.context?.state!=='running')return;
   const revision=++this.revision;const track=this.wanted;const asset=manifest.music[track];
   void this.buffer(asset.url).then(buffer=>{
    if(revision!==this.revision||this.disposed||this.blocked||this.source)return;
@@ -105,7 +111,7 @@ export class GardenAudio {
    const source=this.context!.createBufferSource();source.buffer=buffer;source.loop=asset.loop;source.connect(this.musicGain!);
    source.onended=()=>{if(this.source===source){this.source=null;this.ended=true;}source.disconnect();};
    this.offset=asset.loop?this.offset%buffer.duration:this.offset;this.started=this.context!.currentTime;this.source=source;source.start(0,this.offset);this.status(true);
-  }).catch(()=>{if(revision===this.revision)this.status(false);});
+  }).catch(()=>{if(revision===this.revision){this.unavailableMusic.add(track);resources.diagnostic('optional-audio-unavailable',{resource:asset.url});}});
  }
  play(event:string){
   const name=event==='ammo_shared'?'unlock':event;
@@ -132,5 +138,5 @@ export class GardenAudio {
  private stopEffects(){
   if(this.context&&this.duckGain){const now=this.context.currentTime;this.duckGain.gain.cancelScheduledValues(now);this.duckGain.gain.setValueAtTime(1,now);}
   this.epoch++;for(const voice of this.voices){voice.stop();voice.disconnect();}this.voices.clear();}
- dispose(){this.disposed=true;this.stopMusic();this.stopEffects();this.stopSpeech();if(this.context){this.context.onstatechange=null;void this.context.close();}}
+ dispose(){this.disposed=true;this.stopMusic();this.stopEffects();this.stopSpeech();this.buffers.clear();if(this.context){this.context.onstatechange=null;void this.context.close();}}
 }
