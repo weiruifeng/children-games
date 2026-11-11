@@ -1,21 +1,176 @@
-import {describe,it,expect} from 'vitest';
-import {ENTRY_MAP,LEVELS} from './content';
-import {createGarden,startWave,placePlant,selectKnowledge,submitTask,tickGarden,snapshot,hasSharedAmmo,removePlant} from './simulation';
-import {parseState,parseLegacyProfile as parseProfile,legacyProfile as newProfile} from './snapshot';
-import type {GardenState} from './model';
-function enemy(s:GardenState,row:number,entryId='char-1',x=1150){s.enemies.push({id:s.nextId++,row,entryId,x,kind:'enemy_scroll',hp:240,armor:0,attackTimer:0});}
-function unlock(s:GardenState,id:string){selectKnowledge(s,id);while(!s.task!.finished){s.task!.parts={...ENTRY_MAP[id].parts[s.task!.index]};s.task!.choice=ENTRY_MAP[id].text;submitTask(s);}}
-function three(){const s=createGarden(2);s.dew=1000;startWave(s);placePlant(s,'plant_pod_slinger',0,0);s.cooldowns.plant_pod_slinger=0;placePlant(s,'plant_pod_slinger',1,0);s.cooldowns.plant_pod_slinger=0;placePlant(s,'plant_pod_slinger',1,1);s.nextSpawn=1000;enemy(s,0);enemy(s,1);return s;}
-describe('shared ammunition battle rules',()=>{
- it('one answer fires three independent shooters and keeps firing while studying another word',()=>{const s=three();unlock(s,'char-1');tickGarden(s,.01);expect(s.projectiles).toHaveLength(3);expect(s.projectiles.filter(p=>p.row===1)).toHaveLength(2);selectKnowledge(s,'char-4');const start=s.time;for(let i=0;i<10;i++)tickGarden(s,.1);expect(s.time-start).toBeCloseTo(1);expect(s.events.filter(e=>e.type==='slinger_fire')).toHaveLength(6);expect(s.task!.entryId).toBe('char-4');expect(s.sharedAmmo).toEqual(['char-1']);});
- it('keeps each draft and never ties study to a surviving enemy or plant',()=>{const s=three();selectKnowledge(s,'char-1');s.task!.parts.initial='m';selectKnowledge(s,'char-4');s.task!.parts.final='u';selectKnowledge(s,'char-1');expect(s.task!.parts.initial).toBe('m');s.enemies=[];removePlant(s,s.plants[0].id);s.task!.parts={...ENTRY_MAP['char-1'].parts[0]};expect(submitTask(s)).toBe(true);expect(hasSharedAmmo(s,'char-1')).toBe(true);});
- it('resets ammo and drafts per wave but retains every planted partner',()=>{const s=three();unlock(s,'char-1');const ids=s.plants.map(p=>p.id);s.stage='between';startWave(s);expect(s.sharedAmmo).toEqual([]);expect(s.drafts).toEqual({});expect(s.task).toBeNull();expect(s.plants.map(p=>p.id)).toEqual(ids);tickGarden(s,.1);expect(s.projectiles).toEqual([]);});
- it('does not give multiple rewards for revisiting shared ammunition',()=>{const s=three();unlock(s,'char-1');const score=s.score;selectKnowledge(s,'char-4');selectKnowledge(s,'char-1');expect(s.task!.finished).toBe(true);expect(submitTask(s)).toBe(false);expect(s.score).toBe(score);});
- it('preserves the bank in snapshots and accepts legacy checkpoints with no bank',()=>{const s=three();unlock(s,'char-1');const cp=snapshot(s);expect(parseState(cp).sharedAmmo).toEqual(['char-1']);expect(cp.drafts).toEqual({});const {sharedAmmo:_bank,drafts:_drafts,...legacy}=cp;expect(parseState(legacy).sharedAmmo).toEqual([]);expect(()=>parseState({...cp,sharedAmmo:['bad-id']})).toThrow();});
- it('respects same-row/front-of-shooter constraints and word-launcher compatibility',()=>{const s=createGarden(5);s.dew=2000;startWave(s);placePlant(s,'plant_cone_launcher',0,0);placePlant(s,'plant_pod_slinger',1,0);s.nextSpawn=1000;enemy(s,1,'word-1');unlock(s,'word-1');tickGarden(s,.01);expect(s.projectiles).toHaveLength(0);enemy(s,0,'word-1',200);tickGarden(s,.01);expect(s.projectiles).toHaveLength(0);enemy(s,0,'word-1');tickGarden(s,.01);expect(s.projectiles).toHaveLength(1);expect(s.projectiles[0].heavy).toBe(true);});
- it('does not unlock a word after only its first syllable',()=>{const s=createGarden(5);startWave(s);selectKnowledge(s,'word-1');s.task!.parts={...ENTRY_MAP['word-1'].parts[0]};submitTask(s);expect(s.sharedAmmo).toEqual([]);expect(s.task!.index).toBe(1);});
- it('pausing freezes both the bank and all attacks',()=>{const s=three();unlock(s,'char-1');s.paused=true;const before=JSON.stringify(s);tickGarden(s,.1);selectKnowledge(s,LEVELS[1].entries[0]);expect(JSON.stringify(s)).toBe(before);});
+import { describe, it, expect } from 'vitest';
+import { ENTRY_MAP, LEVELS } from './content';
+import {
+  createGarden,
+  startWave,
+  placePlant,
+  selectKnowledge,
+  submitTask,
+  tickGarden,
+  snapshot,
+  hasSharedAmmo,
+  removePlant,
+} from './simulation';
+import {
+  parseState,
+  parseLegacyProfile as parseProfile,
+  legacyProfile as newProfile,
+} from './snapshot';
+import type { GardenState } from './model';
+function enemy(s: GardenState, row: number, entryId = 'char-1', x = 1150) {
+  s.enemies.push({
+    id: s.nextId++,
+    row,
+    entryId,
+    x,
+    kind: 'enemy_scroll',
+    hp: 240,
+    armor: 0,
+    attackTimer: 0,
+  });
+}
+function unlock(s: GardenState, id: string) {
+  selectKnowledge(s, id);
+  while (!s.task!.finished) {
+    s.task!.parts = { ...ENTRY_MAP[id].parts[s.task!.index] };
+    s.task!.choice = ENTRY_MAP[id].text;
+    submitTask(s);
+  }
+}
+function three() {
+  const s = createGarden(2);
+  s.dew = 1000;
+  startWave(s);
+  placePlant(s, 'plant_pod_slinger', 0, 0);
+  s.cooldowns.plant_pod_slinger = 0;
+  placePlant(s, 'plant_pod_slinger', 1, 0);
+  s.cooldowns.plant_pod_slinger = 0;
+  placePlant(s, 'plant_pod_slinger', 1, 1);
+  s.nextSpawn = 1000;
+  enemy(s, 0);
+  enemy(s, 1);
+  return s;
+}
+describe('shared ammunition battle rules', () => {
+  it('one answer fires three independent shooters and keeps firing while studying another word', () => {
+    const s = three();
+    unlock(s, 'char-1');
+    tickGarden(s, 0.01);
+    expect(s.projectiles).toHaveLength(3);
+    expect(s.projectiles.filter((p) => p.row === 1)).toHaveLength(2);
+    selectKnowledge(s, 'char-4');
+    const start = s.time;
+    for (let i = 0; i < 10; i++) tickGarden(s, 0.1);
+    expect(s.time - start).toBeCloseTo(1);
+    expect(s.events.filter((e) => e.type === 'slinger_fire')).toHaveLength(6);
+    expect(s.task!.entryId).toBe('char-4');
+    expect(s.sharedAmmo).toEqual(['char-1']);
+  });
+  it('keeps each draft and never ties study to a surviving enemy or plant', () => {
+    const s = three();
+    selectKnowledge(s, 'char-1');
+    s.task!.parts.initial = 'm';
+    selectKnowledge(s, 'char-4');
+    s.task!.parts.final = 'u';
+    selectKnowledge(s, 'char-1');
+    expect(s.task!.parts.initial).toBe('m');
+    s.enemies = [];
+    removePlant(s, s.plants[0].id);
+    s.task!.parts = { ...ENTRY_MAP['char-1'].parts[0] };
+    expect(submitTask(s)).toBe(true);
+    expect(hasSharedAmmo(s, 'char-1')).toBe(true);
+  });
+  it('resets ammo and drafts per wave but retains every planted partner', () => {
+    const s = three();
+    unlock(s, 'char-1');
+    const ids = s.plants.map((p) => p.id);
+    s.stage = 'between';
+    startWave(s);
+    expect(s.sharedAmmo).toEqual([]);
+    expect(s.drafts).toEqual({});
+    expect(s.task).toBeNull();
+    expect(s.plants.map((p) => p.id)).toEqual(ids);
+    tickGarden(s, 0.1);
+    expect(s.projectiles).toEqual([]);
+  });
+  it('does not give multiple rewards for revisiting shared ammunition', () => {
+    const s = three();
+    unlock(s, 'char-1');
+    const score = s.score;
+    selectKnowledge(s, 'char-4');
+    selectKnowledge(s, 'char-1');
+    expect(s.task!.finished).toBe(true);
+    expect(submitTask(s)).toBe(false);
+    expect(s.score).toBe(score);
+  });
+  it('preserves the bank in snapshots and accepts legacy checkpoints with no bank', () => {
+    const s = three();
+    unlock(s, 'char-1');
+    const cp = snapshot(s);
+    expect(parseState(cp).sharedAmmo).toEqual(['char-1']);
+    expect(cp.drafts).toEqual({});
+    const { sharedAmmo: _bank, drafts: _drafts, ...legacy } = cp;
+    expect(parseState(legacy).sharedAmmo).toEqual([]);
+    expect(() => parseState({ ...cp, sharedAmmo: ['bad-id'] })).toThrow();
+  });
+  it('respects same-row/front-of-shooter constraints and word-launcher compatibility', () => {
+    const s = createGarden(5);
+    s.dew = 2000;
+    startWave(s);
+    placePlant(s, 'plant_cone_launcher', 0, 0);
+    placePlant(s, 'plant_pod_slinger', 1, 0);
+    s.nextSpawn = 1000;
+    enemy(s, 1, 'word-1');
+    unlock(s, 'word-1');
+    tickGarden(s, 0.01);
+    expect(s.projectiles).toHaveLength(0);
+    enemy(s, 0, 'word-1', 200);
+    tickGarden(s, 0.01);
+    expect(s.projectiles).toHaveLength(0);
+    enemy(s, 0, 'word-1');
+    tickGarden(s, 0.01);
+    expect(s.projectiles).toHaveLength(1);
+    expect(s.projectiles[0].heavy).toBe(true);
+  });
+  it('does not unlock a word after only its first syllable', () => {
+    const s = createGarden(5);
+    startWave(s);
+    selectKnowledge(s, 'word-1');
+    s.task!.parts = { ...ENTRY_MAP['word-1'].parts[0] };
+    submitTask(s);
+    expect(s.sharedAmmo).toEqual([]);
+    expect(s.task!.index).toBe(1);
+  });
+  it('pausing freezes both the bank and all attacks', () => {
+    const s = three();
+    unlock(s, 'char-1');
+    s.paused = true;
+    const before = JSON.stringify(s);
+    tickGarden(s, 0.1);
+    selectKnowledge(s, LEVELS[1].entries[0]);
+    expect(JSON.stringify(s)).toBe(before);
+  });
 });
 
-it('loads legacy profiles and separates resume ammunition from retry ammunition',()=>{const s=three(),p=newProfile('花园');p.unlocked=2;p.waveStart=snapshot(s);unlock(s,'char-1');p.checkpoint=snapshot(s);const restored=parseProfile(p);expect(restored.checkpoint!.sharedAmmo).toEqual(['char-1']);expect(restored.waveStart!.sharedAmmo).toEqual([]);const {waveStart:_start,...legacy}=p;expect(parseProfile(legacy).waveStart).toBeNull();});
-it('marks a retried successful answer as repeated without carrying failed-wave scores',()=>{const s=three(),start=snapshot(s);unlock(s,'char-1');start.attempts=s.attempts;unlock(start,'char-1');expect(start.attempts[start.attempts.length-1]?.repeated).toBe(true);expect(start.score).toBe(150);});
+it('loads legacy profiles and separates resume ammunition from retry ammunition', () => {
+  const s = three(),
+    p = newProfile('花园');
+  p.unlocked = 2;
+  p.waveStart = snapshot(s);
+  unlock(s, 'char-1');
+  p.checkpoint = snapshot(s);
+  const restored = parseProfile(p);
+  expect(restored.checkpoint!.sharedAmmo).toEqual(['char-1']);
+  expect(restored.waveStart!.sharedAmmo).toEqual([]);
+  const { waveStart: _start, ...legacy } = p;
+  expect(parseProfile(legacy).waveStart).toBeNull();
+});
+it('marks a retried successful answer as repeated without carrying failed-wave scores', () => {
+  const s = three(),
+    start = snapshot(s);
+  unlock(s, 'char-1');
+  start.attempts = s.attempts;
+  unlock(start, 'char-1');
+  expect(start.attempts[start.attempts.length - 1]?.repeated).toBe(true);
+  expect(start.score).toBe(150);
+});

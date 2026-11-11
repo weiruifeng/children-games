@@ -1,8 +1,18 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
-import { createPool, type ExecuteValues, type Pool, type PoolConnection, type ResultSetHeader, type RowDataPacket } from 'mysql2/promise';
+import {
+  createPool,
+  type ExecuteValues,
+  type Pool,
+  type PoolConnection,
+  type ResultSetHeader,
+  type RowDataPacket,
+} from 'mysql2/promise';
 import { DATABASE_CONFIG } from '../../config/database.config';
 
-export type SqlConnection = Pick<PoolConnection, 'execute' | 'release' | 'beginTransaction' | 'commit' | 'rollback'>;
+export type SqlConnection = Pick<
+  PoolConnection,
+  'execute' | 'release' | 'beginTransaction' | 'commit' | 'rollback'
+>;
 export type SqlPool = Pick<Pool, 'execute' | 'getConnection' | 'end'>;
 
 @Injectable()

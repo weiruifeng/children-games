@@ -7,3 +7,7 @@ export * from './curriculum';
 
 export * from './characterCatalog';
 export * from './lessonPlanner';
+export * from './cloud';
+export * from './cloud-history';
+export * from './event-batches';
+export * from './transport';

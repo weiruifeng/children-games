@@ -1,17 +1,350 @@
-import {ResourceSettings} from '../resources/ResourceSettings';
-import {useState} from 'react';
-import type {User} from './api';
-import {api} from './api';
-import {AuthPanel} from './AuthPanel';
-import type {GardenRepository} from './repository';
+import { ResourceSettings } from '../resources/ResourceSettings';
+import { useState } from 'react';
+import type { User } from './api';
+import { api } from './api';
+import { AuthPanel } from './AuthPanel';
+import type { GardenRepository } from './repository';
 import * as legacy from '../experiments/pinyin-garden/services/saveStore';
-import {ConfirmDialog,SiteDialog,SiteNotice,type Confirmation} from './SitePrimitives';
-export function ParentSettings({user,repo,onClose,onLogin,onChanged,onLogout}:{user:User;repo:GardenRepository|null;onClose:()=>void;onLogin:(u:User|null)=>void;onChanged:()=>void;onLogout:()=>Promise<void>}){
- const [tab,setTab]=useState(repo&&repo.status!=='synced'?'saves':'account'),[slot,setSlot]=useState(0),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState(false),[confirmation,setConfirmation]=useState<Confirmation|null>(null);
- async function act(fn:()=>Promise<unknown>){if(busy)return;setBusy(true);setMessage('');setError(false);try{await fn();}catch(e){setConfirmation(null);setError(true);setMessage(e instanceof Error?e.message:String(e));}finally{setBusy(false);}}
- const confirm=(title:string,description:string,run:()=>Promise<unknown>)=>setConfirmation({title,description,run});
- const changed=async(fn:()=>Promise<unknown>)=>{await fn();onChanged();setMessage('花园存档已更新。');};
- return <SiteDialog title="账号与进度" onClose={onClose} locked={busy} className="account-panel"><nav className="site-segments">{[['account','账号'],['saves','花园存档'],['backup','备份与恢复'],['resources','游戏素材']].map(([id,label])=><button key={id} disabled={busy} aria-pressed={tab===id} onClick={()=>{setTab(id);setMessage('');}}>{label}</button>)}</nav><div className="site-enter settings-content" key={tab}>
- {tab==='resources'?<ResourceSettings inBattle={/\/(battle\/|review$)/.test(location.hash)} beforeUpdate={async()=>{await repo?.retry();if(repo&&['error','auth-required','conflict'].includes(repo.status))throw Error('请先处理存档问题，再更新花园。');}}/>:tab==='account'?<><div className="account-identity"><span className="site-eyebrow">当前账号</span><h3>{user.username}</h3><p>{user.role==='admin'?'管理员账号':'游戏账号'}</p></div><details className="site-details"><summary>修改登录密码</summary><form className="site-form" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);void act(async()=>{await api('/auth/change-password',{currentPassword:f.get('current'),newPassword:f.get('next')});await repo?.dispose();onLogin(null);});}}><label>当前密码<input name="current" type="password" required autoComplete="current-password" disabled={busy}/></label><label>新密码<input name="next" type="password" required minLength={user.role==='admin'?15:6} maxLength={user.role==='admin'?128:32} autoComplete="new-password" disabled={busy}/><small>{user.role==='admin'?'15–128':'6–32'} 个字符。修改后需要重新登录。</small></label><button className="site-button" disabled={busy}>修改密码并重新登录</button></form></details><button className="site-button" disabled={busy} onClick={()=>confirm('暂时离开花园？',repo?.status==='synced'?'下次登录后，可以继续照顾花园。':'本机可能还有未同步进度，将保留在当前浏览器。建议先同步或导出备份。',onLogout)}>退出账号</button></>:repo?<><SiteNotice>{repo.message}</SiteNotice><div className="site-segments slot-picker" aria-label="选择花园">{[0,1,2].map(n=><button disabled={busy} aria-pressed={slot===n} key={n} onClick={()=>{setSlot(n);setMessage('');}}>花园 {n+1}</button>)}</div>{tab==='saves'?<><p>查看和处理当前花园的云端保存状态。</p><button className="site-button site-primary" disabled={busy} onClick={()=>void act(()=>changed(()=>repo.retry()))}>重试同步</button>{repo.conflicts.has(slot)&&<section className="settings-section"><h3>发现两份不同的进度</h3><p>先比较并导出备份，再选择要继续使用的进度。</p><button className="site-button" disabled={busy} onClick={()=>void act(async()=>setMessage(await repo.compare(slot)))}>比较两份进度</button>{(['remote','local'] as const).map(source=><button className="site-button" disabled={busy} key={source} onClick={()=>confirm('选择继续使用的进度',`将采用${source==='remote'?'云端':'本机'}进度。请确认已保存需要的备份。`,()=>changed(()=>repo.resolve(slot,source)))}>采用{source==='remote'?'云端':'本机'}进度</button>)}</section>}{repo.recoveries.has(slot)&&<button className="site-button" disabled={busy} onClick={()=>confirm('恢复旧战斗存档','归档旧战斗并从花园重新开始，学习记录保留。',()=>changed(()=>repo.recover(slot)))}>恢复旧战斗存档</button>}</>:<><p>备份属于花园 {slot+1}。换设备或导入前，先保存一份完整备份。</p><div className="site-button-row"><button className="site-button site-primary" disabled={busy} onClick={()=>void act(async()=>{await repo.exportBackup(slot);setMessage('备份已准备好，请查看浏览器下载。');})}>完整导出</button><label className="site-button file-button">导入备份<input aria-label="导入备份" type="file" accept=".json,.ndjson" disabled={busy} onChange={e=>{const file=e.target.files?.[0];e.target.value='';if(file)confirm('导入花园备份',`将导入到花园 ${slot+1}，现有进度会归档。`,()=>changed(()=>repo.importFile(slot,file)));}}/></label></div><button className="site-button" disabled={busy} onClick={()=>confirm('导入本机旧档',`将本机旧花园 ${slot+1} 导入当前账号。`,()=>changed(async()=>{const rows=await legacy.exportRawProfiles();if(!rows[slot])throw Error('本机旧槽位为空');await repo.importProfile(slot,rows[slot]);}))}>导入本机旧档</button><details className="site-details"><summary>高级存档操作</summary><p>删除学习历史前，请先导出备份。</p><div className="site-button-row"><button className="site-button site-danger" disabled={busy} onClick={()=>confirm('删除学习历史',`删除花园 ${slot+1} 的全部学习历史并重新开始。请确认已导出备份。`,()=>changed(()=>repo.clearProfile(slot,true)))}>删除历史</button><button className="site-button" disabled={busy} onClick={()=>confirm('清理本机缓存','仅清理当前账号已同步缓存，云端数据和旧匿名档保留。',()=>changed(()=>repo.clearLocalCache()))}>清理已同步本机缓存</button></div></details></>}{repo.status==='auth-required'&&<AuthPanel inline onLogin={u=>{if(u.id!==user.id){setError(true);setMessage('请登录原账号以同步记录，或退出后切换账号。');return;}onLogin({...u});void act(()=>repo.retry());}}/>}</>:<p>账号管理不需要读取游戏存档。进入花园后可管理备份。</p>}
- </div>{busy&&<SiteNotice>正在处理，请稍候…</SiteNotice>}{message&&<SiteNotice key={message} kind={error?'error':'success'}>{message}</SiteNotice>}{confirmation&&<ConfirmDialog value={confirmation} busy={busy} onCancel={()=>setConfirmation(null)} onConfirm={()=>void act(async()=>{await confirmation.run();setConfirmation(null);})}/>}</SiteDialog>;
+import { ConfirmDialog, SiteDialog, SiteNotice, type Confirmation } from './SitePrimitives';
+export function ParentSettings({
+  user,
+  repo,
+  onClose,
+  onLogin,
+  onChanged,
+  onLogout,
+}: {
+  user: User;
+  repo: GardenRepository | null;
+  onClose: () => void;
+  onLogin: (u: User | null) => void;
+  onChanged: () => void;
+  onLogout: () => Promise<void>;
+}) {
+  const [tab, setTab] = useState(repo && repo.status !== 'synced' ? 'saves' : 'account'),
+    [slot, setSlot] = useState(0),
+    [busy, setBusy] = useState(false),
+    [message, setMessage] = useState(''),
+    [error, setError] = useState(false),
+    [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  async function act(fn: () => Promise<unknown>) {
+    if (busy) return;
+    setBusy(true);
+    setMessage('');
+    setError(false);
+    try {
+      await fn();
+    } catch (e) {
+      setConfirmation(null);
+      setError(true);
+      setMessage(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  const confirm = (title: string, description: string, run: () => Promise<unknown>) =>
+    setConfirmation({ title, description, run });
+  const changed = async (fn: () => Promise<unknown>) => {
+    await fn();
+    onChanged();
+    setMessage('花园存档已更新。');
+  };
+  return (
+    <SiteDialog title="账号与进度" onClose={onClose} locked={busy} className="account-panel">
+      <nav className="site-segments">
+        {[
+          ['account', '账号'],
+          ['saves', '花园存档'],
+          ['backup', '备份与恢复'],
+          ['resources', '游戏素材'],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            disabled={busy}
+            aria-pressed={tab === id}
+            onClick={() => {
+              setTab(id);
+              setMessage('');
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
+      <div className="site-enter settings-content" key={tab}>
+        {tab === 'resources' ? (
+          <ResourceSettings
+            inBattle={/\/(battle\/|review$)/.test(location.hash)}
+            beforeUpdate={async () => {
+              await repo?.retry();
+              if (repo && ['error', 'auth-required', 'conflict'].includes(repo.status))
+                throw Error('请先处理存档问题，再更新花园。');
+            }}
+          />
+        ) : tab === 'account' ? (
+          <>
+            <div className="account-identity">
+              <span className="site-eyebrow">当前账号</span>
+              <h3>{user.username}</h3>
+              <p>{user.role === 'admin' ? '管理员账号' : '游戏账号'}</p>
+            </div>
+            <details className="site-details">
+              <summary>修改登录密码</summary>
+              <form
+                className="site-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const f = new FormData(e.currentTarget);
+                  void act(async () => {
+                    await api('/auth/change-password', {
+                      currentPassword: f.get('current'),
+                      newPassword: f.get('next'),
+                    });
+                    await repo?.dispose();
+                    onLogin(null);
+                  });
+                }}
+              >
+                <label>
+                  当前密码
+                  <input
+                    name="current"
+                    type="password"
+                    required
+                    autoComplete="current-password"
+                    disabled={busy}
+                  />
+                </label>
+                <label>
+                  新密码
+                  <input
+                    name="next"
+                    type="password"
+                    required
+                    minLength={user.role === 'admin' ? 15 : 6}
+                    maxLength={user.role === 'admin' ? 128 : 32}
+                    autoComplete="new-password"
+                    disabled={busy}
+                  />
+                  <small>
+                    {user.role === 'admin' ? '15–128' : '6–32'} 个字符。修改后需要重新登录。
+                  </small>
+                </label>
+                <button className="site-button" disabled={busy}>
+                  修改密码并重新登录
+                </button>
+              </form>
+            </details>
+            <button
+              className="site-button"
+              disabled={busy}
+              onClick={() =>
+                confirm(
+                  '暂时离开花园？',
+                  repo?.status === 'synced'
+                    ? '下次登录后，可以继续照顾花园。'
+                    : '本机可能还有未同步进度，将保留在当前浏览器。建议先同步或导出备份。',
+                  onLogout,
+                )
+              }
+            >
+              退出账号
+            </button>
+          </>
+        ) : repo ? (
+          <>
+            <SiteNotice>{repo.message}</SiteNotice>
+            <div className="site-segments slot-picker" aria-label="选择花园">
+              {[0, 1, 2].map((n) => (
+                <button
+                  disabled={busy}
+                  aria-pressed={slot === n}
+                  key={n}
+                  onClick={() => {
+                    setSlot(n);
+                    setMessage('');
+                  }}
+                >
+                  花园 {n + 1}
+                </button>
+              ))}
+            </div>
+            {tab === 'saves' ? (
+              <>
+                <p>查看和处理当前花园的云端保存状态。</p>
+                <button
+                  className="site-button site-primary"
+                  disabled={busy}
+                  onClick={() => void act(() => changed(() => repo.retry()))}
+                >
+                  重试同步
+                </button>
+                {repo.conflicts.has(slot) && (
+                  <section className="settings-section">
+                    <h3>发现两份不同的进度</h3>
+                    <p>先比较并导出备份，再选择要继续使用的进度。</p>
+                    <button
+                      className="site-button"
+                      disabled={busy}
+                      onClick={() => void act(async () => setMessage(await repo.compare(slot)))}
+                    >
+                      比较两份进度
+                    </button>
+                    {(['remote', 'local'] as const).map((source) => (
+                      <button
+                        className="site-button"
+                        disabled={busy}
+                        key={source}
+                        onClick={() =>
+                          confirm(
+                            '选择继续使用的进度',
+                            `将采用${source === 'remote' ? '云端' : '本机'}进度。请确认已保存需要的备份。`,
+                            () => changed(() => repo.resolve(slot, source)),
+                          )
+                        }
+                      >
+                        采用{source === 'remote' ? '云端' : '本机'}进度
+                      </button>
+                    ))}
+                  </section>
+                )}
+                {repo.recoveries.has(slot) && (
+                  <button
+                    className="site-button"
+                    disabled={busy}
+                    onClick={() =>
+                      confirm('恢复旧战斗存档', '归档旧战斗并从花园重新开始，学习记录保留。', () =>
+                        changed(() => repo.recover(slot)),
+                      )
+                    }
+                  >
+                    恢复旧战斗存档
+                  </button>
+                )}
+              </>
+            ) : (
+              <>
+                <p>备份属于花园 {slot + 1}。换设备或导入前，先保存一份完整备份。</p>
+                <div className="site-button-row">
+                  <button
+                    className="site-button site-primary"
+                    disabled={busy}
+                    onClick={() =>
+                      void act(async () => {
+                        await repo.exportBackup(slot);
+                        setMessage('备份已准备好，请查看浏览器下载。');
+                      })
+                    }
+                  >
+                    完整导出
+                  </button>
+                  <label className="site-button file-button">
+                    导入备份
+                    <input
+                      aria-label="导入备份"
+                      type="file"
+                      accept=".json,.ndjson"
+                      disabled={busy}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = '';
+                        if (file)
+                          confirm(
+                            '导入花园备份',
+                            `将导入到花园 ${slot + 1}，现有进度会归档。`,
+                            () => changed(() => repo.importFile(slot, file)),
+                          );
+                      }}
+                    />
+                  </label>
+                </div>
+                <button
+                  className="site-button"
+                  disabled={busy}
+                  onClick={() =>
+                    confirm('导入本机旧档', `将本机旧花园 ${slot + 1} 导入当前账号。`, () =>
+                      changed(async () => {
+                        const rows = await legacy.exportRawProfiles();
+                        if (!rows[slot]) throw Error('本机旧槽位为空');
+                        await repo.importProfile(slot, rows[slot]);
+                      }),
+                    )
+                  }
+                >
+                  导入本机旧档
+                </button>
+                <details className="site-details">
+                  <summary>高级存档操作</summary>
+                  <p>删除学习历史前，请先导出备份。</p>
+                  <div className="site-button-row">
+                    <button
+                      className="site-button site-danger"
+                      disabled={busy}
+                      onClick={() =>
+                        confirm(
+                          '删除学习历史',
+                          `删除花园 ${slot + 1} 的全部学习历史并重新开始。请确认已导出备份。`,
+                          () => changed(() => repo.clearProfile(slot, true)),
+                        )
+                      }
+                    >
+                      删除历史
+                    </button>
+                    <button
+                      className="site-button"
+                      disabled={busy}
+                      onClick={() =>
+                        confirm(
+                          '清理本机缓存',
+                          '仅清理当前账号已同步缓存，云端数据和旧匿名档保留。',
+                          () => changed(() => repo.clearLocalCache()),
+                        )
+                      }
+                    >
+                      清理已同步本机缓存
+                    </button>
+                  </div>
+                </details>
+              </>
+            )}
+            {repo.status === 'auth-required' && (
+              <AuthPanel
+                inline
+                onLogin={(u) => {
+                  if (u.id !== user.id) {
+                    setError(true);
+                    setMessage('请登录原账号以同步记录，或退出后切换账号。');
+                    return;
+                  }
+                  onLogin({ ...u });
+                  void act(() => repo.retry());
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <p>账号管理不需要读取游戏存档。进入花园后可管理备份。</p>
+        )}
+      </div>
+      {busy && <SiteNotice>正在处理，请稍候…</SiteNotice>}
+      {message && (
+        <SiteNotice key={message} kind={error ? 'error' : 'success'}>
+          {message}
+        </SiteNotice>
+      )}
+      {confirmation && (
+        <ConfirmDialog
+          value={confirmation}
+          busy={busy}
+          onCancel={() => setConfirmation(null)}
+          onConfirm={() =>
+            void act(async () => {
+              await confirmation.run();
+              setConfirmation(null);
+            })
+          }
+        />
+      )}
+    </SiteDialog>
+  );
 }

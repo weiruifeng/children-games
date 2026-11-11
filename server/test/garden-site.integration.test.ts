@@ -1,90 +1,614 @@
-import {beforeAll,afterAll,describe,it,expect} from 'vitest';
+import { eventBatches, eventSchema, CLOUD_LIMITS } from '@children-games/shared';
+import type { INestApplication } from '@nestjs/common';
+import type { Server } from 'node:http';
+import type { AuthService } from '../src/modules/garden-site/auth.service';
+import type { DatabaseService, SqlConnection } from '../src/modules/database/database.service';
+import { beforeAll, afterAll, describe, it, expect } from 'vitest';
 import request from 'supertest';
-import {randomUUID} from 'node:crypto';
-import {newProfile} from '../../shared/src/pinyin-garden/snapshot';
-import {toCloudProfile} from '../../shared/src/pinyin-garden/cloud';
-const enabled=process.env.GARDEN_DB_TEST==='1';
-describe.skipIf(!enabled)('garden site real MySQL',()=>{
- let app:any,auth:any,db:any,http:any;const origin='http://localhost:5173',pass='garden-test-password-2026';const prefix='t'+randomUUID().replace(/-/g,'').slice(0,10);
- let adminCookie='',adminCsrf='',cookie='',csrf='',userId='',invite='';
- beforeAll(async()=>{
-  if(!process.env.MYSQL_DATABASE?.endsWith('_test'))throw Error('Integration requires an explicit *_test database');
-  const {createGardenApp}=await import('../src/garden-app');const {AuthService}=await import('../src/modules/garden-site/auth.service');const {DatabaseService}=await import('../src/modules/database/database.service');
-  app=await createGardenApp();http=app.getHttpServer();auth=app.get(AuthService);db=app.get(DatabaseService);const rate=auth.rate.bind(auth);auth.rate=(key:string,max:number,seconds:number)=>rate(prefix+':'+key,max,seconds);
-  // Seed a unique isolated administrator through the same password implementation.
-  const argon=await import('argon2');const aid=randomUUID();await db.withTransaction(async(c:any)=>{await c.execute("INSERT INTO garden_user (id,username_normalized,password_hash,user_role) VALUES (?,?,?,'admin')",[aid,prefix+'admin',await argon.hash(pass,{type:argon.argon2id,memoryCost:19456,timeCost:2,parallelism:1})]);});
-  const login=await request(http).post('/api/admin/auth/login').set('Origin',origin).send({username:prefix+'admin',password:pass});expect(login.status).toBe(200);adminCookie=login.headers['set-cookie'][0].split(';')[0];const me=await request(http).get('/api/admin/auth/me').set('Cookie',adminCookie);adminCsrf=me.body.csrfToken;
-  const codes=await request(http).post('/api/admin/invitations').set('Origin',origin).set('Cookie',adminCookie).set('X-CSRF-Token',adminCsrf).send({count:4,validDays:7});expect(codes.status).toBe(201);invite=codes.body.items[0].code;
- },30000);
- afterAll(async()=>{await app?.close();});
- const admin=(method:'post'|'patch',path:string,body:any)=>request(http)[method](path).set('Cookie',adminCookie).set('Origin',origin).set('X-CSRF-Token',adminCsrf).send(body);
- const write=(path:string,body:any,method:'put'|'post'='post')=>request(http)[method](path).set('Cookie',cookie).set('Origin',origin).set('X-CSRF-Token',csrf).send(body);
- it('keeps old model and Studio endpoints absent',async()=>{for(const url of ['/api/game/generate','/api/game/converse','/api/studio/games'])expect((await request(http).post(url).send({})).status).toBe(404);});
- it('rejects missing invite and external origin',async()=>{expect((await request(http).post('/api/auth/register').set('Origin',origin).send({username:prefix,password:pass,invitationCode:'wrong'})).status).toBe(400);expect((await request(http).post('/api/auth/register').set('Origin','https://evil.test').send({})).status).toBe(403);});
- it('consumes an invite exactly once under concurrent registration',async()=>{const results=await Promise.all([prefix+'one',prefix+'two'].map(username=>request(http).post('/api/auth/register').set('Origin',origin).send({username,password:pass,invitationCode:invite})));expect(results.map(r=>r.status).sort()).toEqual([201,400]);const winner=results.findIndex(r=>r.status===201);userId=results[winner].body.userId;const login=await request(http).post('/api/auth/login').set('Origin',origin).send({username:winner===0?prefix+'one':prefix+'two',password:pass});cookie=login.headers['set-cookie'][0].split(';')[0];csrf=(await request(http).get('/api/auth/me').set('Cookie',cookie)).body.csrfToken;});
- it('registers Chinese display names, logs in and preserves names in account and admin views',async()=>{
-  const issued=await admin('post','/api/admin/invitations',{count:1,validDays:7});
-  const name='小小园丁'+prefix,invitationCode=issued.body.items[0].code;
-  const register=(username:string)=>auth.register({username,password:pass,invitationCode});
-  for(const invalid of ['小','小 小','1园丁','小苗🌱','小'.repeat(33)])await expect(register(invalid)).rejects.toThrow();
-  expect((await register(name)).userId).toBeTruthy();
-  const login=await request(http).post('/api/auth/login').set('Origin',origin).send({username:name,password:pass});
-  expect(login.status).toBe(200);
-  expect(login.body.user.username).toBe(name);
-  const me=await request(http).get('/api/auth/me').set('Cookie',login.headers['set-cookie'][0].split(';')[0]);
-  expect(me.body.user.username).toBe(name);
-  const list=await request(http).get('/api/admin/users').query({username:name}).set('Cookie',adminCookie);
-  expect(list.body.items.some((u:any)=>u.username_normalized===name)).toBe(true);
- });
- it('requires identity and CSRF and rejects ordinary admin access',async()=>{expect((await request(http).get('/api/garden/profiles')).status).toBe(401);expect((await request(http).get('/api/admin/users').set('Cookie',cookie)).status).toBe(401);expect((await request(http).put('/api/garden/profiles/1').set('Origin',origin).set('Cookie',cookie).send({})).status).toBe(403);});
- it('rejects cross-entry credentials and renamed role cookies',async()=>{
-  const [u]=await auth.rows('SELECT username_normalized FROM garden_user WHERE id=?',[userId]);
-  for(const [path,name] of [['/api/auth/login',prefix+'admin'],['/api/admin/auth/login',u.username_normalized]]){
-   const result=await request(http).post(path).set('Origin',origin).send({username:name,password:pass});expect(result.status).toBe(403);expect(result.body.error.code).toBe('WRONG_LOGIN_ENTRY');expect(result.headers['set-cookie']).toBeUndefined();
-  }
-  expect((await request(http).get('/api/garden/profiles').set('Cookie',adminCookie.replace('_admin_session=','_parent_session='))).status).toBe(403);
-  expect((await request(http).get('/api/admin/users').set('Cookie',cookie.replace('_parent_session=','_admin_session='))).status).toBe(403);
-  expect((await request(http).get('/api/Admin/users').set('Cookie',cookie.replace('_parent_session=','_admin_session='))).status).toBe(403);
-  expect((await request(http).get('/api/auth/me').set('Cookie',cookie.replace('_parent_session=','_session='))).status).toBe(401);
- });
- it('keeps simultaneous identities, CSRF and logout independent',async()=>{
-  const [u]=await auth.rows('SELECT username_normalized FROM garden_user WHERE id=?',[userId]);
-  const login=async(path:string,name:string)=>(await request(http).post(path).set('Origin',origin).send({username:name,password:pass})).headers['set-cookie'][0].split(';')[0];
-  const ac=await login('/api/admin/auth/login',prefix+'admin'),pc=await login('/api/auth/login',u.username_normalized),both=ac+'; '+pc;
-  const am=await request(http).get('/api/admin/auth/me').set('Cookie',both),pm=await request(http).get('/api/auth/me').set('Cookie',both);
-  expect(am.body.user.role).toBe('admin');expect(pm.body.user.id).toBe(userId);expect(am.body.csrfToken).not.toBe(pm.body.csrfToken);
-  expect((await request(http).post('/api/admin/auth/logout').set('Origin',origin).set('Cookie',both).set('X-CSRF-Token',pm.body.csrfToken).send({})).status).toBe(403);
-  expect((await request(http).post('/api/admin/auth/logout').set('Origin',origin).set('Cookie',both).set('X-CSRF-Token',am.body.csrfToken).send({})).status).toBe(204);
-  expect((await request(http).get('/api/admin/auth/me').set('Cookie',both)).status).toBe(401);expect((await request(http).get('/api/auth/me').set('Cookie',both)).status).toBe(200);
-  const ac2=await login('/api/admin/auth/login',prefix+'admin'),both2=ac2+'; '+pc;
-  expect((await request(http).post('/api/auth/logout').set('Origin',origin).set('Cookie',both2).set('X-CSRF-Token',pm.body.csrfToken).send({})).status).toBe(204);
-  expect((await request(http).get('/api/admin/auth/me').set('Cookie',both2)).status).toBe(200);expect((await request(http).get('/api/auth/me').set('Cookie',both2)).status).toBe(401);
- });
- it('starts with three empty slots without creating profiles on read',async()=>{const r=await request(http).get('/api/garden/profiles').set('Cookie',cookie);expect(r.body.slots).toHaveLength(3);expect(r.body.slots.every((s:any)=>s.revision===0&&s.empty)).toBe(true);});
- it('retries a committed snapshot without increasing revision twice',async()=>{const payload={baseRevision:0,generation:0,mutationId:randomUUID(),profile:toCloudProfile(newProfile('测试花园'))};const a=await write('/api/garden/profiles/1',payload,'put'),b=await write('/api/garden/profiles/1',payload,'put');expect(a.status,a.text).toBe(200);expect(b.body).toEqual(a.body);expect(a.body.revision).toBe(1);const changed=await write('/api/garden/profiles/1',{...payload,profile:toCloudProfile(newProfile('别的内容'))},'put');expect(changed.status).toBe(409);});
- it('only one concurrent revision wins',async()=>{const r=await Promise.all(['A','B'].map(name=>write('/api/garden/profiles/1',{baseRevision:1,generation:0,mutationId:randomUUID(),profile:toCloudProfile(newProfile(name))},'put')));expect(r.map(x=>x.status).sort()).toEqual([200,409]);});
- it('deduplicates learning events and rejects reused ID content',async()=>{const event={eventId:'event-1',packVersion:'garden-adventure-4',attempt:{taskId:'task1',entryId:'symbol-a',syllable:0,correct:true,assisted:false,repeated:false,at:1000}};for(let i=0;i<2;i++)expect((await write('/api/garden/profiles/1/events',{generation:0,events:[event]})).status).toBe(201);const read=await request(http).get('/api/garden/profiles/1/events').set('Cookie',cookie);expect(read.body.items).toHaveLength(1);expect((await write('/api/garden/profiles/1/events',{generation:0,events:[{...event,attempt:{...event.attempt,correct:false}}]})).status).toBe(409);});
- it('clears to a tombstone and isolates old learning generation',async()=>{const payload={baseRevision:2,generation:0,mutationId:randomUUID()};const r=await write('/api/garden/profiles/1/clear',payload);expect(r.status,r.text).toBe(201);expect(r.body.generation).toBe(1);expect((await write('/api/garden/profiles/1/clear',payload)).body).toEqual(r.body);expect((await write('/api/garden/profiles/1',{baseRevision:2,generation:0,mutationId:randomUUID(),profile:toCloudProfile(newProfile('旧设备'))},'put')).status).toBe(409);const rows=await request(http).get('/api/garden/profiles/1/events').set('Cookie',cookie);expect(rows.body.items).toHaveLength(0);expect((await request(http).get('/api/garden/profiles/1/events?all=true').set('Cookie',cookie)).body.items).toHaveLength(1);});
- it('deletion watermark rejects resurrected old events',async()=>{expect((await write('/api/garden/profiles/1/delete-history',{baseRevision:3,generation:1,mutationId:randomUUID()})).status).toBe(201);const late={eventId:'late',packVersion:'old',attempt:{taskId:'t',entryId:'unknown-old-entry',syllable:0,correct:true,assisted:false,repeated:false,at:1}};expect((await write('/api/garden/profiles/1/events',{generation:0,events:[late]})).status).toBe(409);});
- it('keeps archived data private',async()=>{const r=await write('/api/garden/archives',{data:{private:'test'}});expect(r.status).toBe(201);expect((await request(http).get('/api/garden/archives/'+r.body.archiveId).set('Cookie',adminCookie)).status).toBe(401);});
- it('rejects a request created for another logged-in account',async()=>{expect((await request(http).get('/api/garden/profiles').set('Cookie',cookie).set('X-Garden-User',randomUUID())).status).toBe(401);});
- it('reports invalid profiles without a server error',async()=>{const bad={...toCloudProfile(newProfile('invalid')),levelStars:{invalid:[true,true,true]}};expect((await write('/api/garden/profiles/2',{baseRevision:0,generation:0,mutationId:randomUUID(),profile:bad},'put')).status).toBe(422);});
- it('returns historical summary using the fixed report timezone',async()=>{const r=await request(http).get('/api/garden/profiles/1/summary').set('Cookie',cookie);expect(r.status).toBe(200);expect(r.body.timeZone).toBe('Asia/Shanghai');expect(r.body.summary.total).toBe(0);});
- it('rejects every ordinary-user admin action',async()=>{for(const [method,path,body] of [['get','/api/admin/invitations',undefined],['get','/api/admin/audit',undefined],['post','/api/admin/invitations',{count:1,validDays:7}],['post','/api/admin/invitations/x/revoke',{}],['patch','/api/admin/users/x/status',{status:'disabled'}],['post','/api/admin/users/x/password-reset',{}]] as const){const r=await request(http)[method](path).set('Cookie',cookie).set('Origin',origin).set('X-CSRF-Token',csrf).send(body);expect(r.status).toBe(401);}});
- it('does not consume a code when a username already exists, and rejects revoked/expired codes',async()=>{const issued=await admin('post','/api/admin/invitations',{count:3,validDays:7});const [row]=await auth.rows('SELECT username_normalized FROM garden_user WHERE id=?',[userId]);const register=(username:string,code:string)=>request(http).post('/api/auth/register').set('Origin',origin).send({username,password:pass,invitationCode:code});expect((await register(row.username_normalized,issued.body.items[0].code)).status).toBe(409);expect((await register(prefix+'extra',issued.body.items[0].code)).status).toBe(201);await admin('post','/api/admin/invitations/'+issued.body.items[1].id+'/revoke',{});expect((await register(prefix+'revoked',issued.body.items[1].code)).status).toBe(400);await db.withTransaction(async(c:any)=>{await c.execute('UPDATE garden_invitation SET expires_at=? WHERE id=?',[new Date(0),issued.body.items[2].id]);});expect((await register(prefix+'expired',issued.body.items[2].code)).status).toBe(400);});
- it('handles a concurrently reused mutation ID across different slots as a conflict',async()=>{const mutationId=randomUUID(),payload={baseRevision:0,generation:0,mutationId,profile:toCloudProfile(newProfile('concurrent'))};const results=await Promise.all([2,3].map(slot=>write('/api/garden/profiles/'+slot,payload,'put')));expect(results.map(r=>r.status).sort()).toEqual([200,409]);});
- it('supports short parent passwords for registration, change and reset while keeping admin policy',async()=>{
-  const issued=await admin('post','/api/admin/invitations',{count:1,validDays:7});const name=prefix+'short',code=issued.body.items[0].code;
-  const reg=(password:string)=>request(http).post('/api/auth/register').set('Origin',origin).send({username:name,password,invitationCode:code});
-  expect((await reg('abc12')).status).toBe(400);expect((await reg('x'.repeat(33))).status).toBe(400);const registered=await reg('abc123');expect(registered.status).toBe(201);
-  const login=await request(http).post('/api/auth/login').set('Origin',origin).send({username:name,password:'abc123'});expect(login.status).toBe(200);const c=login.headers['set-cookie'][0].split(';')[0],me=await request(http).get('/api/auth/me').set('Cookie',c);
-  expect((await request(http).post('/api/auth/change-password').set('Origin',origin).set('Cookie',c).set('X-CSRF-Token',me.body.csrfToken).send({currentPassword:'abc123',newPassword:'def456'})).status).toBe(204);
-  expect((await request(http).post('/api/auth/login').set('Origin',origin).send({username:name,password:'def456'})).status).toBe(200);
-  const reset=await admin('post','/api/admin/users/'+registered.body.userId+'/password-reset',{});
-  expect((await request(http).post('/api/auth/reset-password').set('Origin',origin).send({resetCode:reset.body.resetCode,newPassword:'ghi789'})).status).toBe(204);
-  expect((await request(http).post('/api/auth/login').set('Origin',origin).send({username:name,password:'ghi789'})).status).toBe(200);
-  expect((await request(http).post('/api/admin/auth/change-password').set('Origin',origin).set('Cookie',adminCookie).set('X-CSRF-Token',adminCsrf).send({currentPassword:pass,newPassword:'abc123'})).status).toBe(400);
- });
- it('password reset codes are single use and revoke sessions',async()=>{const issued=await admin('post','/api/admin/users/'+userId+'/password-reset',{});expect(issued.status).toBe(201);const body={resetCode:issued.body.resetCode,newPassword:'changed-garden-password-2026'};expect((await request(http).post('/api/auth/reset-password').set('Origin',origin).send(body)).status).toBe(204);expect((await request(http).get('/api/auth/me').set('Cookie',cookie)).status).toBe(401);expect((await request(http).post('/api/auth/reset-password').set('Origin',origin).send(body)).status).toBe(400);const [row]=await auth.rows('SELECT username_normalized FROM garden_user WHERE id=?',[userId]);const login=await request(http).post('/api/auth/login').set('Origin',origin).send({username:row.username_normalized,password:body.newPassword});cookie=login.headers['set-cookie'][0].split(';')[0];});
- it('disabling a user invalidates their existing session',async()=>{expect((await admin('patch','/api/admin/users/'+userId+'/status',{status:'disabled'})).status).toBe(200);expect((await request(http).get('/api/auth/me').set('Cookie',cookie)).status).toBe(401);});
+import { randomUUID } from 'node:crypto';
+import { newProfile } from '../../shared/src/pinyin-garden/snapshot';
+import { toCloudProfile } from '../../shared/src/pinyin-garden/cloud';
+const enabled = process.env.GARDEN_DB_TEST === '1';
+describe.skipIf(!enabled)('garden site real MySQL', () => {
+  let app: INestApplication, auth: AuthService, db: DatabaseService, http: Server;
+  const origin = 'http://localhost:5173',
+    pass = 'garden-test-password-2026';
+  const prefix = 't' + randomUUID().replace(/-/g, '').slice(0, 10);
+  let adminCookie = '',
+    adminCsrf = '',
+    cookie = '',
+    csrf = '',
+    userId = '',
+    invite = '';
+  beforeAll(async () => {
+    if (!process.env.MYSQL_DATABASE?.endsWith('_test'))
+      throw Error('Integration requires an explicit *_test database');
+    const { createGardenApp } = await import('../src/garden-app');
+    const { AuthService } = await import('../src/modules/garden-site/auth.service');
+    const { DatabaseService } = await import('../src/modules/database/database.service');
+    app = await createGardenApp();
+    http = app.getHttpServer();
+    auth = app.get(AuthService);
+    db = app.get(DatabaseService);
+    const rate = auth.rate.bind(auth);
+    auth.rate = (key: string, max: number, seconds: number) =>
+      rate(prefix + ':' + key, max, seconds);
+    // Seed a unique isolated administrator through the same password implementation.
+    const argon = await import('argon2');
+    const aid = randomUUID();
+    await db.withTransaction(async (c: SqlConnection) => {
+      await c.execute(
+        "INSERT INTO garden_user (id,username_normalized,password_hash,user_role) VALUES (?,?,?,'admin')",
+        [
+          aid,
+          prefix + 'admin',
+          await argon.hash(pass, {
+            type: argon.argon2id,
+            memoryCost: 19456,
+            timeCost: 2,
+            parallelism: 1,
+          }),
+        ],
+      );
+    });
+    const login = await request(http)
+      .post('/api/admin/auth/login')
+      .set('Origin', origin)
+      .send({ username: prefix + 'admin', password: pass });
+    expect(login.status).toBe(200);
+    adminCookie = login.headers['set-cookie'][0].split(';')[0];
+    const me = await request(http).get('/api/admin/auth/me').set('Cookie', adminCookie);
+    adminCsrf = me.body.csrfToken;
+    const codes = await request(http)
+      .post('/api/admin/invitations')
+      .set('Origin', origin)
+      .set('Cookie', adminCookie)
+      .set('X-CSRF-Token', adminCsrf)
+      .send({ count: 4, validDays: 7 });
+    expect(codes.status).toBe(201);
+    invite = codes.body.items[0].code;
+  }, 30000);
+  afterAll(async () => {
+    await app?.close();
+  });
+  const admin = (method: 'post' | 'patch', path: string, body: object) =>
+    request(http)
+      [method](path)
+      .set('Cookie', adminCookie)
+      .set('Origin', origin)
+      .set('X-CSRF-Token', adminCsrf)
+      .send(body);
+  const write = (path: string, body: object, method: 'put' | 'post' = 'post') =>
+    request(http)
+      [method](path)
+      .set('Cookie', cookie)
+      .set('Origin', origin)
+      .set('X-CSRF-Token', csrf)
+      .send(body);
+  it('keeps old model and Studio endpoints absent', async () => {
+    for (const url of ['/api/game/generate', '/api/game/converse', '/api/studio/games'])
+      expect((await request(http).post(url).send({})).status).toBe(404);
+  });
+  it('rejects missing invite and external origin', async () => {
+    expect(
+      (
+        await request(http)
+          .post('/api/auth/register')
+          .set('Origin', origin)
+          .send({ username: prefix, password: pass, invitationCode: 'wrong' })
+      ).status,
+    ).toBe(400);
+    expect(
+      (await request(http).post('/api/auth/register').set('Origin', 'https://evil.test').send({}))
+        .status,
+    ).toBe(403);
+  });
+  it('consumes an invite exactly once under concurrent registration', async () => {
+    const results = await Promise.all(
+      [prefix + 'one', prefix + 'two'].map((username) =>
+        request(http)
+          .post('/api/auth/register')
+          .set('Origin', origin)
+          .send({ username, password: pass, invitationCode: invite }),
+      ),
+    );
+    expect(results.map((r) => r.status).sort()).toEqual([201, 400]);
+    const winner = results.findIndex((r) => r.status === 201);
+    userId = results[winner].body.userId;
+    const login = await request(http)
+      .post('/api/auth/login')
+      .set('Origin', origin)
+      .send({ username: winner === 0 ? prefix + 'one' : prefix + 'two', password: pass });
+    cookie = login.headers['set-cookie'][0].split(';')[0];
+    csrf = (await request(http).get('/api/auth/me').set('Cookie', cookie)).body.csrfToken;
+  });
+  it('registers Chinese display names, logs in and preserves names in account and admin views', async () => {
+    const issued = await admin('post', '/api/admin/invitations', { count: 1, validDays: 7 });
+    const name = '小小园丁' + prefix,
+      invitationCode = issued.body.items[0].code;
+    const register = (username: string) =>
+      auth.register({ username, password: pass, invitationCode });
+    for (const invalid of ['小', '小 小', '1园丁', '小苗🌱', '小'.repeat(33)])
+      await expect(register(invalid)).rejects.toThrow();
+    expect((await register(name)).userId).toBeTruthy();
+    const login = await request(http)
+      .post('/api/auth/login')
+      .set('Origin', origin)
+      .send({ username: name, password: pass });
+    expect(login.status).toBe(200);
+    expect(login.body.user.username).toBe(name);
+    const me = await request(http)
+      .get('/api/auth/me')
+      .set('Cookie', login.headers['set-cookie'][0].split(';')[0]);
+    expect(me.body.user.username).toBe(name);
+    const list = await request(http)
+      .get('/api/admin/users')
+      .query({ username: name })
+      .set('Cookie', adminCookie);
+    expect(
+      list.body.items.some((u: { username_normalized: string }) => u.username_normalized === name),
+    ).toBe(true);
+  });
+  it('requires identity and CSRF and rejects ordinary admin access', async () => {
+    expect((await request(http).get('/api/garden/profiles')).status).toBe(401);
+    expect((await request(http).get('/api/admin/users').set('Cookie', cookie)).status).toBe(401);
+    expect(
+      (
+        await request(http)
+          .put('/api/garden/profiles/1')
+          .set('Origin', origin)
+          .set('Cookie', cookie)
+          .send({})
+      ).status,
+    ).toBe(403);
+  });
+  it('rejects cross-entry credentials and renamed role cookies', async () => {
+    const [u] = await auth.rows('SELECT username_normalized FROM garden_user WHERE id=?', [userId]);
+    for (const [path, name] of [
+      ['/api/auth/login', prefix + 'admin'],
+      ['/api/admin/auth/login', u.username_normalized],
+    ]) {
+      const result = await request(http)
+        .post(path)
+        .set('Origin', origin)
+        .send({ username: name, password: pass });
+      expect(result.status).toBe(403);
+      expect(result.body.error.code).toBe('WRONG_LOGIN_ENTRY');
+      expect(result.headers['set-cookie']).toBeUndefined();
+    }
+    expect(
+      (
+        await request(http)
+          .get('/api/garden/profiles')
+          .set('Cookie', adminCookie.replace('_admin_session=', '_parent_session='))
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await request(http)
+          .get('/api/admin/users')
+          .set('Cookie', cookie.replace('_parent_session=', '_admin_session='))
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await request(http)
+          .get('/api/Admin/users')
+          .set('Cookie', cookie.replace('_parent_session=', '_admin_session='))
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await request(http)
+          .get('/api/auth/me')
+          .set('Cookie', cookie.replace('_parent_session=', '_session='))
+      ).status,
+    ).toBe(401);
+  });
+  it('keeps simultaneous identities, CSRF and logout independent', async () => {
+    const [u] = await auth.rows('SELECT username_normalized FROM garden_user WHERE id=?', [userId]);
+    const login = async (path: string, name: string) =>
+      (
+        await request(http)
+          .post(path)
+          .set('Origin', origin)
+          .send({ username: name, password: pass })
+      ).headers['set-cookie'][0].split(';')[0];
+    const ac = await login('/api/admin/auth/login', prefix + 'admin'),
+      pc = await login('/api/auth/login', u.username_normalized),
+      both = ac + '; ' + pc;
+    const am = await request(http).get('/api/admin/auth/me').set('Cookie', both),
+      pm = await request(http).get('/api/auth/me').set('Cookie', both);
+    expect(am.body.user.role).toBe('admin');
+    expect(pm.body.user.id).toBe(userId);
+    expect(am.body.csrfToken).not.toBe(pm.body.csrfToken);
+    expect(
+      (
+        await request(http)
+          .post('/api/admin/auth/logout')
+          .set('Origin', origin)
+          .set('Cookie', both)
+          .set('X-CSRF-Token', pm.body.csrfToken)
+          .send({})
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await request(http)
+          .post('/api/admin/auth/logout')
+          .set('Origin', origin)
+          .set('Cookie', both)
+          .set('X-CSRF-Token', am.body.csrfToken)
+          .send({})
+      ).status,
+    ).toBe(204);
+    expect((await request(http).get('/api/admin/auth/me').set('Cookie', both)).status).toBe(401);
+    expect((await request(http).get('/api/auth/me').set('Cookie', both)).status).toBe(200);
+    const ac2 = await login('/api/admin/auth/login', prefix + 'admin'),
+      both2 = ac2 + '; ' + pc;
+    expect(
+      (
+        await request(http)
+          .post('/api/auth/logout')
+          .set('Origin', origin)
+          .set('Cookie', both2)
+          .set('X-CSRF-Token', pm.body.csrfToken)
+          .send({})
+      ).status,
+    ).toBe(204);
+    expect((await request(http).get('/api/admin/auth/me').set('Cookie', both2)).status).toBe(200);
+    expect((await request(http).get('/api/auth/me').set('Cookie', both2)).status).toBe(401);
+  });
+  it('starts with three empty slots without creating profiles on read', async () => {
+    const r = await request(http).get('/api/garden/profiles').set('Cookie', cookie);
+    expect(r.body.slots).toHaveLength(3);
+    expect(
+      r.body.slots.every((s: { revision: number; empty: boolean }) => s.revision === 0 && s.empty),
+    ).toBe(true);
+  });
+  it('retries a committed snapshot without increasing revision twice', async () => {
+    const payload = {
+      baseRevision: 0,
+      generation: 0,
+      mutationId: randomUUID(),
+      profile: toCloudProfile(newProfile('测试花园')),
+    };
+    const a = await write('/api/garden/profiles/1', payload, 'put'),
+      b = await write('/api/garden/profiles/1', payload, 'put');
+    expect(a.status, a.text).toBe(200);
+    expect(b.body).toEqual(a.body);
+    expect(a.body.revision).toBe(1);
+    const changed = await write(
+      '/api/garden/profiles/1',
+      { ...payload, profile: toCloudProfile(newProfile('别的内容')) },
+      'put',
+    );
+    expect(changed.status).toBe(409);
+  });
+  it('only one concurrent revision wins', async () => {
+    const r = await Promise.all(
+      ['A', 'B'].map((name) =>
+        write(
+          '/api/garden/profiles/1',
+          {
+            baseRevision: 1,
+            generation: 0,
+            mutationId: randomUUID(),
+            profile: toCloudProfile(newProfile(name)),
+          },
+          'put',
+        ),
+      ),
+    );
+    expect(r.map((x) => x.status).sort()).toEqual([200, 409]);
+  });
+  it('deduplicates learning events and rejects reused ID content', async () => {
+    const event = {
+      eventId: 'event-1',
+      packVersion: 'garden-adventure-4',
+      attempt: {
+        taskId: 'task1',
+        entryId: 'symbol-a',
+        syllable: 0,
+        correct: true,
+        assisted: false,
+        repeated: false,
+        at: 1000,
+      },
+    };
+    for (let i = 0; i < 2; i++)
+      expect(
+        (await write('/api/garden/profiles/1/events', { generation: 0, events: [event] })).status,
+      ).toBe(201);
+    const read = await request(http).get('/api/garden/profiles/1/events').set('Cookie', cookie);
+    expect(read.body.items).toHaveLength(1);
+    expect(
+      (
+        await write('/api/garden/profiles/1/events', {
+          generation: 0,
+          events: [{ ...event, attempt: { ...event.attempt, correct: false } }],
+        })
+      ).status,
+    ).toBe(409);
+  });
+  it('accepts byte-bounded Unicode history batches and rejects the oversized envelope', async () => {
+    const rows = Array.from({ length: 200 }, (_, i) => ({
+      generation: 0,
+      event: eventSchema.parse({
+        eventId: 'unicode:' + i,
+        packVersion: 'garden-adventure-4',
+        attempt: {
+          taskId: '字'.repeat(300),
+          entryId: '字'.repeat(160),
+          runId: '字'.repeat(160),
+          readingId: '字'.repeat(160),
+          syllable: 0,
+          correct: true,
+          assisted: false,
+          repeated: false,
+          at: i,
+        },
+      }),
+    }));
+    const oversized = { generation: 0, events: rows.map((row) => row.event) };
+    expect(Buffer.byteLength(JSON.stringify(oversized))).toBeGreaterThan(CLOUD_LIMITS.eventBatch);
+    expect((await write('/api/garden/profiles/2/events', oversized)).status).toBe(413);
+    for (const batch of eventBatches(rows)) {
+      const response = await write('/api/garden/profiles/2/events', batch.body);
+      expect(response.status, response.text).toBe(201);
+      expect(response.body.accepted).toHaveLength(batch.rows.length);
+    }
+    const response = await request(http)
+      .get('/api/garden/profiles/2/events?limit=1000')
+      .set('Cookie', cookie);
+    expect(response.body.items).toHaveLength(200);
+  });
+  it('clears to a tombstone and isolates old learning generation', async () => {
+    const payload = { baseRevision: 2, generation: 0, mutationId: randomUUID() };
+    const r = await write('/api/garden/profiles/1/clear', payload);
+    expect(r.status, r.text).toBe(201);
+    expect(r.body.generation).toBe(1);
+    expect((await write('/api/garden/profiles/1/clear', payload)).body).toEqual(r.body);
+    expect(
+      (
+        await write(
+          '/api/garden/profiles/1',
+          {
+            baseRevision: 2,
+            generation: 0,
+            mutationId: randomUUID(),
+            profile: toCloudProfile(newProfile('旧设备')),
+          },
+          'put',
+        )
+      ).status,
+    ).toBe(409);
+    const rows = await request(http).get('/api/garden/profiles/1/events').set('Cookie', cookie);
+    expect(rows.body.items).toHaveLength(0);
+    expect(
+      (await request(http).get('/api/garden/profiles/1/events?all=true').set('Cookie', cookie)).body
+        .items,
+    ).toHaveLength(1);
+  });
+  it('deletion watermark rejects resurrected old events', async () => {
+    expect(
+      (
+        await write('/api/garden/profiles/1/delete-history', {
+          baseRevision: 3,
+          generation: 1,
+          mutationId: randomUUID(),
+        })
+      ).status,
+    ).toBe(201);
+    const late = {
+      eventId: 'late',
+      packVersion: 'old',
+      attempt: {
+        taskId: 't',
+        entryId: 'unknown-old-entry',
+        syllable: 0,
+        correct: true,
+        assisted: false,
+        repeated: false,
+        at: 1,
+      },
+    };
+    expect(
+      (await write('/api/garden/profiles/1/events', { generation: 0, events: [late] })).status,
+    ).toBe(409);
+  });
+  it('keeps archived data private', async () => {
+    const r = await write('/api/garden/archives', { data: { private: 'test' } });
+    expect(r.status).toBe(201);
+    expect(
+      (
+        await request(http)
+          .get('/api/garden/archives/' + r.body.archiveId)
+          .set('Cookie', adminCookie)
+      ).status,
+    ).toBe(401);
+  });
+  it('rejects a request created for another logged-in account', async () => {
+    expect(
+      (
+        await request(http)
+          .get('/api/garden/profiles')
+          .set('Cookie', cookie)
+          .set('X-Garden-User', randomUUID())
+      ).status,
+    ).toBe(401);
+  });
+  it('reports invalid profiles without a server error', async () => {
+    const bad = {
+      ...toCloudProfile(newProfile('invalid')),
+      levelStars: { invalid: [true, true, true] },
+    };
+    expect(
+      (
+        await write(
+          '/api/garden/profiles/2',
+          { baseRevision: 0, generation: 0, mutationId: randomUUID(), profile: bad },
+          'put',
+        )
+      ).status,
+    ).toBe(422);
+  });
+  it('returns historical summary using the fixed report timezone', async () => {
+    const r = await request(http).get('/api/garden/profiles/1/summary').set('Cookie', cookie);
+    expect(r.status).toBe(200);
+    expect(r.body.timeZone).toBe('Asia/Shanghai');
+    expect(r.body.summary.total).toBe(0);
+  });
+  it('rejects every ordinary-user admin action', async () => {
+    for (const [method, path, body] of [
+      ['get', '/api/admin/invitations', undefined],
+      ['get', '/api/admin/audit', undefined],
+      ['post', '/api/admin/invitations', { count: 1, validDays: 7 }],
+      ['post', '/api/admin/invitations/x/revoke', {}],
+      ['patch', '/api/admin/users/x/status', { status: 'disabled' }],
+      ['post', '/api/admin/users/x/password-reset', {}],
+    ] as const) {
+      const r = await request(http)
+        [method](path)
+        .set('Cookie', cookie)
+        .set('Origin', origin)
+        .set('X-CSRF-Token', csrf)
+        .send(body);
+      expect(r.status).toBe(401);
+    }
+  });
+  it('does not consume a code when a username already exists, and rejects revoked/expired codes', async () => {
+    const issued = await admin('post', '/api/admin/invitations', { count: 3, validDays: 7 });
+    const [row] = await auth.rows('SELECT username_normalized FROM garden_user WHERE id=?', [
+      userId,
+    ]);
+    const register = (username: string, code: string) =>
+      request(http)
+        .post('/api/auth/register')
+        .set('Origin', origin)
+        .send({ username, password: pass, invitationCode: code });
+    expect((await register(row.username_normalized, issued.body.items[0].code)).status).toBe(409);
+    expect((await register(prefix + 'extra', issued.body.items[0].code)).status).toBe(201);
+    await admin('post', '/api/admin/invitations/' + issued.body.items[1].id + '/revoke', {});
+    expect((await register(prefix + 'revoked', issued.body.items[1].code)).status).toBe(400);
+    await db.withTransaction(async (c: SqlConnection) => {
+      await c.execute('UPDATE garden_invitation SET expires_at=? WHERE id=?', [
+        new Date(0),
+        issued.body.items[2].id,
+      ]);
+    });
+    expect((await register(prefix + 'expired', issued.body.items[2].code)).status).toBe(400);
+  });
+  it('handles a concurrently reused mutation ID across different slots as a conflict', async () => {
+    const mutationId = randomUUID(),
+      payload = {
+        baseRevision: 0,
+        generation: 0,
+        mutationId,
+        profile: toCloudProfile(newProfile('concurrent')),
+      };
+    const results = await Promise.all(
+      [2, 3].map((slot) => write('/api/garden/profiles/' + slot, payload, 'put')),
+    );
+    expect(results.map((r) => r.status).sort()).toEqual([200, 409]);
+  });
+  it('supports short parent passwords for registration, change and reset while keeping admin policy', async () => {
+    const issued = await admin('post', '/api/admin/invitations', { count: 1, validDays: 7 });
+    const name = prefix + 'short',
+      code = issued.body.items[0].code;
+    const reg = (password: string) =>
+      request(http)
+        .post('/api/auth/register')
+        .set('Origin', origin)
+        .send({ username: name, password, invitationCode: code });
+    expect((await reg('abc12')).status).toBe(400);
+    expect((await reg('x'.repeat(33))).status).toBe(400);
+    const registered = await reg('abc123');
+    expect(registered.status).toBe(201);
+    const login = await request(http)
+      .post('/api/auth/login')
+      .set('Origin', origin)
+      .send({ username: name, password: 'abc123' });
+    expect(login.status).toBe(200);
+    const c = login.headers['set-cookie'][0].split(';')[0],
+      me = await request(http).get('/api/auth/me').set('Cookie', c);
+    expect(
+      (
+        await request(http)
+          .post('/api/auth/change-password')
+          .set('Origin', origin)
+          .set('Cookie', c)
+          .set('X-CSRF-Token', me.body.csrfToken)
+          .send({ currentPassword: 'abc123', newPassword: 'def456' })
+      ).status,
+    ).toBe(204);
+    expect(
+      (
+        await request(http)
+          .post('/api/auth/login')
+          .set('Origin', origin)
+          .send({ username: name, password: 'def456' })
+      ).status,
+    ).toBe(200);
+    const reset = await admin(
+      'post',
+      '/api/admin/users/' + registered.body.userId + '/password-reset',
+      {},
+    );
+    expect(
+      (
+        await request(http)
+          .post('/api/auth/reset-password')
+          .set('Origin', origin)
+          .send({ resetCode: reset.body.resetCode, newPassword: 'ghi789' })
+      ).status,
+    ).toBe(204);
+    expect(
+      (
+        await request(http)
+          .post('/api/auth/login')
+          .set('Origin', origin)
+          .send({ username: name, password: 'ghi789' })
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await request(http)
+          .post('/api/admin/auth/change-password')
+          .set('Origin', origin)
+          .set('Cookie', adminCookie)
+          .set('X-CSRF-Token', adminCsrf)
+          .send({ currentPassword: pass, newPassword: 'abc123' })
+      ).status,
+    ).toBe(400);
+  });
+  it('password reset codes are single use and revoke sessions', async () => {
+    const issued = await admin('post', '/api/admin/users/' + userId + '/password-reset', {});
+    expect(issued.status).toBe(201);
+    const body = { resetCode: issued.body.resetCode, newPassword: 'changed-garden-password-2026' };
+    expect(
+      (await request(http).post('/api/auth/reset-password').set('Origin', origin).send(body))
+        .status,
+    ).toBe(204);
+    expect((await request(http).get('/api/auth/me').set('Cookie', cookie)).status).toBe(401);
+    expect(
+      (await request(http).post('/api/auth/reset-password').set('Origin', origin).send(body))
+        .status,
+    ).toBe(400);
+    const [row] = await auth.rows('SELECT username_normalized FROM garden_user WHERE id=?', [
+      userId,
+    ]);
+    const login = await request(http)
+      .post('/api/auth/login')
+      .set('Origin', origin)
+      .send({ username: row.username_normalized, password: body.newPassword });
+    cookie = login.headers['set-cookie'][0].split(';')[0];
+  });
+  it('disabling a user invalidates their existing session', async () => {
+    expect(
+      (await admin('patch', '/api/admin/users/' + userId + '/status', { status: 'disabled' }))
+        .status,
+    ).toBe(200);
+    expect((await request(http).get('/api/auth/me').set('Cookie', cookie)).status).toBe(401);
+  });
 });

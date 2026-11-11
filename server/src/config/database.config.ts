@@ -1,7 +1,8 @@
 import 'dotenv/config';
 
 if (process.env.NODE_ENV === 'production') {
-  for (const name of ['MYSQL_HOST','MYSQL_DATABASE','MYSQL_USER','MYSQL_PASSWORD']) if (!process.env[name]) throw new Error(`Missing ${name}`);
+  for (const name of ['MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USER', 'MYSQL_PASSWORD'])
+    if (!process.env[name]) throw new Error(`Missing ${name}`);
 }
 export const DATABASE_CONFIG = {
   timezone: 'Z',

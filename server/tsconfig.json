@@ -20,7 +20,8 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@children-games/shared": ["../shared/src/index.ts"]
-    }
+    },
+    "strict": true
   },
   "include": ["src/**/*", "test/**/*", "../shared/src/**/*"],
   "exclude": ["node_modules", "dist", "../shared/src/**/*.test.ts"]

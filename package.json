@@ -20,10 +20,24 @@
     "dev:garden-site": "npm run dev:garden-site -w web",
     "migrate:garden": "npm run migrate:garden -w server",
     "bootstrap:admin": "npm run bootstrap:admin -w server",
-    "local:garden": "node scripts/dev-garden-local.mjs"
+    "local:garden": "node scripts/dev-garden-local.mjs",
+    "lint": "eslint web/src shared/src server/src server/test web/e2e --max-warnings 0",
+    "format:check": "prettier --check \"web/src/**/*.{ts,tsx,css}\" \"shared/src/**/*.ts\" \"server/src/**/*.ts\" \"server/test/**/*.ts\" \"web/e2e/**/*.ts\" \"web/*.{ts,json}\" \"server/*.json\" \"shared/*.json\" package.json eslint.config.mjs .prettierrc.json server/scripts/test-garden-integration.mjs",
+    "format": "prettier --write \"web/src/**/*.{ts,tsx,css}\" \"shared/src/**/*.ts\" \"server/src/**/*.ts\" \"server/test/**/*.ts\" \"web/e2e/**/*.ts\" \"web/*.{ts,json}\" \"server/*.json\" \"shared/*.json\" package.json eslint.config.mjs .prettierrc.json server/scripts/test-garden-integration.mjs",
+    "test:unit": "npm test -w web && npm test -w server",
+    "test:integration": "npm run test:garden-integration -w server",
+    "test:e2e": "npm run test:e2e -w web",
+    "check": "npm run lint && npm run format:check && npm run type-check && npm run test:unit && npm run build && node scripts/check-garden-release.mjs"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "@eslint/js": "^9.39.5",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10",
+    "typescript-eslint": "^8.72.2"
   },
   "engines": {
     "node": ">=24"

@@ -1,0 +1,30 @@
+.deployment-grid {
+  display: grid;
+  gap: 8px;
+}
+.deployment-grid [role='row'] {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+.deployment-grid button {
+  width: 100%;
+  min-height: 44px;
+  padding: 6px;
+}
+.deployment-grid button:focus-visible {
+  outline: 3px solid #4f713d;
+  outline-offset: 2px;
+  transform: translateY(-2px);
+}
+.deployment-grid button[aria-disabled='true'] {
+  opacity: 0.55;
+}
+.reduced-motion .deployment-grid button:focus-visible {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .deployment-grid button:focus-visible {
+    transform: none;
+  }
+}

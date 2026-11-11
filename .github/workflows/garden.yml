@@ -26,9 +26,10 @@ jobs:
           cache: npm
       - run: npm ci --registry=https://registry.npmjs.org
       - run: npm run migrate:garden
+      - run: npm run lint
+      - run: npm run format:check
       - run: npm run type-check
-      - run: npm test -w web
-      - run: npm test -w server
+      - run: npm run test:unit
       - run: npm run test:garden-integration -w server
         env:
           GARDEN_DB_TEST: '1'
@@ -38,7 +39,9 @@ jobs:
       - run: node server/scripts/seed-garden-test-admin.mjs
         env:
           GARDEN_E2E_ADMIN_FILE: ${{ github.workspace }}/.workbench/ci-garden/admin.json
-      - run: npm run test:garden-e2e -w web
+      - run: npm run test:e2e -w web
         env:
           GARDEN_E2E_START: '1'
+          GARDEN_E2E_PREVIEW_START: '1'
+          RESOURCE_PRODUCTION_ORIGIN: http://localhost:5195
           GARDEN_E2E_ADMIN_FILE: ${{ github.workspace }}/.workbench/ci-garden/admin.json

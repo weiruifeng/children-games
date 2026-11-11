@@ -1,14 +1,181 @@
-import {Waji} from '../../../ui/Waji';
-import {allowedPlants,starsFor,waveLeaks,lessonPreview,ENTRY_MAP,PLANTS,type GardenState} from '@children-games/shared';
-import {PartnerIcon} from './PartnerIcon';
-import {GardenIcon} from './GardenIcon';
-import {regionName} from './adventureRegions';
-import {CHARACTER_LEVEL_MAP,nextAdventure} from '@children-games/shared';
-export function BattlePanel({state:s,onStart,onResume,onHome,onRetry,onNext,onReplay,onSound,muted,onLearningHome,leaving,exitError,onSettings}:{onSettings?:()=>void;onLearningHome:()=>void;leaving:boolean;exitError:string;state:GardenState;onStart:()=>void;onResume:()=>void;onHome:()=>void;onRetry:()=>void;onNext:()=>void;onReplay:()=>void;onSound:()=>void;muted:boolean;onPronounce?:(pinyin:string[])=>void}){
- const hasNext=!!nextAdventure(s.levelId??'');
- if(s.stage==='won')return <><Waji mood="victory" animate/><h2>花园守住啦！</h2>{!s.reviewPool&&<div className="result-stars">{starsFor(s).map((earned,i)=><span className={earned?'earned':''} key={i}><GardenIcon name="star"/><small>{['守护','独立操作','策略'][i]}</small></span>)}</div>}<p>本关 {s.score} 分 · 独立完成 {Object.values(s.results).filter(r=>r.independent).length} 个任务</p><button className="primary" onClick={onNext}>{s.levelId?(hasNext?'下一处守护':'回花园'):'回花园'} <GardenIcon name="play"/></button><div className="panel-actions"><button onClick={onReplay}>再挑战一次</button><button onClick={onHome}>回花园</button></div></>;
- if(s.stage==='lost')return <><Waji mood="encourage" animate/><h2>再试一次吧</h2><p>爱心用完啦，再试一次这一波吧。</p><button className="primary" onClick={onRetry}><GardenIcon name="play"/> 重试这一波</button><div className="panel-actions"><button onClick={onHome}>回花园</button></div></>;
- if(s.paused)return <><div className="pause-portrait"><PartnerIcon kind="plant_dew_collector" size={110}/><span>z z</span></div><h2>休息一下</h2><button className="primary" onClick={onResume}><GardenIcon name="play"/> 继续玩</button><div className="panel-actions"><button onClick={onHome}><GardenIcon name="home"/> 回花园</button><button onClick={onSound}><GardenIcon name={muted?'muted':'sound'}/> 声音{muted?'关':'开'}</button></div>{onSettings&&<button onClick={onSettings}><GardenIcon name="settings"/> 设置</button>}<button className="panel-world-return" onClick={onLearningHome} disabled={leaving}>{leaving?'正在保存…':'← 回学习首页'}</button>{exitError&&<p className="panel-exit-error" role="alert">{exitError}</p>}</>;
- const preview=lessonPreview(s);
- return <>{s.stage==='ready'&&<Waji className="departure-waji" animate/>}<h2>{s.stage==='between'?(waveLeaks(s)?'这一波结束了':'这一波，守住啦！'):'一起守护花园'}</h2>{s.stage==='ready'?<div className="departure-partners">{allowedPlants(s.level).map(kind=><div key={kind}><PartnerIcon kind={kind} size={64}/><span>{PLANTS[kind].name}</span></div>)}</div>:<PartnerIcon kind="plant_pod_slinger" size={100}/>}<p>{s.stage==='between'?(waveLeaks(s)?`漏过 ${waveLeaks(s)} 只墨团，还剩 ${s.hearts} 颗爱心。下一波记得准备弹药。`:'伙伴留下来，下一波重新准备弹药。'):'拖伙伴到空地，拼好卡片一起守护。'}</p><div className="wave-lesson-preview"><strong>{s.levelId?regionName(CHARACTER_LEVEL_MAP[s.levelId].chapter):'花园守护'} · 这一波的种子卡</strong><p>{preview.note}</p><div>{preview.cards.map(id=><span className="preview-seed" key={id}>{s.levelId?ENTRY_MAP[id].text:ENTRY_MAP[id].pinyin.join(' ')}</span>)}</div></div><button className="primary wave-start" onClick={()=>{onStart();}}><GardenIcon name="play"/> {s.stage==='between'?`开始第 ${s.wave+2} 波`:'开始第一波'}</button><small className="start-grace">开始后有 12 秒布置时间</small><div className="panel-actions"><button onClick={onHome}>回花园</button></div></>;
+import { Waji } from '../../../ui/Waji';
+import {
+  allowedPlants,
+  starsFor,
+  waveLeaks,
+  lessonPreview,
+  ENTRY_MAP,
+  PLANTS,
+  type GardenState,
+} from '@children-games/shared';
+import { PartnerIcon } from './PartnerIcon';
+import { GardenIcon } from './GardenIcon';
+import { regionName } from './adventureRegions';
+import { CHARACTER_LEVEL_MAP, nextAdventure } from '@children-games/shared';
+export function BattlePanel({
+  state: s,
+  onStart,
+  onResume,
+  onHome,
+  onRetry,
+  onNext,
+  onReplay,
+  onSound,
+  muted,
+  onLearningHome,
+  leaving,
+  exitError,
+  onSettings,
+}: {
+  onSettings?: () => void;
+  onLearningHome: () => void;
+  leaving: boolean;
+  exitError: string;
+  state: GardenState;
+  onStart: () => void;
+  onResume: () => void;
+  onHome: () => void;
+  onRetry: () => void;
+  onNext: () => void;
+  onReplay: () => void;
+  onSound: () => void;
+  muted: boolean;
+  onPronounce?: (pinyin: string[]) => void;
+}) {
+  const hasNext = !!nextAdventure(s.levelId ?? '');
+  if (s.stage === 'won')
+    return (
+      <>
+        <Waji mood="victory" animate />
+        <h2>花园守住啦！</h2>
+        {!s.reviewPool && (
+          <div className="result-stars">
+            {starsFor(s).map((earned, i) => (
+              <span className={earned ? 'earned' : ''} key={i}>
+                <GardenIcon name="star" />
+                <small>{['守护', '独立操作', '策略'][i]}</small>
+              </span>
+            ))}
+          </div>
+        )}
+        <p>
+          本关 {s.score} 分 · 独立完成{' '}
+          {Object.values(s.results).filter((r) => r.independent).length} 个任务
+        </p>
+        <button className="primary" onClick={onNext}>
+          {s.levelId ? (hasNext ? '下一处守护' : '回花园') : '回花园'} <GardenIcon name="play" />
+        </button>
+        <div className="panel-actions">
+          <button onClick={onReplay}>再挑战一次</button>
+          <button onClick={onHome}>回花园</button>
+        </div>
+      </>
+    );
+  if (s.stage === 'lost')
+    return (
+      <>
+        <Waji mood="encourage" animate />
+        <h2>再试一次吧</h2>
+        <p>爱心用完啦，再试一次这一波吧。</p>
+        <button className="primary" onClick={onRetry}>
+          <GardenIcon name="play" /> 重试这一波
+        </button>
+        <div className="panel-actions">
+          <button onClick={onHome}>回花园</button>
+        </div>
+      </>
+    );
+  if (s.paused)
+    return (
+      <>
+        <div className="pause-portrait">
+          <PartnerIcon kind="plant_dew_collector" size={110} />
+          <span>z z</span>
+        </div>
+        <h2>休息一下</h2>
+        <button className="primary" onClick={onResume}>
+          <GardenIcon name="play" /> 继续玩
+        </button>
+        <div className="panel-actions">
+          <button onClick={onHome}>
+            <GardenIcon name="home" /> 回花园
+          </button>
+          <button onClick={onSound}>
+            <GardenIcon name={muted ? 'muted' : 'sound'} /> 声音{muted ? '关' : '开'}
+          </button>
+        </div>
+        {onSettings && (
+          <button onClick={onSettings}>
+            <GardenIcon name="settings" /> 设置
+          </button>
+        )}
+        <button className="panel-world-return" onClick={onLearningHome} disabled={leaving}>
+          {leaving ? '正在保存…' : '← 回学习首页'}
+        </button>
+        {exitError && (
+          <p className="panel-exit-error" role="alert">
+            {exitError}
+          </p>
+        )}
+      </>
+    );
+  const preview = lessonPreview(s);
+  return (
+    <>
+      {s.stage === 'ready' && <Waji className="departure-waji" animate />}
+      <h2>
+        {s.stage === 'between'
+          ? waveLeaks(s)
+            ? '这一波结束了'
+            : '这一波，守住啦！'
+          : '一起守护花园'}
+      </h2>
+      {s.stage === 'ready' ? (
+        <div className="departure-partners">
+          {allowedPlants(s.level).map((kind) => (
+            <div key={kind}>
+              <PartnerIcon kind={kind} size={64} />
+              <span>{PLANTS[kind].name}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <PartnerIcon kind="plant_pod_slinger" size={100} />
+      )}
+      <p>
+        {s.stage === 'between'
+          ? waveLeaks(s)
+            ? `漏过 ${waveLeaks(s)} 只墨团，还剩 ${s.hearts} 颗爱心。下一波记得准备弹药。`
+            : '伙伴留下来，下一波重新准备弹药。'
+          : '拖伙伴到空地，拼好卡片一起守护。'}
+      </p>
+      <div className="wave-lesson-preview">
+        <strong>
+          {s.levelId ? regionName(CHARACTER_LEVEL_MAP[s.levelId].chapter) : '花园守护'} ·
+          这一波的种子卡
+        </strong>
+        <p>{preview.note}</p>
+        <div>
+          {preview.cards.map((id) => (
+            <span className="preview-seed" key={id}>
+              {s.levelId ? ENTRY_MAP[id].text : ENTRY_MAP[id].pinyin.join(' ')}
+            </span>
+          ))}
+        </div>
+      </div>
+      <button
+        className="primary wave-start"
+        onClick={() => {
+          onStart();
+        }}
+      >
+        <GardenIcon name="play" />{' '}
+        {s.stage === 'between' ? `开始第 ${s.wave + 2} 波` : '开始第一波'}
+      </button>
+      <small className="start-grace">开始后有 12 秒布置时间</small>
+      <div className="panel-actions">
+        <button onClick={onHome}>回花园</button>
+      </div>
+    </>
+  );
 }

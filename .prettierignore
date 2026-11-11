@@ -1,0 +1,9 @@
+node_modules/
+**/dist/
+web/dist-garden/
+.workbench/
+.runtime/
+package-lock.json
+shared/src/pinyin-garden/data/
+web/public/
+docs/specs/pinyin-garden/content-inventory/

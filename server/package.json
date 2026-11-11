@@ -8,11 +8,13 @@
     "start:dev": "nest start --entryFile garden-main --watch",
     "start:prod": "node dist/server/src/garden-main.js",
     "type-check": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run",
+    "test": "vitest run --exclude test/garden-site.integration.test.ts",
     "start:garden-site": "node dist/server/src/garden-main.js",
     "migrate:garden": "node scripts/migrate-garden.mjs",
     "bootstrap:admin": "node scripts/bootstrap-admin.mjs",
-    "test:garden-integration": "vitest run test/garden-site.integration.test.ts"
+    "test:garden-integration": "node scripts/test-garden-integration.mjs",
+    "prebuild": "tsc -p ../shared/tsconfig.json",
+    "prestart:dev": "tsc -p ../shared/tsconfig.json"
   },
   "dependencies": {
     "@nestjs/common": "^12.4.0",
@@ -24,7 +26,8 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "zod": "^4.6.7",
-    "dotenv": "^18.0.3"
+    "dotenv": "^18.0.3",
+    "@children-games/shared": "*"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.9",

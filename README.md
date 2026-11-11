@@ -38,6 +38,8 @@ npm run start:garden-site
 
 ## 验证与发布
 
+日常统一执行 `npm run check`，包含 lint、格式、类型、单元测试、构建和产物检查；自动排版使用 `npm run format`。真实数据库与浏览器测试单独执行，所需隔离配置和模块职责见[维护说明](docs/pinyin-garden.md#代码质量与职责边界)。
+
 ```bash
 npm run type-check
 npm test -w web

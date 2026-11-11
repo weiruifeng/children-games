@@ -1,12 +1,148 @@
-.waji{display:inline-block;width:130px;height:150px;overflow:hidden;background:transparent;vertical-align:middle;transform-origin:50% 90%}.waji-welcome{width:130px;height:246px}.waji-icon{display:block;width:44px;height:44px;flex-shrink:0;overflow:hidden;border-radius:22%}.waji-greeting{position:relative;text-align:center}.waji-greet-button{display:inline-block!important;border:0!important;padding:0!important;box-shadow:none!important;background:transparent!important;cursor:pointer;transform:none!important}.waji-greet-button:focus-visible{outline:3px solid #bd9137;outline-offset:8px;border-radius:16px}.waji-greeting-copy{display:block;min-height:20px;font-size:12px;color:#806c4d;margin-top:12px}.waji-motion{animation:waji-welcome 1.4s ease-in-out both}.waji-happy.waji-motion{animation-name:waji-reward;animation-duration:1.1s}.waji-think.waji-motion{animation-name:waji-ponder;animation-duration:1.7s}.waji-encourage.waji-motion{animation-name:waji-encourage;animation-duration:1.25s}
-@keyframes waji-welcome{0%,100%{transform:rotate(0)}20%{transform:rotate(-4deg) translateY(-3px)}45%{transform:rotate(3deg)}70%{transform:rotate(-2deg)}}
-@keyframes waji-reward{0%,100%{transform:translateY(0) scale(1)}25%{transform:translateY(4px) scale(.98)}55%{transform:translateY(-16px) scale(1.03)}80%{transform:translateY(0) scale(.99)}}
-@keyframes waji-ponder{0%,100%{transform:rotate(0)}30%,70%{transform:rotate(-7deg) translateY(-2px)}}
-@keyframes waji-encourage{0%,100%{transform:translateY(0)}25%,65%{transform:translateY(5px) rotate(2deg)}45%,85%{transform:translateY(-3px)}}
-.reduced-motion .waji{animation:none!important;transition:none!important}
-@media(prefers-reduced-motion:reduce){.waji{animation:none!important;transition:none!important}}
+.waji {
+  display: inline-block;
+  width: 130px;
+  height: 150px;
+  overflow: hidden;
+  background: transparent;
+  vertical-align: middle;
+  transform-origin: 50% 90%;
+}
+.waji-welcome {
+  width: 130px;
+  height: 246px;
+}
+.waji-icon {
+  display: block;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 22%;
+}
+.waji-greeting {
+  position: relative;
+  text-align: center;
+}
+.waji-greet-button {
+  display: inline-block !important;
+  border: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  cursor: pointer;
+  transform: none !important;
+}
+.waji-greet-button:focus-visible {
+  outline: 3px solid #bd9137;
+  outline-offset: 8px;
+  border-radius: 16px;
+}
+.waji-greeting-copy {
+  display: block;
+  min-height: 20px;
+  font-size: 12px;
+  color: #806c4d;
+  margin-top: 12px;
+}
+.waji-motion {
+  animation: waji-welcome 1.4s ease-in-out both;
+}
+.waji-happy.waji-motion {
+  animation-name: waji-reward;
+  animation-duration: 1.1s;
+}
+.waji-think.waji-motion {
+  animation-name: waji-ponder;
+  animation-duration: 1.7s;
+}
+.waji-encourage.waji-motion {
+  animation-name: waji-encourage;
+  animation-duration: 1.25s;
+}
+@keyframes waji-welcome {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(-4deg) translateY(-3px);
+  }
+  45% {
+    transform: rotate(3deg);
+  }
+  70% {
+    transform: rotate(-2deg);
+  }
+}
+@keyframes waji-reward {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(4px) scale(0.98);
+  }
+  55% {
+    transform: translateY(-16px) scale(1.03);
+  }
+  80% {
+    transform: translateY(0) scale(0.99);
+  }
+}
+@keyframes waji-ponder {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  30%,
+  70% {
+    transform: rotate(-7deg) translateY(-2px);
+  }
+}
+@keyframes waji-encourage {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25%,
+  65% {
+    transform: translateY(5px) rotate(2deg);
+  }
+  45%,
+  85% {
+    transform: translateY(-3px);
+  }
+}
+.reduced-motion .waji {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .waji {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 
 /* Measure every greeting in the same grid cell so text changes cannot move the character. */
-.waji-greeting-messages{display:grid;min-width:0}.waji-greeting-copy{grid-area:1/1;line-height:1.5;overflow-wrap:anywhere}.waji-greeting-reserve{visibility:hidden;pointer-events:none;user-select:none}
+.waji-greeting-messages {
+  display: grid;
+  min-width: 0;
+}
+.waji-greeting-copy {
+  grid-area: 1/1;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.waji-greeting-reserve {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
 
-.waji-greeting .waji-greeting-messages .waji-greeting-copy{display:flex;align-items:center;justify-content:center;text-align:center}
+.waji-greeting .waji-greeting-messages .waji-greeting-copy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}

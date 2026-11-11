@@ -20,6 +20,7 @@ for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>stop());
 function done(child){return new Promise((resolve,reject)=>{child.on('error',reject);child.on('exit',code=>code===0?resolve():reject(Error(`命令退出: ${code}`)));});}
 try{
  for(const usedPort of [port,apiPort])await new Promise((resolve,reject)=>{const probe=createServer();probe.once('error',()=>reject(Error(`端口 ${usedPort} 已被占用，请停止旧服务或调整 .env.garden.local`)));probe.listen(usedPort,'127.0.0.1',()=>probe.close(resolve));});
+ await done(run(process.execPath,['node_modules/typescript/bin/tsc','-p','shared/tsconfig.json']));
  await done(run(process.execPath,['node_modules/typescript/bin/tsc','-p','server/tsconfig.json']));
  if(stopping)process.exit(0);
  await done(run(process.execPath,['server/scripts/migrate-garden.mjs']));
