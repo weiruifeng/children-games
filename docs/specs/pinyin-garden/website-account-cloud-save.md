@@ -1,7 +1,7 @@
 # 拼音花园网站化：账号、邀请注册、管理后台与云存档 Spec
 
 
-更新：2026-11-10。本文维护现有账号、权限、云存档和版本兼容契约。部署状态见[部署手册](../../../deploy/garden-site/README.md)，未完成事项见[维护说明](../../pinyin-garden.md#待办与验收边界)。首页、花园与管理后台使用独立发布入口；生成游戏、Studio和恐龙源码保留但不上线。
+更新：2026-11-10。本文维护现有账号、权限、云存档和版本兼容契约。部署状态见[部署手册](../../../deploy/garden-site/README.md)，未完成事项见[维护说明](../../pinyin-garden.md#待办与验收边界)。首页、花园与管理后台使用独立发布入口；旧生成游戏、Studio和恐龙实验已从当前仓库移除。
 
 ## 1. 目标与边界
 
@@ -30,9 +30,9 @@
 - 根路径 `/` 保留 `web/src/pages/LearningHome.tsx` 的“挖机的学习小世界”，沿用 Waji、首页样式、减少动态设置及进入花园交互；不得替换为旧 `pages/Home.tsx`，不得直接重定向整个首页。
 - 首页公开可访问；进入花园后检查登录。已登录继续进入花园，未登录显示账号入口并保留合法返回位置。首页“识字乐园/数学乐园”可保留当前非交互预告，不增加未实现游戏链接。
 - 正式公开页面只有首页与拼音花园，外加业务必需的登录注册/重置页面和受权限保护的 `/admin/`。
-- 游戏创造相关 `App.tsx`、`pages/Home.tsx`、`Converse.tsx`、`Game.tsx`、作品API客户端，以及恐龙实验，不进入正式前端依赖图。不能只隐藏按钮而继续打包这些页面。
+- 前端仅保留首页、花园和后台；已移除旧生成游戏页面、作品API客户端和恐龙实验。
 - 后端不加载 GameModule、StudioModule、RescueModule、LLM模块；花园启动和健康检查不需要任何LLM环境变量，不访问模型端点。
-- 同仓库逻辑隔离，首版不搬到新仓库、不删除旧功能源码或作品数据。旧功能如需恢复开发使用独立开发入口，不复用线上根首页。
+- 当前仓库只保留正式网站；历史功能通过Git追溯，不改写旧数据库和用户数据。
 - 构建输出必须与旧全量构建分目录。使用已有的 `build:garden-site` 与 `start:garden-site`；生产流水线只使用这组专用命令。
 - 首页图像、Waji动态组件及必要资源也在发布白名单内，不能按“只有pinyin-garden文件夹”筛选而遗漏首页依赖。后台依赖不得拉入旧创造功能。
 - 数据库复用公共连接层，新增花园业务表；现有 game_record/game_version 不承担账号花园存档，首次花园部署不要求执行Studio建表迁移。
@@ -90,16 +90,14 @@
 ### 3.1 模块划分
 
 ```text
-GardenSiteModule（花园部署专用入口）
-  DatabaseModule
-  AuthModule         用户、会话、密码修改/重置、认证守卫
-  InvitationsModule 邀请码生成与注册时核销
-  GardenModule       三槽位、校验、版本控制、幂等写入
-  AdminModule        管理接口、审计
-  HealthController   最小健康检查
+GardenSiteModule
+  DatabaseModule / DatabaseService   连接池与事务
+  AuthService                       用户、会话、邀请码与管理员权限
+  GardenService                     三槽位、学习事件、校验、版本与幂等
+  SiteController                    认证、管理、花园与健康检查接口
 ```
 
-现有 AppModule 继续服务本地原项目。新增花园启动脚本和构建入口，不导入 GameModule、StudioModule、RescueModule 或 LLM 配置；仅靠隐藏前端入口不足以关闭旧 API。上线测试需验证这些旧 API 返回 404。
+`GardenSiteModule` 是唯一应用模块入口，直接使用 DatabaseModule、AuthService、GardenService 和 SiteController；不加载模型或旧业务模块。上线回归继续验证旧 API 返回404。
 
 ### 3.2 会话与权限
 
@@ -233,7 +231,7 @@ HTTPS 同域入口
 
 运行环境保留现有 Node >=20 的项目约束，但生产应选实施时受支持、依赖验证通过的 LTS；数据库现有本地文档为 MySQL 8.4，生产版本部署前确认。本文不引入 MySQL 5.7 兼容承诺，不新增 ORM。
 
-- 新增 `vite.garden.config.ts` 和花园专用构建脚本，输出独立目录（建议 `web/dist-garden`）。现有全项目构建继续可用。
+- 唯一配置 `web/vite.config.ts` 输出正式目录 `web/dist-garden`；`build` 与 `build:garden-site` 使用同一构建。
 - 创建独立公开目录或构建白名单，仅发布首页、花园、后台所需资源，不直接复制整个 `web/public`。
 - `web/public/design/` 评审稿、无关恐龙资源、原始素材、生成提示词来源文件默认不进入公开包；必要署名可整理为单独 credits 页面。
 - `/assets/*` 缺失应返回 404，不回退 HTML。hash 路由无需全路径 SPA fallback；为 `/`、`/garden/` 和 `/admin/` 配置明确入口。

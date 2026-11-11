@@ -10,11 +10,12 @@
     "type-check": "tsc -b --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build:garden-site": "tsc -b && vite build --config vite.garden.config.ts",
-    "dev:garden-site": "vite --config vite.garden.config.ts",
-    "preview:garden-site": "vite preview --config vite.garden.config.ts",
-    "test:garden-e2e": "playwright test --config playwright.garden.config.ts",
-    "test:resources": "playwright test --config playwright.resources.config.ts"
+    "build:garden-site": "npm run build",
+    "dev:garden-site": "vite",
+    "preview:garden-site": "vite preview",
+    "test:garden-e2e": "playwright test --project=accounts",
+    "test:resources": "playwright test --project=resources",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@children-games/shared": "*",

@@ -65,7 +65,13 @@ test('a one-file update reuses cached files and never mutates the running releas
 test('twenty entry/exit cycles release canvases, handles and decoded images',async({page})=>{
  test.setTimeout(120000);await garden(page);
  const memory=()=>page.evaluate(async()=>{const p='/src/resources/manager.ts';return (await import(p)).resources.diagnostics().memory;});const before=await memory();
- for(let i=0;i<20;i++){await depart(page);await expect(page.locator('canvas')).toHaveCount(1);await page.getByRole('button',{name:'回花园',exact:true}).click();await expect(page.locator('.adventure-home')).toBeVisible();await expect(page.locator('canvas')).toHaveCount(0);}
+ for(let i=0;i<20;i++){
+  await page.getByRole('button',{name:/出发守护|继续守护/}).click();
+  const start=page.getByRole('button',{name:'开始第一波',exact:true}),unlock=page.getByRole('button',{name:'点一下开启声音',exact:true});
+  // A browser may suspend a newly created audio context between scene cycles.
+  // Exercise the real unlock gesture before checking scene/memory cleanup.
+  await expect(start.or(unlock)).toBeVisible();if(await unlock.isVisible())await unlock.click();
+  await expect(start).toBeVisible();await expect(page.locator('canvas')).toHaveCount(1);await page.getByRole('button',{name:'回花园',exact:true}).click();await expect(page.locator('.adventure-home')).toBeVisible();await expect(page.locator('canvas')).toHaveCount(0);}
  const after=await memory();expect(after.blobs).toBe(before.blobs);expect(after.entries).toBeLessThanOrEqual(before.entries+1);
 });
 test('another tab can clear unused media without evicting an active battle',async({page,context})=>{

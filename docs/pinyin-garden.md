@@ -6,7 +6,7 @@
 
 正式网站保留学习首页 `/`、花园 `/garden/` 与后台 `/admin/`；使用 `npm run build:garden-site` 和 `npm run start:garden-site`。产物分别为 `web/dist-garden` 与 `server/dist/server/src/garden-main.js`。本机账号版用 `npm run local:garden`，配置见根README。生产部署与当前发布位置见[部署手册](../deploy/garden-site/README.md)。
 
-匿名试玩使用 `npm run dev:pinyin` 与 `/experiments/pinyin-garden/`。全仓库 `npm run build` 用于保留功能的兼容性验证，不作为网站发布目录。生成、对话、Studio和恐龙源码与原有数据保留，但花园网站不加载其模块和API。
+本地交互调试与资源浏览器测试复用 `/experiments/pinyin-garden/` 和匿名存储适配器；线上旧URL跳转到账号版。`npm run build` 和 `build:garden-site` 统一产出正式网站。旧生成/对话/Studio/恐龙代码与专属素材已移除，数据库迁移历史及存档兼容规则保留。Vite与Playwright分别只有一份配置；Playwright按accounts/resources项目分组。
 
 长期检查：
 

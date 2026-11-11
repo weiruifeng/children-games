@@ -1,6 +1,6 @@
 # 首页与花园部署
 
-生产环境参数来自私有环境文件或secret管理系统，不使用本地开发密码。当前源码仍保留旧功能，部署只使用本目录流程。
+生产环境参数来自私有环境文件或secret管理系统，不使用本地开发密码。当前仓库只维护正式花园网站，部署使用本目录流程。
 
 1. 在受支持Node环境安装依赖，运行 `npm ci`、`npm run build:garden-site`、`node scripts/check-garden-release.mjs`。
 2. 创建独立生产数据库。使用迁移凭据运行 `npm run migrate:garden`；应用账号只授予业务库DML，不授予DDL。不要运行旧Studio迁移代替花园迁移。

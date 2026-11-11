@@ -30,7 +30,7 @@ export function gardenResourcesPlugin(){
   const sourceFiles=[...await files(path.join(repo,'web/src')),...await files(path.join(repo,'shared/src'))].filter(s=>/\.(tsx?|css)$/.test(s)&&!s.includes('.test.'));
   const sourceHash=createHash('sha256');for(const file of sourceFiles){sourceHash.update(path.relative(repo,file));sourceHash.update(await readFile(file));}
   sourceHash.update(await readFile(fileURLToPath(import.meta.url)));
-  for(const name of ['package-lock.json','web/vite.garden.config.ts','web/index.html','web/garden/index.html','web/admin/index.html'])sourceHash.update(await readFile(path.join(repo,name)));
+  for(const name of ['package-lock.json','web/vite.config.ts','web/index.html','web/garden/index.html','web/admin/index.html'])sourceHash.update(await readFile(path.join(repo,name)));
   const contentSha256=contentDigest(await loadRuntimeLedger());sourceHash.update(contentSha256);
   const appBuildId=sourceHash.digest('hex').slice(0,20),releaseId=digest(JSON.stringify({resources,groups,appBuildId})).slice(0,24);
   const budgets={};for(const [name,group] of Object.entries(groups)){const unique=[...new Set(group.map(id=>resources[id].url))];budgets[name]={bytes:unique.reduce((n,url)=>n+media.get(url).length,0),decodedBytes:group.reduce((n,id)=>n+(resources[id].decodedBytes??0),0)};}

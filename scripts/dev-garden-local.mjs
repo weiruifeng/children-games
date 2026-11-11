@@ -29,7 +29,7 @@ try{
  let ready=false;for(let i=0;i<40&&!stopping;i++){try{const r=await fetch(env.GARDEN_API_TARGET+'/api/ready',{signal:AbortSignal.timeout(1000)});if(r.ok){ready=true;break;}}catch{}await new Promise(resolve=>setTimeout(resolve,250));}
  if(stopping)process.exit(process.exitCode??0);
  if(!ready)throw Error('本地API未能就绪，请检查数据库和端口');
- const web=run(process.execPath,['node_modules/vite/bin/vite.js','--config','web/vite.garden.config.ts','--host','127.0.0.1','--port',String(port),'--strictPort','web']);
+ const web=run(process.execPath,['node_modules/vite/bin/vite.js','--config','web/vite.config.ts','--host','127.0.0.1','--port',String(port),'--strictPort','web']);
  web.on('error',e=>{console.error(e.message);stop(1);});web.on('exit',code=>{if(!stopping)stop(code||1);});
  console.log(`\n花园本地入口：${origin}/\n管理后台：${origin}/admin/\n按 Ctrl+C 停止前后端。\n`);
 }catch(e){console.error(e.message);stop(1);}

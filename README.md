@@ -4,7 +4,7 @@
 
 ## 本机一键启动
 
-先切到包含账号/云存档实现的 `feature/20261108-server` 分支，使用Node24和本机MySQL。首次配置把 `deploy/garden-site/local.env.example` 复制到仓库根 `.env.garden.local`，填写本地凭据并创建同名空数据库；该文件已被Git忽略。
+使用Node24和本机MySQL。首次配置把 `deploy/garden-site/local.env.example` 复制到仓库根 `.env.garden.local`，填写本地凭据并创建同名空数据库；该文件已被Git忽略。
 
 ```bash
 npm run local:garden
@@ -34,7 +34,7 @@ npm run start:garden-site
 
 另一个终端运行 `npm run dev:garden-site`，打开 `http://localhost:5173/`。本地API默认3009端口；`PUBLIC_ORIGIN`须与浏览器实际origin完全一致。管理员登录 `/admin/` 发码，普通用户在 `/garden/` 注册。部署时使用HTTPS同域代理，生产Cookie才设置Secure。
 
-仅维护旧匿名试玩版时可运行 `npm run dev:web` 或 `npm run dev:pinyin`，地址为 `/experiments/pinyin-garden/`；这份匿名档仍只在浏览器，网站版可以显式导入它，不自动删除。
+本地调试游戏交互时可运行 `npm run dev:web` 或 `npm run dev:pinyin`，地址为 `/experiments/pinyin-garden/`；这份匿名档仍只在浏览器，网站版可以显式导入它，不自动删除。
 
 ## 验证与发布
 
@@ -48,7 +48,7 @@ npm run build:garden-site
 node scripts/check-garden-release.mjs
 ```
 
-发布前端目录是 `web/dist-garden`，后端入口是 `server/dist/server/src/garden-main.js`。全仓库 `npm run build` 仍用于保留代码回归，包含其他实验，不能把它的 `web/dist` 当作网站上线目录。
+`npm run build` 与 `npm run build:garden-site` 使用同一正式构建：前端输出 `web/dist-garden`，后端入口为 `server/dist/server/src/garden-main.js`。Vite仅保留 `web/vite.config.ts`。
 
 可复用浏览器测试：`npm run test:garden-e2e -w web`。使用测试管理员环境变量或私有 `GARDEN_E2E_ADMIN_FILE`；首次安装浏览器运行 `npx playwright install chromium`。CI通过仅允许测试库的seed脚本创建临时管理员，不写入生产默认密码。
 
@@ -60,9 +60,11 @@ node scripts/check-garden-release.mjs
 - [花园维护说明](docs/pinyin-garden.md)、[玩法Spec](docs/specs/pinyin-garden/spec.md)。
 - [题库来源与覆盖](docs/specs/pinyin-garden/content-inventory/README.md)：审核原始证据及许可证，保留在仓库。
 
-## 保留但不上线的代码
+## 仓库范围
 
-游戏创造、对话、Studio和恐龙实验保留源码与原有数据。网站专用构建及GardenSiteModule不加载这些模块；旧生成、对话、作品接口为404。只有维护这些旧功能时才涉及模型配置及 [Studio数据库说明](docs/local-mysql.md)、[恐龙复用说明](docs/opengame-rescue-pilot.md)。
+仅维护学习首页、拼音花园、账号云存档和后台。旧生成游戏、对话、Studio及恐龙实验代码和专属素材已移除，历史可通过Git追溯；既有数据库迁移文件和用户数据不删除。旧API继续返回404。
+
+浏览器回归统一使用 `web/playwright.config.ts`：`npm run test:resources -w web` 检查资源/露珠/动画；`npm run test:garden-e2e -w web` 检查账号/云存档，后者需要隔离测试库与测试管理员。设置 `GARDEN_E2E_START=1` 可启动本地测试API；未指定外部地址时测试前端自动使用localhost:5194。匿名调试入口不进入公开运行页面，生产旧URL跳转到 `/garden/`。
 
 当前已有HTTPS IP发布记录；域名备案、独立备份/告警和真机验收等剩余事项见[维护待办](docs/pinyin-garden.md#待办与验收边界)。
 

@@ -20,7 +20,10 @@ test('invitation, account isolation, cloud reload and animation feedback',async(
  const button=p.getByRole('button',{name:'关闭',exact:true});await button.hover();await p.mouse.down();await p.waitForTimeout(150);expect(await button.evaluate(e=>getComputedStyle(e).transform)).not.toBe('none');await p.mouse.up();
  await p.emulateMedia({reducedMotion:'reduce'});await p.getByRole('button',{name:'设置',exact:true}).click();await p.getByRole('button',{name:'账号与进度',exact:true}).click();expect(await p.locator('.account-panel').evaluate(e=>getComputedStyle(e).animationName)).toBe('none');await p.getByRole('button',{name:'关闭',exact:true}).click();
  await p.getByRole('button',{name:'出发守护',exact:true}).click();await p.getByRole('button',{name:'开始第一波'}).click();await p.getByRole('button',{name:'暂停',exact:true}).click();await expect.poll(async()=>p.evaluate(async()=> (await (await fetch('/api/garden/profiles/1')).json()).profile?.checkpoint?.stage),{timeout:20000}).toBe('playing');
- await p.reload();await expect(p.getByRole('heading',{name:'休息一下'})).toBeVisible();
+ await p.reload();
+ const paused=p.getByRole('heading',{name:'休息一下'}),unlock=p.getByRole('button',{name:'点一下开启声音',exact:true});
+ await expect(paused.or(unlock)).toBeVisible();if(await unlock.isVisible())await unlock.click();
+ await expect(paused).toBeVisible();
  const second=await browser.newContext(),p2=await second.newPage();await p2.goto('/garden/');await login(p2,user);await expect(p2.locator('.garden-app')).toBeVisible();const after=await p2.evaluate(async()=> (await (await fetch('/api/garden/profiles/1')).json()).profile);expect(after.name).toBe(before.name);
  await second.close();await device.close();
  const capacity=await browser.newContext(),large=await capacity.newPage();await large.goto('/');
